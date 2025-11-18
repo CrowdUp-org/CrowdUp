@@ -223,29 +223,29 @@ export default function Home() {
             <div className="mb-6 relative">
               <button
                 onClick={() => setShowSortMenu(!showSortMenu)}
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-3 py-1.5 text-sm font-medium hover:from-yellow-500 hover:to-orange-600 transition-all shadow-lg shadow-orange-500/30"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] text-white px-4 py-2 text-sm font-medium hover:from-[#FF8400] hover:to-[#FF7300] transition-all shadow-lg shadow-orange-500/30 hover:scale-105"
               >
                 Sort by: {sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
                 <ChevronDown className="h-4 w-4" />
               </button>
               
               {showSortMenu && (
-                <div className="absolute top-full mt-2 bg-white rounded-lg shadow-lg border z-10">
+                <div className="absolute top-full mt-2 bg-white rounded-xl shadow-lg border z-10 overflow-hidden">
                   <button
                     onClick={() => { setSortBy("featured"); setShowSortMenu(false); }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-50 rounded-t-lg"
+                    className="block w-full text-left px-4 py-2.5 hover:bg-[#E1E1E1]/30 text-[#020202] transition-colors"
                   >
                     Featured
                   </button>
                   <button
                     onClick={() => { setSortBy("new"); setShowSortMenu(false); }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-50"
+                    className="block w-full text-left px-4 py-2.5 hover:bg-[#E1E1E1]/30 text-[#020202] transition-colors"
                   >
                     New
                   </button>
                   <button
                     onClick={() => { setSortBy("top"); setShowSortMenu(false); }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-50 rounded-b-lg"
+                    className="block w-full text-left px-4 py-2.5 hover:bg-[#E1E1E1]/30 text-[#020202] transition-colors"
                   >
                     Top
                   </button>
@@ -254,11 +254,11 @@ export default function Home() {
             </div>
 
             {formattedPosts.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border">
-                <p className="text-gray-600 mb-4">No posts yet. Be the first to share!</p>
+              <div className="text-center py-12 bg-white rounded-2xl border shadow-sm">
+                <p className="text-[#717182] mb-4">No posts yet. Be the first to share!</p>
                 <Button
                   onClick={() => window.location.href = "/create"}
-                  className="rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-orange-500/30"
+                  className="rounded-xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] text-white hover:from-[#FF8400] hover:to-[#FF7300] shadow-lg shadow-orange-500/30 hover:scale-105 transition-all"
                 >
                   Create Post
                 </Button>
@@ -275,7 +275,7 @@ export default function Home() {
                       onClick={loadMore}
                       variant="outline" 
                       size="lg" 
-                      className="rounded-full px-8 hover:bg-gradient-to-br hover:from-yellow-400 hover:to-orange-500 hover:text-white hover:border-transparent border-gray-300 transition-all shadow-lg hover:shadow-orange-500/30"
+                      className="rounded-xl px-8 hover:bg-gradient-to-r hover:from-[#FF992B] hover:to-[#FF8400] hover:text-white hover:border-transparent border-gray-300 transition-all shadow-sm hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105"
                     >
                       Load More Posts
                     </Button>

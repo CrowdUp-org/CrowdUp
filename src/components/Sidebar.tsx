@@ -67,21 +67,21 @@ export default function Sidebar() {
   return (
     <div className="space-y-4 sticky top-24">
       {/* Community Feed */}
-      <div className="rounded-2xl bg-orange-50 p-5 border border-orange-100">
+      <div className="rounded-2xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] p-5 shadow-lg shadow-orange-500/20">
         <div className="flex items-center gap-2 mb-2">
-          <TrendingUp className="h-5 w-5 text-orange-500" />
-          <h3 className="font-semibold text-base text-gray-900">Community Feed</h3>
+          <TrendingUp className="h-5 w-5 text-white" />
+          <h3 className="font-semibold text-base text-white">Community Feed</h3>
         </div>
-        <p className="text-sm text-gray-600 leading-relaxed">
+        <p className="text-sm text-white/90 leading-relaxed">
           Latest feedback and suggestions from the community
         </p>
       </div>
 
       {/* Trending Groups */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="h-5 w-5 text-orange-500" />
-          <h3 className="font-semibold text-base text-gray-900">Trending Group</h3>
+          <TrendingUp className="h-5 w-5 text-[#FF8400]" />
+          <h3 className="font-semibold text-base text-[#020202]">Trending Group</h3>
         </div>
         
         <div className="space-y-3">
@@ -90,18 +90,18 @@ export default function Sidebar() {
               <button
                 key={company.name}
                 onClick={() => router.push(`/company/${company.id}`)}
-                className="w-full flex items-center justify-between hover:bg-gray-50 p-2 -mx-2 rounded-lg transition-colors"
+                className="w-full flex items-center justify-between hover:bg-[#E1E1E1]/30 p-2 -mx-2 rounded-xl transition-all hover:scale-[1.02]"
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                    className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md"
                     style={{ backgroundColor: company.color }}
                   >
                     {company.initial}
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-sm text-gray-900">{company.name}</p>
-                    <p className="text-xs text-gray-500">{company.followers}</p>
+                    <p className="font-medium text-sm text-[#020202]">{company.name}</p>
+                    <p className="text-xs text-[#717182]">{company.followers}</p>
                   </div>
                 </div>
               </button>
@@ -113,24 +113,24 @@ export default function Sidebar() {
       </div>
 
       {/* Community Stats */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex items-center gap-2 mb-4">
-          <Users className="h-5 w-5 text-orange-500" />
-          <h3 className="font-semibold text-base text-gray-900">Community</h3>
+          <Users className="h-5 w-5 text-[#FF8400]" />
+          <h3 className="font-semibold text-base text-[#020202]">Community</h3>
         </div>
         
         <div className="space-y-2.5">
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-sm text-gray-600">Total Users</span>
-            <span className="font-semibold text-gray-900">{stats.users}</span>
+            <span className="text-sm text-[#717182]">Total Users</span>
+            <span className="font-semibold text-[#020202]">{stats.users}</span>
           </div>
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-sm text-gray-600">Total Posts</span>
-            <span className="font-semibold text-gray-900">{stats.posts}</span>
+            <span className="text-sm text-[#717182]">Total Posts</span>
+            <span className="font-semibold text-[#020202]">{stats.posts}</span>
           </div>
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-sm text-gray-600">Companies</span>
-            <span className="font-semibold text-gray-900">{stats.companies}</span>
+            <span className="text-sm text-[#717182]">Companies</span>
+            <span className="font-semibold text-[#020202]">{stats.companies}</span>
           </div>
         </div>
       </div>

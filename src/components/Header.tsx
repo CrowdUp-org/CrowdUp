@@ -14,6 +14,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { signOut } from "@/lib/auth";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
   const router = useRouter();
@@ -44,11 +45,12 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl rounded-2xl border transition-all duration-300 ${
+      className={cn(
+        "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl rounded-2xl transition-all duration-300",
         scrolled
           ? "bg-white/80 backdrop-blur-xl shadow-lg shadow-black/5"
-          : "bg-white/95 backdrop-blur-sm shadow-md"
-      }`}
+          : "glass-effect shadow-md"
+      )}
     >
       <div className="flex items-center justify-between px-8 py-3.5">
         {/* Logo */}
@@ -57,10 +59,10 @@ export default function Header() {
           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <div className="flex items-center gap-1">
-            <span className="text-2xl font-bold text-black">Crowd</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Up</span>
+            <span className="text-2xl font-bold text-[#020202]">Crowd</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-[#FF992B] to-[#FF8400] bg-clip-text text-transparent">Up</span>
           </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 transition-transform hover:scale-110 shadow-lg shadow-orange-500/30">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] transition-transform hover:scale-110 shadow-[0_0_30px_rgba(255,133,0,0.3)]">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -79,14 +81,15 @@ export default function Header() {
         </button>
 
         {/* Navigation Icons - Container with better spacing */}
-        <nav className="flex items-center gap-4 rounded-2xl bg-gray-50/80 px-6 py-2.5 border border-gray-200/80 backdrop-blur-sm">
+        <nav className="flex items-center gap-4 rounded-2xl bg-[#909090] px-6 py-2.5 shadow-[0_0_28px_rgba(144,144,144,0.6)]">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.push("/")}
-            className={`rounded-xl transition-all hover:scale-105 h-10 w-10 ${
-              isActive("/") ? "bg-gray-300 text-gray-900 hover:bg-gray-400" : "hover:bg-gray-200"
-            }`}
+            className={cn(
+              "rounded-xl transition-all hover:scale-105 h-10 w-10 focus-ring",
+              isActive("/") ? "bg-[#808080] text-white hover:bg-[#707070]" : "hover:bg-[#808080] text-white hover:text-white"
+            )}
           >
             <Home className="h-5 w-5" />
           </Button>
@@ -94,9 +97,10 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={() => router.push("/search")}
-            className={`rounded-xl transition-all hover:scale-105 h-10 w-10 ${
-              isActive("/search") ? "bg-gray-300 text-gray-900 hover:bg-gray-400" : "hover:bg-gray-200"
-            }`}
+            className={cn(
+              "rounded-xl transition-all hover:scale-105 h-10 w-10 focus-ring",
+              isActive("/search") ? "bg-[#808080] text-white hover:bg-[#707070]" : "hover:bg-[#808080] text-white hover:text-white"
+            )}
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -104,7 +108,7 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={() => router.push("/create")}
-            className="rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 transition-all hover:scale-105 shadow-lg shadow-orange-500/30 h-10 w-10"
+            className="rounded-xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] text-white hover:from-[#FF8400] hover:to-[#FF7300] transition-all hover:scale-105 shadow-lg shadow-orange-500/30 h-10 w-10 focus-ring"
           >
             <Plus className="h-5 w-5" />
           </Button>
@@ -112,9 +116,10 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={() => router.push("/messages")}
-            className={`rounded-xl transition-all hover:scale-105 h-10 w-10 ${
-              isActive("/messages") ? "bg-gray-300 text-gray-900 hover:bg-gray-400" : "hover:bg-gray-200"
-            }`}
+            className={cn(
+              "rounded-xl transition-all hover:scale-105 h-10 w-10 focus-ring",
+              isActive("/messages") ? "bg-[#808080] text-white hover:bg-[#707070]" : "hover:bg-[#808080] text-white hover:text-white"
+            )}
           >
             <MessageCircle className="h-5 w-5" />
           </Button>
@@ -128,9 +133,10 @@ export default function Header() {
                 router.push("/auth/signin");
               }
             }}
-            className={`rounded-xl transition-all hover:scale-105 h-10 w-10 ${
-              pathname.startsWith("/profile") ? "bg-gray-300 text-gray-900 hover:bg-gray-400" : "hover:bg-gray-200"
-            }`}
+            className={cn(
+              "rounded-xl transition-all hover:scale-105 h-10 w-10 focus-ring",
+              pathname.startsWith("/profile") ? "bg-[#808080] text-white hover:bg-[#707070]" : "hover:bg-[#808080] text-white hover:text-white"
+            )}
           >
             <User className="h-5 w-5" />
           </Button>
@@ -145,7 +151,7 @@ export default function Header() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-xl transition-all hover:scale-105 hover:bg-gray-100 h-10 w-10 relative"
+                  className="rounded-xl transition-all hover:scale-105 hover:bg-gray-100 h-10 w-10 relative focus-ring"
                 >
                   <Bell className="h-5 w-5" />
                   {/* Notification badge */}
@@ -169,9 +175,9 @@ export default function Header() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2.5 rounded-xl hover:bg-gray-100 transition-all px-3 py-2 h-auto">
-                  <Avatar className="h-9 w-9 bg-gradient-to-br from-yellow-400 to-orange-500 ring-2 ring-orange-200 transition-all hover:ring-4">
-                    <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
+                <Button variant="ghost" className="flex items-center gap-2.5 rounded-xl hover:bg-gray-100/50 transition-all px-3 py-2 h-auto focus-ring">
+                  <Avatar className="h-9 w-9 bg-gradient-to-r from-[#FF992B] to-[#FF8400] ring-2 ring-orange-200 transition-all hover:ring-4">
+                    <AvatarFallback className="bg-gradient-to-r from-[#FF992B] to-[#FF8400] text-white font-semibold">
                       {user.display_name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -209,7 +215,7 @@ export default function Header() {
           ) : (
             <Button
               onClick={() => router.push("/auth/signin")}
-              className="rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-orange-500/30"
+              className="rounded-xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] text-white hover:from-[#FF8400] hover:to-[#FF7300] shadow-lg shadow-orange-500/30 transition-all hover:scale-105 focus-ring"
             >
               Sign In
             </Button>

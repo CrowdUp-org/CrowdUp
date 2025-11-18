@@ -66,8 +66,8 @@ export default function PodiumView({ posts }: PodiumViewProps) {
           onClick={() => router.push(`/post/${post.postId}`)}
           className={cn(
             "relative flex flex-col rounded-2xl border bg-white p-5 cursor-pointer transition-all hover:scale-105 hover:shadow-xl w-full",
-            "h-64 border-gray-200 shadow-md",
-            "hover:-translate-y-1"
+            "h-64 border-gray-200 shadow-md hover:shadow-2xl",
+            "hover:-translate-y-1 hover:border-gray-300"
           )}
         >
           {/* Content */}
@@ -99,18 +99,18 @@ export default function PodiumView({ posts }: PodiumViewProps) {
               </div>
 
               {/* Title */}
-              <h3 className="font-bold text-base text-gray-900 leading-tight mb-3 line-clamp-3">
+              <h3 className="font-bold text-base text-[#020202] leading-tight mb-3 line-clamp-3">
                 {post.title}
               </h3>
             </div>
 
             {/* Votes */}
             <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
-              <TrendingUp className="h-5 w-5 flex-shrink-0 text-green-600" />
-              <span className="text-2xl font-bold text-green-600">
+              <TrendingUp className="h-5 w-5 flex-shrink-0 text-[#FF8400]" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-[#FF992B] to-[#FF8400] bg-clip-text text-transparent">
                 {post.votes}
               </span>
-              <span className="text-sm text-gray-500 ml-1 whitespace-nowrap">votes</span>
+              <span className="text-sm text-[#717182] ml-1 whitespace-nowrap">votes</span>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@ export default function PodiumView({ posts }: PodiumViewProps) {
         {/* Podium Base - Same color for all */}
         <div className={cn(
           "w-full rounded-b-xl shadow-lg mt-2 flex items-center justify-center font-bold text-lg transition-all",
-          "bg-gradient-to-b from-orange-100 to-orange-200 text-gray-700",
+          "bg-gradient-to-b from-[#FF992B]/20 to-[#FF8400]/30 text-[#020202]",
           podiumHeights[position]
         )}>
           <span className="opacity-70">#{post.rank}</span>
@@ -131,12 +131,12 @@ export default function PodiumView({ posts }: PodiumViewProps) {
     <div className="mb-8">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 shadow-lg shadow-orange-500/30">
+        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] shadow-lg shadow-orange-500/30">
           <Trophy className="h-6 w-6 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Top Posts This Week</h2>
-          <p className="text-sm text-gray-600">Most upvoted posts by the community</p>
+          <h2 className="text-2xl font-bold text-[#020202]">Top Posts This Week</h2>
+          <p className="text-sm text-[#717182]">Most upvoted posts by the community</p>
         </div>
       </div>
 

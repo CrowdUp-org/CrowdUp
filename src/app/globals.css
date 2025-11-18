@@ -125,6 +125,59 @@
   }
 }
 
+/* Design System Custom Utilities */
+@layer utilities {
+  /* Glassmorphism Effect with fallback */
+  .glass-effect {
+    background: rgb(225, 225, 225);
+    background: rgba(225, 225, 225, 0.3);
+    @supports (backdrop-filter: blur(5.51px)) {
+      backdrop-filter: blur(5.51px);
+      -webkit-backdrop-filter: blur(5.51px);
+    }
+  }
+  
+  /* Accessible text colors */
+  .text-gray-accessible {
+    color: #565656; /* 4.5:1 contrast ratio */
+  }
+  
+  /* Focus styles for accessibility */
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2;
+  }
+  
+  /* Primary Gradient */
+  .gradient-primary {
+    background: linear-gradient(90deg, #FF992B 0%, #FF8400 100%);
+  }
+  
+  /* Navigation Shadow */
+  .nav-shadow {
+    box-shadow: 0 0 28px rgba(144, 144, 144, 1);
+  }
+  
+  /* Logo Glow */
+  .logo-glow {
+    box-shadow: 0 0 30px rgba(255, 133, 0, 0.3);
+  }
+  
+  /* Button Gradient Hover */
+  .btn-gradient-hover:hover {
+    background: linear-gradient(90deg, #FF8400 0%, #FF7300 100%);
+  }
+}
+
+/* Design System Color Variables */
+:root {
+  --color-primary-orange-start: #FF992B;
+  --color-primary-orange-end: #FF8400;
+  --color-neutral-dark: #020202;
+  --color-nav-gray: #909090;
+  --color-icon-gray: #717182;
+  --color-glass-bg: rgba(225, 225, 225, 0.3);
+}
+
 /* Hide Next.js error overlay portal */
 nextjs-portal {
   display: none !important;

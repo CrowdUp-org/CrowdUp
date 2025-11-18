@@ -45,11 +45,11 @@ export const SidePanel = () => {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-          <h2 className="text-base font-semibold text-gray-900">Sidebar</h2>
+          <h2 className="text-base font-semibold text-[#020202]">Sidebar</h2>
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 rounded-lg hover:bg-gray-100" 
+            className="h-8 w-8 rounded-xl hover:bg-[#E1E1E1]/30 text-[#717182] hover:text-[#020202] transition-all" 
             onClick={() => setOpen(false)}
           >
             <X className="h-5 w-5" />
@@ -59,21 +59,21 @@ export const SidePanel = () => {
         {/* Body */}
         <div className="overflow-y-auto h-[calc(100vh-65px)] p-5 space-y-4">
           {/* Community Feed */}
-          <div className="rounded-2xl bg-orange-50 p-5 border border-orange-100">
+          <div className="rounded-2xl bg-gradient-to-r from-[#FF992B] to-[#FF8400] p-5 shadow-lg shadow-orange-500/20">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-5 w-5 text-orange-500" />
-              <h3 className="font-semibold text-base text-gray-900">Community Feed</h3>
+              <TrendingUp className="h-5 w-5 text-white" />
+              <h3 className="font-semibold text-base text-white">Community Feed</h3>
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-white/90 leading-relaxed">
               Latest feedback and suggestions from the community
             </p>
           </div>
 
           {/* Trending Groups */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="h-5 w-5 text-orange-500" />
-              <h3 className="font-semibold text-base text-gray-900">Trending Group</h3>
+              <TrendingUp className="h-5 w-5 text-[#FF8400]" />
+              <h3 className="font-semibold text-base text-[#020202]">Trending Group</h3>
             </div>
             
             <div className="space-y-3">
@@ -84,17 +84,17 @@ export const SidePanel = () => {
                     router.push(`/company/${group.id}`);
                     setOpen(false);
                   }}
-                  className="w-full flex items-center justify-between hover:bg-gray-50 p-2 -mx-2 rounded-lg transition-colors"
+                  className="w-full flex items-center justify-between hover:bg-[#E1E1E1]/30 p-2 -mx-2 rounded-xl transition-all hover:scale-[1.02]"
                 >
                   <div className="flex items-center gap-3">
-                    <Avatar className={`h-10 w-10 ${group.color}`}>
+                    <Avatar className={`h-10 w-10 ${group.color} shadow-md`}>
                       <AvatarFallback className={`${group.color} text-white font-semibold text-sm`}>
                         {group.initial}
                       </AvatarFallback>
                     </Avatar>
                     <div className="text-left">
-                      <p className="font-medium text-sm text-gray-900">{group.name}</p>
-                      <p className="text-xs text-gray-500">{group.followers} followers</p>
+                      <p className="font-medium text-sm text-[#020202]">{group.name}</p>
+                      <p className="text-xs text-[#717182]">{group.followers} followers</p>
                     </div>
                   </div>
                   <span className="text-sm font-semibold text-green-600">{group.growth}</span>
@@ -104,24 +104,24 @@ export const SidePanel = () => {
           </div>
 
           {/* Community Stats */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <Users className="h-5 w-5 text-orange-500" />
-              <h3 className="font-semibold text-base text-gray-900">Community</h3>
+              <Users className="h-5 w-5 text-[#FF8400]" />
+              <h3 className="font-semibold text-base text-[#020202]">Community</h3>
             </div>
             
             <div className="space-y-2.5">
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-sm text-gray-600">Active Users</span>
-                <span className="font-semibold text-gray-900">24.7K</span>
+                <span className="text-sm text-[#717182]">Active Users</span>
+                <span className="font-semibold text-[#020202]">24.7K</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-sm text-gray-600">Posts Today</span>
-                <span className="font-semibold text-gray-900">156</span>
+                <span className="text-sm text-[#717182]">Posts Today</span>
+                <span className="font-semibold text-[#020202]">156</span>
               </div>
               <div className="flex items-center justify-between py-1.5">
-                <span className="text-sm text-gray-600">Companies</span>
-                <span className="font-semibold text-gray-900">847</span>
+                <span className="text-sm text-[#717182]">Companies</span>
+                <span className="font-semibold text-[#020202]">847</span>
               </div>
             </div>
           </div>

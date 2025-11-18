@@ -161,7 +161,7 @@ export default function PostCard({
   return (
     <div 
       onClick={handlePostClick}
-      className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-all cursor-pointer"
+      className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-lg transition-all cursor-pointer hover:border-gray-300"
     >
       <div className="flex items-start gap-4">
         {/* Vote Section */}
@@ -171,16 +171,19 @@ export default function PostCard({
             size="icon" 
             onClick={(e) => handleVote("up", e)}
             className={cn(
-              "h-7 w-7 rounded-md hover:bg-gray-100",
-              userVote === "up" && "text-green-600"
+              "h-8 w-8 rounded-xl transition-all hover:scale-110",
+              userVote === "up" 
+                ? "bg-gradient-to-r from-[#FF992B] to-[#FF8400] text-white hover:from-[#FF8400] hover:to-[#FF7300]" 
+                : "hover:bg-[#E1E1E1]/30 text-[#717182] hover:text-[#020202]"
             )}
           >
             <ChevronUp className="h-5 w-5" />
           </Button>
           <span className={cn(
-            "text-base font-semibold tabular-nums py-0.5",
-            userVote === "up" && "text-green-600",
-            userVote === "down" && "text-red-600"
+            "text-base font-semibold tabular-nums py-1",
+            userVote === "up" && "text-[#FF8400]",
+            userVote === "down" && "text-red-600",
+            !userVote && "text-[#020202]"
           )}>
             {votes}
           </span>
@@ -189,8 +192,10 @@ export default function PostCard({
             size="icon" 
             onClick={(e) => handleVote("down", e)}
             className={cn(
-              "h-7 w-7 rounded-md hover:bg-gray-100",
-              userVote === "down" && "text-red-600"
+              "h-8 w-8 rounded-xl transition-all hover:scale-110",
+              userVote === "down" 
+                ? "bg-red-500 text-white hover:bg-red-600" 
+                : "hover:bg-[#E1E1E1]/30 text-[#717182] hover:text-[#020202]"
             )}
           >
             <ChevronDown className="h-5 w-5" />
@@ -226,12 +231,12 @@ export default function PostCard({
           </div>
 
           {/* Title */}
-          <h3 className="text-base font-semibold mb-2 text-gray-900 leading-snug">
+          <h3 className="text-base font-semibold mb-2 text-[#020202] leading-snug">
             {title}
           </h3>
 
           {/* Description */}
-          <p className="text-sm text-gray-600 mb-3 leading-relaxed line-clamp-3">
+          <p className="text-sm text-[#717182] mb-3 leading-relaxed line-clamp-3">
             {description}
           </p>
 
@@ -245,19 +250,19 @@ export default function PostCard({
               className="flex items-center gap-2 hover:opacity-70 transition-opacity"
             >
               <Avatar className="h-5 w-5">
-                <AvatarFallback className="bg-gray-200 text-[10px] font-medium">
+                <AvatarFallback className="bg-[#E1E1E1] text-[10px] font-medium text-[#020202]">
                   {authorInitial}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-600">{author}</span>
-              <span className="text-sm text-gray-400">• {timestamp}</span>
+              <span className="text-sm text-[#717182]">{author}</span>
+              <span className="text-sm text-[#717182]/60">• {timestamp}</span>
             </button>
 
             <div className="flex items-center gap-1">
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="gap-1.5 h-8 px-2.5 text-gray-600 hover:bg-gray-100"
+                className="gap-1.5 h-8 px-2.5 text-[#717182] hover:bg-[#E1E1E1]/30 hover:text-[#020202] rounded-xl transition-all"
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePostClick();
@@ -269,7 +274,7 @@ export default function PostCard({
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-8 w-8 text-gray-600 hover:bg-gray-100"
+                className="h-8 w-8 text-[#717182] hover:bg-[#E1E1E1]/30 hover:text-[#020202] rounded-xl transition-all"
                 onClick={handleShare}
               >
                 <Share2 className="h-4 w-4" />
@@ -282,7 +287,7 @@ export default function PostCard({
         <Button 
           variant="ghost" 
           size="icon" 
-          className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
+          className="h-8 w-8 text-[#717182] hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
           onClick={handleReport}
           title="Report post"
         >

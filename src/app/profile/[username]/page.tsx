@@ -27,6 +27,7 @@ interface UserProfile {
   username: string;
   display_name: string;
   bio: string | null;
+  avatar_url: string | null;
   created_at: string;
 }
 
@@ -77,7 +78,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     // Fetch user profile
     const { data: userData, error: userError } = await supabase
       .from("users")
-      .select("id, username, display_name, bio, created_at")
+      .select("id, username, display_name, bio, avatar_url, created_at")
       .eq("username", username)
       .single();
 
@@ -203,9 +204,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-start gap-6">
               <Avatar className="h-24 w-24 bg-gradient-to-br from-yellow-400 to-orange-500 ring-4 ring-orange-200">
-                <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-3xl font-bold">
-                  {profile.display_name.charAt(0).toUpperCase()}
-                </AvatarFallback>
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt={profile.display_name} className="h-full w-full object-cover rounded-full" />
+                ) : (
+                  <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-3xl font-bold">
+                    {profile.display_name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                )}
               </Avatar>
               <div>
                 <h1 className="text-3xl font-bold mb-1">{profile.display_name}</h1>

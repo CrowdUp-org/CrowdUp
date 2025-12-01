@@ -12,31 +12,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CompanySelect } from "@/components/ui/company-select";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Send } from "lucide-react";
+import { Send, AlertCircle, Lightbulb, Bug, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUserId } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
-const COMPANY_COLORS: Record<string, string> = {
-  instagram: "#E1306C",
-  whatsapp: "#25D366",
-  spotify: "#1DB954",
-  discord: "#5865F2",
-  netflix: "#E50914",
-  twitter: "#1DA1F2",
-};
+const postTypes = [
+  { value: "bug", label: "Bug Report", icon: Bug, color: "bg-red-50 border-red-200 text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-300", description: "Report something that's broken" },
+  { value: "feature", label: "Feature Request", icon: Lightbulb, color: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300", description: "Suggest a new feature" },
+  { value: "complaint", label: "Complaint", icon: AlertCircle, color: "bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300", description: "Voice your concerns" },
+];
 
 export default function CreatePostPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     type: "",
     company: "",
+    companyColor: "",
     title: "",
     description: "",
+    priority: "medium",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [charCount, setCharCount] = useState(0);
 
   useEffect(() => {
     const userId = getCurrentUserId();
@@ -71,11 +73,13 @@ export default function CreatePostPage() {
     const { error: insertError } = await supabase.from("posts").insert({
       user_id: userId,
       type: typeMap[formData.type] as "Bug Report" | "Feature Request" | "Complaint",
-      company: formData.company.charAt(0).toUpperCase() + formData.company.slice(1),
-      company_color: COMPANY_COLORS[formData.company] || "#000000",
+      company: formData.company,
+      company_color: formData.companyColor || "#6B7280",
       title: formData.title,
       description: formData.description,
-    });
+      priority: formData.priority,
+      status: "open",
+    } as any);
 
     if (insertError) {
       setError("Failed to create post. Please try again.");
@@ -88,12 +92,12 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header />
-      <main className="mx-auto max-w-3xl px-6 pt-24 pb-8">
-        <div className="bg-white rounded-2xl border shadow-sm p-8">
-          <h1 className="text-3xl font-bold mb-2">Create a Post</h1>
-          <p className="text-gray-600 mb-8">Share your feedback with the community</p>
+      <main className="mx-auto max-w-3xl px-4 sm:px-6 pt-24 pb-8">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Create a Post</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">Share your feedback with the community</p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
@@ -102,46 +106,64 @@ export default function CreatePostPage() {
               </div>
             )}
 
-            {/* Post Type */}
+            {/* Post Type - Visual Cards */}
             <div>
-              <Label htmlFor="type" className="text-base font-semibold mb-2 block">
-                Post Type
+              <Label className="text-base font-semibold mb-3 block text-gray-900 dark:text-gray-100">
+                What type of feedback?
               </Label>
-              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Select post type..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bug">🐛 Bug Report</SelectItem>
-                  <SelectItem value="feature">💡 Feature Request</SelectItem>
-                  <SelectItem value="complaint">⚠️ Complaint</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {postTypes.map((type) => {
+                  const Icon = type.icon;
+                  const isSelected = formData.type === type.value;
+                  return (
+                    <button
+                      key={type.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: type.value })}
+                      className={cn(
+                        "relative flex flex-col items-center p-4 rounded-xl border-2 transition-all text-center",
+                        isSelected
+                          ? "border-orange-500 bg-orange-50 dark:bg-orange-950 ring-2 ring-orange-500/20"
+                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-900"
+                      )}
+                    >
+                      <div className={cn(
+                        "h-10 w-10 rounded-lg flex items-center justify-center mb-2",
+                        type.color
+                      )}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{type.label}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{type.description}</span>
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 h-5 w-5 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Company */}
+            {/* Company - Autocomplete */}
             <div>
-              <Label htmlFor="company" className="text-base font-semibold mb-2 block">
+              <Label className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100">
                 Company/App
               </Label>
-              <Select value={formData.company} onValueChange={(value) => setFormData({ ...formData, company: value })}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Select company..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="instagram">Instagram</SelectItem>
-                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                  <SelectItem value="spotify">Spotify</SelectItem>
-                  <SelectItem value="discord">Discord</SelectItem>
-                  <SelectItem value="netflix">Netflix</SelectItem>
-                  <SelectItem value="twitter">Twitter</SelectItem>
-                </SelectContent>
-              </Select>
+              <CompanySelect
+                value={formData.company}
+                onChange={(company, color) => setFormData({ ...formData, company, companyColor: color })}
+                placeholder="Search or type company name..."
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Can&apos;t find your company? Just type the name to add it.
+              </p>
             </div>
 
             {/* Title */}
             <div>
-              <Label htmlFor="title" className="text-base font-semibold mb-2 block">
+              <Label htmlFor="title" className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100">
                 Title
               </Label>
               <Input
@@ -149,23 +171,80 @@ export default function CreatePostPage() {
                 placeholder="Brief summary of your feedback..."
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="h-12"
+                className="h-12 dark:bg-gray-900 dark:border-gray-700"
+                maxLength={150}
               />
+              <div className="flex justify-between mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Make it clear and specific</p>
+                <span className={cn(
+                  "text-xs",
+                  formData.title.length > 120 ? "text-orange-500" : "text-gray-400"
+                )}>
+                  {formData.title.length}/150
+                </span>
+              </div>
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-base font-semibold mb-2 block">
+              <Label htmlFor="description" className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100">
                 Description
               </Label>
               <Textarea
                 id="description"
-                placeholder="Provide detailed information about your feedback..."
+                placeholder="Provide detailed information about your feedback...
+
+• What happened?
+• What did you expect?
+• Steps to reproduce (for bugs)"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, description: e.target.value });
+                  setCharCount(e.target.value.length);
+                }}
                 rows={8}
-                className="resize-none"
+                className="resize-none dark:bg-gray-900 dark:border-gray-700"
+                maxLength={2000}
               />
+              <div className="flex justify-between mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400">Be as detailed as possible</p>
+                <span className={cn(
+                  "text-xs",
+                  charCount > 1800 ? "text-orange-500" : "text-gray-400"
+                )}>
+                  {charCount}/2000
+                </span>
+              </div>
+            </div>
+
+            {/* Priority */}
+            <div>
+              <Label className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100">
+                Priority
+              </Label>
+              <div className="flex gap-2">
+                {["low", "medium", "high", "critical"].map((priority) => (
+                  <button
+                    key={priority}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, priority })}
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-medium border transition-all capitalize",
+                      formData.priority === priority
+                        ? priority === "critical"
+                          ? "bg-red-500 text-white border-red-500"
+                          : priority === "high"
+                          ? "bg-orange-500 text-white border-orange-500"
+                          : priority === "medium"
+                          ? "bg-yellow-500 text-white border-yellow-500"
+                          : "bg-green-500 text-white border-green-500"
+                        : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300"
+                    )}
+                  >
+                    {priority}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Actions */}

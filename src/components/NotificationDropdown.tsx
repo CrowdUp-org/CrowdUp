@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Check, CheckCheck, ThumbsUp, MessageSquare, Reply, UserPlus, AlertCircle, Building2 } from "lucide-react";
+import { Bell, CheckCheck, ThumbsUp, MessageSquare, Reply, UserPlus, AlertCircle, Building2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -138,8 +138,8 @@ export function NotificationDropdown() {
   }, []);
 
   const markAsRead = async (notificationId: string) => {
-    await (supabase
-      .from("notifications") as any)
+    await supabase
+      .from("notifications")
       .update({ is_read: true })
       .eq("id", notificationId);
 
@@ -153,8 +153,8 @@ export function NotificationDropdown() {
     const userId = getCurrentUserId();
     if (!userId) return;
 
-    await (supabase
-      .from("notifications") as any)
+    await supabase
+      .from("notifications")
       .update({ is_read: true })
       .eq("user_id", userId)
       .eq("is_read", false);

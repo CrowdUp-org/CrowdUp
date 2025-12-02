@@ -27,3 +27,25 @@ CREATE INDEX IF NOT EXISTS idx_company_follows_user ON public.company_follows(us
 CREATE INDEX IF NOT EXISTS idx_company_follows_company ON public.company_follows(company_id);
 CREATE INDEX IF NOT EXISTS idx_app_follows_user ON public.app_follows(user_id);
 CREATE INDEX IF NOT EXISTS idx_app_follows_app ON public.app_follows(app_id);
+
+-- Enable Row Level Security for company_follows
+ALTER TABLE public.company_follows ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own follows
+CREATE POLICY company_follows_select ON public.company_follows
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY company_follows_insert ON public.company_follows
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY company_follows_delete ON public.company_follows
+  FOR DELETE USING (user_id = auth.uid());
+
+-- Enable Row Level Security for app_follows
+ALTER TABLE public.app_follows ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own follows
+CREATE POLICY app_follows_select ON public.app_follows
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY app_follows_insert ON public.app_follows
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY app_follows_delete ON public.app_follows
+  FOR DELETE USING (user_id = auth.uid());

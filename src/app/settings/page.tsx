@@ -166,8 +166,9 @@ export default function SettingsPage() {
   };
 
   const handlePrivacyUpdate = async (key: keyof typeof privacySettings, value: boolean) => {
-    setPrivacySettings({ ...privacySettings, [key]: value });
-    // TODO: Save to backend
+    const newSettings = { ...privacySettings, [key]: value };
+    setPrivacySettings(newSettings);
+    
     const userId = getCurrentUserId();
     if (!userId) return;
     
@@ -175,13 +176,14 @@ export default function SettingsPage() {
       .from("user_settings")
       .upsert({
         user_id: userId,
-        privacy_settings: { ...privacySettings, [key]: value },
+        privacy_settings: newSettings,
       });
   };
 
   const handleNotificationUpdate = async (key: keyof typeof notificationSettings, value: boolean) => {
-    setNotificationSettings({ ...notificationSettings, [key]: value });
-    // TODO: Save to backend
+    const newSettings = { ...notificationSettings, [key]: value };
+    setNotificationSettings(newSettings);
+    
     const userId = getCurrentUserId();
     if (!userId) return;
     
@@ -189,7 +191,7 @@ export default function SettingsPage() {
       .from("user_settings")
       .upsert({
         user_id: userId,
-        notification_settings: { ...notificationSettings, [key]: value },
+        notification_settings: newSettings,
       });
   };
 

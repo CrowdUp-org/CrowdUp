@@ -70,7 +70,7 @@ Once migration is complete, you can:
 If you encounter issues:
 1. Check the Supabase logs for detailed error messages
 2. Verify your project has the latest schema
-3. Ensure RLS policies are disabled (they are by default in development)
+3. Ensure RLS (Row Level Security) is ENABLED for all tables, and add appropriate row-level policies per table. Never disable RLS except for tightly controlled local development/testing. See Supabase docs for writing policies: https://supabase.com/docs/guides/auth/row-level-security
 
 ---
 

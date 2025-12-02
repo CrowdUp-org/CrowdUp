@@ -29,6 +29,18 @@ CREATE TABLE IF NOT EXISTS bookmarks (
 CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookmarks_post ON bookmarks(post_id);
 
+-- Enable RLS for bookmarks
+ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY bookmarks_select ON bookmarks
+  FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY bookmarks_insert ON bookmarks
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY bookmarks_update ON bookmarks
+  FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY bookmarks_delete ON bookmarks
+  FOR DELETE USING (user_id = auth.uid());
+
 -- ============================================
 -- 3. OFFICIAL COMPANY RESPONSES
 -- ============================================
@@ -46,6 +58,49 @@ CREATE TABLE IF NOT EXISTS official_responses (
 );
 
 CREATE INDEX IF NOT EXISTS idx_official_responses_post ON official_responses(post_id);
+
+-- Enable RLS for official_responses
+ALTER TABLE official_responses ENABLE ROW LEVEL SECURITY;
+
+-- Anyone may read official responses
+CREATE POLICY official_responses_select ON official_responses
+  FOR SELECT USING (true);
+
+-- Only company admins/owners can write official responses
+CREATE POLICY official_responses_insert ON official_responses
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM company_members m
+      WHERE m.company_id = official_responses.company_id
+        AND m.user_id = auth.uid()
+        AND m.role IN ('admin', 'owner')
+    )
+  );
+CREATE POLICY official_responses_update ON official_responses
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM company_members m
+      WHERE m.company_id = official_responses.company_id
+        AND m.user_id = auth.uid()
+        AND m.role IN ('admin', 'owner')
+    )
+  ) WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM company_members m
+      WHERE m.company_id = official_responses.company_id
+        AND m.user_id = auth.uid()
+        AND m.role IN ('admin', 'owner')
+    )
+  );
+CREATE POLICY official_responses_delete ON official_responses
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM company_members m
+      WHERE m.company_id = official_responses.company_id
+        AND m.user_id = auth.uid()
+        AND m.role IN ('admin', 'owner')
+    )
+  );
 
 -- ============================================
 -- 4. THREADED COMMENTS (Reply Support)
@@ -79,6 +134,21 @@ CREATE TABLE notifications (
 
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = false;
+
+-- Enable RLS for notifications
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+-- Users can only see their own notifications
+CREATE POLICY notifications_select ON notifications
+  FOR SELECT USING (user_id = auth.uid());
+-- Note: INSERT is done via server-side triggers, so no client insert policy needed
+-- If client inserts are needed, uncomment the following:
+-- CREATE POLICY notifications_insert ON notifications
+--   FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY notifications_update ON notifications
+  FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE POLICY notifications_delete ON notifications
+  FOR DELETE USING (user_id = auth.uid());
 
 -- ============================================
 -- 6. DYNAMIC COMPANIES (No More Hardcoding)
@@ -146,6 +216,16 @@ CREATE INDEX IF NOT EXISTS idx_post_views_post ON post_views(post_id);
 
 -- Add view count to posts for quick access
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
+
+-- Enable RLS for post_views
+ALTER TABLE post_views ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated users to insert views (for their own user_id or anonymous)
+CREATE POLICY post_views_insert ON post_views
+  FOR INSERT WITH CHECK (user_id IS NULL OR user_id = auth.uid());
+-- Users can only see their own view records
+CREATE POLICY post_views_select ON post_views
+  FOR SELECT USING (user_id = auth.uid());
 
 -- ============================================
 -- 9. TRIGGERS FOR AUTOMATIC UPDATES

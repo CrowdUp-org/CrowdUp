@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setMounted(true);
     // Load saved theme from localStorage
     const savedTheme = localStorage.getItem("crowdup-theme") as Theme | null;
-    if (savedTheme) {
+    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
       setThemeState(savedTheme);
     }
   }, []);

@@ -253,10 +253,15 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
     setInviting(false);
   };
 
-  const handleRemoveMember = async (memberId: string, memberUserId: string) => {
+  const handleRemoveMember = async (memberId: string, memberUserId: string, memberRole: string) => {
     const userId = getCurrentUserId();
     if (memberUserId === userId) {
       setError("You cannot remove yourself");
+      return;
+    }
+    
+    if (memberRole === 'owner') {
+      setError("Cannot remove the company owner");
       return;
     }
 
@@ -572,7 +577,7 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleRemoveMember(member.id, member.users.id)}
+                            onClick={() => handleRemoveMember(member.id, member.users.id, member.role)}
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>

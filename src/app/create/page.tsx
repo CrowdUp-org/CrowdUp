@@ -15,7 +15,7 @@ import {
 import { CompanySelect } from "@/components/ui/company-select";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Send, AlertCircle, Lightbulb, Bug, X } from "lucide-react";
+import { Send, AlertCircle, Lightbulb, Bug } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUserId } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -79,7 +79,7 @@ export default function CreatePostPage() {
       description: formData.description,
       priority: formData.priority,
       status: "open",
-    } as any);
+    });
 
     if (insertError) {
       setError("Failed to create post. Please try again.");

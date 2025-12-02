@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Check, ChevronsUpDown, Building2, Plus, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 
@@ -37,6 +37,7 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
   const [search, setSearch] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -182,13 +183,13 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
                     : "hover:bg-gray-50 dark:hover:bg-gray-800"
                 )}
               >
-                {company.logo_url ? (
+                {company.logo_url && !imageErrors.has(company.id) ? (
                   <img
                     src={company.logo_url}
                     alt={company.name}
                     className="h-8 w-8 rounded-lg object-contain bg-white dark:bg-gray-800 p-1"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
+                    onError={() => {
+                      setImageErrors(prev => new Set(prev).add(company.id));
                     }}
                   />
                 ) : (

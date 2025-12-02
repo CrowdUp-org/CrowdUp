@@ -141,10 +141,10 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 -- Users can only see their own notifications
 CREATE POLICY notifications_select ON notifications
   FOR SELECT USING (user_id = auth.uid());
--- Note: INSERT is done via server-side triggers, so no client insert policy needed
--- If client inserts are needed, uncomment the following:
--- CREATE POLICY notifications_insert ON notifications
---   FOR INSERT WITH CHECK (user_id = auth.uid());
+-- Note: Most inserts are done via server-side triggers, but this policy ensures
+-- that if client inserts are attempted, they can only insert for themselves
+CREATE POLICY notifications_insert ON notifications
+  FOR INSERT WITH CHECK (user_id = auth.uid());
 CREATE POLICY notifications_update ON notifications
   FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 CREATE POLICY notifications_delete ON notifications
@@ -221,6 +221,8 @@ ALTER TABLE posts ADD COLUMN IF NOT EXISTS view_count INTEGER DEFAULT 0;
 ALTER TABLE post_views ENABLE ROW LEVEL SECURITY;
 
 -- Allow authenticated users to insert views (for their own user_id or anonymous)
+-- Note: For production, consider implementing rate limiting at the application layer
+-- or using Supabase edge functions to prevent view count manipulation
 CREATE POLICY post_views_insert ON post_views
   FOR INSERT WITH CHECK (user_id IS NULL OR user_id = auth.uid());
 -- Users can only see their own view records

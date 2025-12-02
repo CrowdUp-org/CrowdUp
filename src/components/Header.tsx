@@ -1,6 +1,9 @@
 "use client";
 
 import { Home, Search, Plus, MessageCircle, User, Bell, ChevronDown, Building2, Smartphone, BarChart3, Sun, Moon, Monitor, Bookmark, Settings } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
@@ -14,10 +17,82 @@ import {
   DropdownMenuSubContent,
   DropdownMenuPortal,
 } from "./ui/dropdown-menu";
-import { useRouter, usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 import { signOut } from "@/lib/auth";
-import { useAuth } from "@/contexts/AuthContext";
+import svgPaths from "./navbar/svg-paths";
+
+type NavItem = "home" | "search" | "add" | "messages" | "profile";
+
+function Svg({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="relative shrink-0 size-[24.107px]" data-name="SVG">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+        <g id="SVG">
+          <path d={svgPaths.p2d6a7600} id="Vector" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+          <path d={svgPaths.pd775100} id="Vector_2" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function Svg1({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="relative shrink-0 size-[24.107px]" data-name="SVG">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+        <g id="SVG">
+          <path d={svgPaths.p393528b4} id="Vector" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+          <path d={svgPaths.pf3de100} id="Vector_2" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function Svg2() {
+  return (
+    <div className="relative shrink-0 size-[24.107px]" data-name="SVG">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+        <g id="SVG">
+          <path d="M5.0221 12.0536H19.0846" id="Vector" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+          <path d="M12.0535 5.0224V19.0849" id="Vector_2" stroke="white" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function Svg3({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="relative shrink-0 size-[24.107px]" data-name="SVG">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+        <g id="SVG">
+          <path d={svgPaths.p3f8a600} id="Vector" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function Svg4({ isActive }: { isActive: boolean }) {
+  return (
+    <div className="relative shrink-0 size-[24.107px]" data-name="SVG">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+        <g id="SVG">
+          <path d={svgPaths.p1036f160} id="Vector" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+          <path d={svgPaths.p1d3f6a00} id="Vector_2" stroke={isActive ? "white" : "#717182"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.00893" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function OverlayShadow() {
+  return (
+    <div className="bg-[#ff992b] box-border content-stretch flex items-center justify-center overflow-clip relative rounded-[16px] shadow-[0px_13.776px_20.663px_-4.133px_rgba(0,0,0,0.1),0px_5.51px_8.265px_-5.51px_rgba(0,0,0,0.1)] shrink-0 size-[48.214px]" data-name="Overlay+Shadow">
+      <Svg2 />
+    </div>
+  );
+}
 import { useTheme } from "@/contexts/ThemeContext";
 import { NotificationDropdown } from "./NotificationDropdown";
 
@@ -36,18 +111,52 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isActive = (path: string) => pathname === path;
+  // Don't show header on auth pages
+  if (pathname.startsWith("/auth")) {
+    return null;
+  }
+
+  // Determine active item based on current path
+  const getActiveItem = (): NavItem => {
+    if (pathname === "/") return "home";
+    if (pathname === "/search") return "search";
+    if (pathname === "/create") return "add";
+    if (pathname === "/messages") return "messages";
+    if (pathname.startsWith("/profile")) return "profile";
+    return "home";
+  };
+
+  const activeItem = getActiveItem();
+
+  const handleNavigation = (item: NavItem) => {
+    switch (item) {
+      case "home":
+        router.push("/");
+        break;
+      case "search":
+        router.push("/search");
+        break;
+      case "add":
+        router.push("/create");
+        break;
+      case "messages":
+        router.push("/messages");
+        break;
+      case "profile":
+        if (user) {
+          router.push(`/profile/${user.username}`);
+        } else {
+          router.push("/auth/signin");
+        }
+        break;
+    }
+  };
 
   const handleSignOut = () => {
     signOut();
     refreshUser();
     router.push("/auth/signin");
   };
-
-  // Don't show header on auth pages
-  if (pathname.startsWith("/auth")) {
-    return null;
-  }
 
   return (
     <header
@@ -85,68 +194,90 @@ export default function Header() {
           </div>
         </button>
 
-        {/* Navigation Icons - Container with better spacing */}
-        <nav className="flex items-center gap-1.5 sm:gap-2 md:gap-4 rounded-xl sm:rounded-2xl bg-gray-50/80 dark:bg-gray-800/80 px-2 sm:px-4 md:px-6 py-2 sm:py-2.5 border border-gray-200/80 dark:border-gray-700/80 backdrop-blur-sm">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push("/")}
-            className={`rounded-lg sm:rounded-xl transition-all hover:scale-105 h-8 w-8 sm:h-10 sm:w-10 ${
-              isActive("/") ? "bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-500" : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-            }`}
-          >
-            <Home className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push("/search")}
-            className={`rounded-lg sm:rounded-xl transition-all hover:scale-105 h-8 w-8 sm:h-10 sm:w-10 ${
-              isActive("/search") ? "bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-500" : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-            }`}
-          >
-            <Search className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push("/create")}
-            className="rounded-lg sm:rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 transition-all hover:scale-105 shadow-lg shadow-orange-500/30 h-8 w-8 sm:h-10 sm:w-10"
-          >
-            <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push("/messages")}
-            className={`rounded-lg sm:rounded-xl transition-all hover:scale-105 h-8 w-8 sm:h-10 sm:w-10 ${
-              isActive("/messages") ? "bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-500" : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-            }`}
-          >
-            <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              if (user) {
-                router.push(`/profile/${user.username}`);
-              } else {
-                router.push("/auth/signin");
-              }
-            }}
-            className={`rounded-lg sm:rounded-xl transition-all hover:scale-105 h-8 w-8 sm:h-10 sm:w-10 ${
-              pathname.startsWith("/profile") ? "bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-500" : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-300"
-            }`}
-          >
-            <User className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-        </nav>
+        {/* Navbar centrale */}
+        <div className="relative">
+          <div className="backdrop-blur-[5.51px] backdrop-filter bg-[rgba(225,225,225,0.3)] box-border content-stretch flex flex-col items-center justify-center p-[9.643px] rounded-[20px]" data-name="Overlay+OverlayBlur">
+            <div 
+              className="absolute bg-[#909090] h-[57.857px] rounded-[17.564px] shadow-[0px_0px_28px_-3px_#909090] top-[9.64px] w-[96.429px] transition-all duration-300 ease-out" 
+              data-name="Overlay+Shadow"
+              style={{
+                left: activeItem === "home" ? "9.64px" : 
+                      activeItem === "search" ? "115.672px" : 
+                      activeItem === "add" ? "221.704px" :
+                      activeItem === "messages" ? "327.736px" : 
+                      "433.768px"
+              }}
+            />
+            <div className="content-stretch flex gap-[9.643px] items-center relative shrink-0 z-10" data-name="Container">
+              <button
+                onClick={() => handleNavigation("home")}
+                className="content-stretch flex flex-col h-[57.857px] items-center justify-center relative rounded-[20px] shrink-0 w-[96.429px] cursor-pointer transition-all hover:scale-105"
+                data-name="Button"
+              >
+                <Svg isActive={activeItem === "home"} />
+              </button>
+              <button
+                onClick={() => handleNavigation("search")}
+                className="content-stretch flex flex-col h-[57.857px] items-center justify-center relative rounded-[17.564px] shrink-0 w-[96.429px] cursor-pointer transition-all hover:scale-105"
+                data-name="Button"
+              >
+                <Svg1 isActive={activeItem === "search"} />
+              </button>
+              <div
+                className="content-stretch flex flex-col h-[57.857px] items-center justify-center relative rounded-[17.564px] shrink-0 w-[96.429px]"
+                data-name="Button"
+              >
+                <div className="content-stretch flex flex-col items-start relative shrink-0" data-name="Container">
+                  <OverlayShadow />
+                </div>
+              </div>
+              <button
+                onClick={() => handleNavigation("messages")}
+                className="content-stretch flex flex-col h-[57.857px] items-center justify-center relative rounded-[17.564px] shrink-0 w-[96.429px] cursor-pointer transition-all hover:scale-105"
+                data-name="Button"
+              >
+                <Svg3 isActive={activeItem === "messages"} />
+              </button>
+              <button
+                onClick={() => handleNavigation("profile")}
+                className="content-stretch flex flex-col h-[57.857px] items-center justify-center relative rounded-[17.564px] shrink-0 w-[96.429px] cursor-pointer transition-all hover:scale-105"
+                data-name="Button"
+              >
+                <Svg4 isActive={activeItem === "profile"} />
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* User Section with Notification */}
         <div className="flex items-center gap-1.5 sm:gap-3">
-          {/* Notification Bell */}
-          {user && <NotificationDropdown />}
+          {/* Notification Bell - Far Right */}
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-xl transition-all hover:scale-105 hover:bg-gray-100 h-10 w-10 relative"
+                >
+                  <Bell className="h-5 w-5" />
+                  {/* Notification badge */}
+                  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <div className="px-4 py-3 border-b">
+                  <h3 className="font-semibold">Notifications</h3>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  <div className="p-4 text-center text-gray-500 text-sm">
+                    No new notifications
+                  </div>
+                  {/* Placeholder for future notifications */}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           {user ? (
             <DropdownMenu>

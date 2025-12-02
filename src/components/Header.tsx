@@ -1,9 +1,9 @@
 "use client";
 
+import { Home, Search, Plus, MessageCircle, User, Bell, ChevronDown, Building2, Smartphone, BarChart3, Sun, Moon, Monitor, Bookmark, Settings } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, ChevronDown, User, Building2, Smartphone } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
@@ -12,6 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from "./ui/dropdown-menu";
 import { signOut } from "@/lib/auth";
 import svgPaths from "./navbar/svg-paths";
@@ -89,12 +93,15 @@ function OverlayShadow() {
     </div>
   );
 }
+import { useTheme } from "@/contexts/ThemeContext";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, refreshUser } = useAuth();
   const [scrolled, setScrolled] = useState(false);
+  const { user, refreshUser } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -153,23 +160,23 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl rounded-2xl border transition-all duration-300 ${
+      className={`fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-50 w-[98%] sm:w-[95%] max-w-7xl rounded-xl sm:rounded-2xl border transition-all duration-300 ${
         scrolled
-          ? "bg-white/80 backdrop-blur-xl shadow-lg shadow-black/5"
-          : "bg-white/95 backdrop-blur-sm shadow-md"
+          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg shadow-black/5 dark:shadow-black/20 border-gray-200 dark:border-gray-800"
+          : "bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-md border-gray-200 dark:border-gray-800"
       }`}
     >
-      <div className="flex items-center justify-between px-8 py-3.5">
+      <div className="flex items-center justify-between px-3 sm:px-6 md:px-8 py-2.5 sm:py-3.5">
         {/* Logo */}
         <button
           onClick={() => router.push("/")}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition-opacity"
         >
-          <div className="flex items-center gap-1">
-            <span className="text-2xl font-bold text-black">Crowd</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Up</span>
+          <div className="flex items-center gap-0.5 sm:gap-1">
+            <span className="text-lg sm:text-2xl font-bold text-black dark:text-white">Crowd</span>
+            <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Up</span>
           </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 transition-transform hover:scale-110 shadow-lg shadow-orange-500/30">
+          <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 transition-transform hover:scale-110 shadow-lg shadow-orange-500/30">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -177,7 +184,7 @@ export default function Header() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-6 w-6"
+              className="h-5 w-5 sm:h-6 sm:w-6"
             >
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
@@ -243,8 +250,8 @@ export default function Header() {
         </div>
 
         {/* User Section with Notification */}
-        <div className="flex items-center gap-3">
-          {/* Notification Bell */}
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Notification Bell - Far Right */}
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -254,6 +261,7 @@ export default function Header() {
                   className="rounded-xl transition-all hover:scale-105 hover:bg-gray-100 h-10 w-10 relative"
                 >
                   <Bell className="h-5 w-5" />
+                  {/* Notification badge */}
                   <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
                 </Button>
               </DropdownMenuTrigger>
@@ -265,6 +273,7 @@ export default function Header() {
                   <div className="p-4 text-center text-gray-500 text-sm">
                     No new notifications
                   </div>
+                  {/* Placeholder for future notifications */}
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -273,17 +282,21 @@ export default function Header() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2.5 rounded-xl hover:bg-gray-100 transition-all px-3 py-2 h-auto">
-                  <Avatar className="h-9 w-9 bg-gradient-to-br from-yellow-400 to-orange-500 ring-2 ring-orange-200 transition-all hover:ring-4">
-                    <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
-                      {user.display_name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
+                <Button variant="ghost" className="flex items-center gap-1.5 sm:gap-2.5 rounded-lg sm:rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all px-2 sm:px-3 py-1.5 sm:py-2 h-auto">
+                  <Avatar className="h-7 w-7 sm:h-9 sm:w-9 bg-gradient-to-br from-yellow-400 to-orange-500 ring-2 ring-orange-200 transition-all hover:ring-4">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.display_name} className="h-full w-full object-cover rounded-full" />
+                    ) : (
+                      <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
+                        {user.display_name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-gray-900">{user.display_name}</p>
-                    <p className="text-xs text-gray-500">@{user.username}</p>
+                  <div className="text-left hidden sm:block">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.display_name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</p>
                   </div>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 hidden sm:block" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -291,10 +304,49 @@ export default function Header() {
                   <User className="h-4 w-4 mr-2" />
                   Profile
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/profile/bookmarks")}>
+                  <Bookmark className="h-4 w-4 mr-2" />
+                  Saved Posts
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/settings")}>
-                  <Bell className="h-4 w-4 mr-2" />
+                  <Settings className="h-4 w-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    {theme === "dark" ? (
+                      <Moon className="h-4 w-4 mr-2" />
+                    ) : theme === "light" ? (
+                      <Sun className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Monitor className="h-4 w-4 mr-2" />
+                    )}
+                    Theme
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => setTheme("light")}>
+                        <Sun className="h-4 w-4 mr-2" />
+                        Light
+                        {theme === "light" && <span className="ml-auto text-orange-500">✓</span>}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme("dark")}>
+                        <Moon className="h-4 w-4 mr-2" />
+                        Dark
+                        {theme === "dark" && <span className="ml-auto text-orange-500">✓</span>}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme("system")}>
+                        <Monitor className="h-4 w-4 mr-2" />
+                        System
+                        {theme === "system" && <span className="ml-auto text-orange-500">✓</span>}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push("/company/create")}>
                   <Building2 className="h-4 w-4 mr-2" />
@@ -313,7 +365,7 @@ export default function Header() {
           ) : (
             <Button
               onClick={() => router.push("/auth/signin")}
-              className="rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-orange-500/30"
+              className="rounded-lg sm:rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-orange-500/30 text-sm sm:text-base px-3 sm:px-4 py-1.5 sm:py-2"
             >
               Sign In
             </Button>

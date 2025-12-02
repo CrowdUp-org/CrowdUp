@@ -6,7 +6,8 @@ import PodiumView from "@/components/PodiumView";
 import Sidebar from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import SidePanel from "@/components/SidePanel";
-import { ChevronDown } from "lucide-react";
+import { NoPostsEmptyState } from "@/components/EmptyState";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
@@ -196,11 +197,12 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <Header />
-        <main className="mx-auto max-w-7xl px-6 pt-28 pb-8">
-          <div className="text-center py-12">
-            <p className="text-gray-600">Loading posts...</p>
+        <main className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 pt-20 sm:pt-24 md:pt-28 pb-8">
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-10 w-10 animate-spin text-orange-500 mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">Loading amazing posts...</p>
           </div>
         </main>
       </div>
@@ -208,44 +210,44 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <Header />
-      <main className="mx-auto max-w-7xl px-6 pt-28 pb-8">
-        <div className="flex gap-6">
+      <main className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6 pt-20 sm:pt-24 md:pt-28 pb-8">
+        <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
           {/* Main Feed */}
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 space-y-3 sm:space-y-4">
             {/* Podium View */}
             {topPosts.length === 3 && (
               <PodiumView posts={topPosts as [typeof topPosts[0], typeof topPosts[1], typeof topPosts[2]]} />
             )}
 
             {/* Sort dropdown */}
-            <div className="mb-6 relative">
+            <div className="mb-4 sm:mb-6 relative">
               <button
                 onClick={() => setShowSortMenu(!showSortMenu)}
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-3 py-1.5 text-sm font-medium hover:from-yellow-500 hover:to-orange-600 transition-all shadow-lg shadow-orange-500/30"
+                className="inline-flex items-center gap-1.5 sm:gap-2 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-medium hover:from-yellow-500 hover:to-orange-600 transition-all shadow-lg shadow-orange-500/30"
               >
                 Sort by: {sortBy.charAt(0).toUpperCase() + sortBy.slice(1)}
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
               
               {showSortMenu && (
-                <div className="absolute top-full mt-2 bg-white rounded-lg shadow-lg border z-10">
+                <div className="absolute top-full mt-2 bg-white rounded-lg shadow-lg border z-10 min-w-[140px]">
                   <button
                     onClick={() => { setSortBy("featured"); setShowSortMenu(false); }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-50 rounded-t-lg"
+                    className="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-50 rounded-t-lg text-sm"
                   >
                     Featured
                   </button>
                   <button
                     onClick={() => { setSortBy("new"); setShowSortMenu(false); }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-50"
+                    className="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-50 text-sm"
                   >
                     New
                   </button>
                   <button
                     onClick={() => { setSortBy("top"); setShowSortMenu(false); }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-50 rounded-b-lg"
+                    className="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-50 rounded-b-lg text-sm"
                   >
                     Top
                   </button>
@@ -254,15 +256,7 @@ export default function Home() {
             </div>
 
             {formattedPosts.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border">
-                <p className="text-gray-600 mb-4">No posts yet. Be the first to share!</p>
-                <Button
-                  onClick={() => window.location.href = "/create"}
-                  className="rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600 shadow-lg shadow-orange-500/30"
-                >
-                  Create Post
-                </Button>
-              </div>
+              <NoPostsEmptyState onCreatePost={() => window.location.href = "/create"} />
             ) : (
               <>
                 {formattedPosts.slice(0, displayCount).map((post) => (
@@ -270,12 +264,12 @@ export default function Home() {
                 ))}
                 
                 {displayCount < formattedPosts.length && (
-                  <div className="text-center py-8">
+                  <div className="text-center py-6 sm:py-8">
                     <Button 
                       onClick={loadMore}
                       variant="outline" 
                       size="lg" 
-                      className="rounded-full px-8 hover:bg-gradient-to-br hover:from-yellow-400 hover:to-orange-500 hover:text-white hover:border-transparent border-gray-300 transition-all shadow-lg hover:shadow-orange-500/30"
+                      className="rounded-full px-6 sm:px-8 text-sm sm:text-base hover:bg-gradient-to-br hover:from-yellow-400 hover:to-orange-500 hover:text-white hover:border-transparent border-gray-300 transition-all shadow-lg hover:shadow-orange-500/30"
                     >
                       Load More Posts
                     </Button>
@@ -285,8 +279,8 @@ export default function Home() {
             )}
           </div>
 
-          {/* Sidebar */}
-          <aside className="w-80 hidden lg:block">
+          {/* Sidebar - Hidden on mobile and tablet */}
+          <aside className="w-80 hidden xl:block">
             <Sidebar />
           </aside>
         </div>

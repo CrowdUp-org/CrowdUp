@@ -60,3 +60,9 @@ npm run build        # Build for production
 npm start            # Start production server
 npm run lint         # Run ESLint
 ```
+
+## Deployment
+
+For deploying to **Cloudflare Pages**, see [CLOUDFLARE_DEPLOYMENT.md](./CLOUDFLARE_DEPLOYMENT.md) for detailed configuration instructions.
+
+**Note**: This project uses `npm` for production deployments due to compatibility issues with Bun 1.2.x. You can still use Bun for local development.

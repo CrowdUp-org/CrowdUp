@@ -9,7 +9,9 @@ In your Cloudflare Pages project settings, use the following configuration:
 ### Build Settings
 - **Build command**: `npm run build`
 - **Build output directory**: `.next`
-- **Install command**: `npm ci` (recommended) or `npm install`
+- **Install command**: `npm ci` (recommended for production - faster and more reliable) or `npm install`
+
+> **Note**: `npm ci` is preferred because it installs dependencies exactly as specified in `package-lock.json`, is faster than `npm install`, and ensures reproducible builds.
 
 ### Environment Variables
 Make sure to set the following environment variables in your Cloudflare Pages project settings:

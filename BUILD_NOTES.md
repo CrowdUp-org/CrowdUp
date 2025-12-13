@@ -96,7 +96,13 @@ Then open http://localhost:3000
 The project is ready to deploy to:
 - Vercel (recommended for Next.js)
 - Netlify
+- AWS Amplify
+- Railway
 - Any Node.js hosting platform
+
+**Important**: This application cannot be deployed to GitHub Pages because it requires a Node.js runtime for API routes, server-side rendering, and middleware.
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
 Remember to set environment variables in your deployment platform:
 - `NEXT_PUBLIC_SUPABASE_URL`

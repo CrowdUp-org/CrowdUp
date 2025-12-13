@@ -61,6 +61,14 @@ npm start            # Start production server
 npm run lint         # Run ESLint
 ```
 
+## Deployment
+
+This application requires a Node.js runtime and is designed to be deployed on platforms like Vercel, Netlify, or self-hosted environments.
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+**Quick Deploy to Vercel**: [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CrowdUp-org/CrowdUp)
+
 ## License
 
     This work is licensed under CC BY-NC-ND 4.0. To view a copy of this license, visit https://creativecommons.org

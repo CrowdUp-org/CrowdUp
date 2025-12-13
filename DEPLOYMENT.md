@@ -52,14 +52,14 @@ vercel --prod
 
 ### 1. Netlify
 
-Netlify also supports Next.js applications:
+Netlify supports Next.js applications with their Next.js Runtime:
 
 1. Connect your GitHub repository to Netlify
-2. Configure build settings:
-   - Build command: `npm run build`
-   - Publish directory: `.next`
+2. Netlify will automatically detect Next.js and configure the runtime
 3. Add environment variables in Netlify dashboard
 4. Deploy
+
+Note: Netlify will automatically use their Next.js Runtime plugin which handles server-side features and API routes.
 
 ### 2. Self-Hosted (Node.js)
 
@@ -88,15 +88,30 @@ pm2 startup
 Create a `Dockerfile`:
 
 ```dockerfile
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 COPY . .
 RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.ts ./next.config.ts
 
 EXPOSE 3000
 

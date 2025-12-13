@@ -91,8 +91,9 @@ export default function PostCard({
       borderColor: "border-yellow-200",
     },
   };
+  
+  const config = (typeConfig as Record<string, any>)[type] ?? typeConfig["Feature Request"];
 
-  const config = typeConfig[type];
 
   const handleVote = async (voteType: "up" | "down", e: React.MouseEvent) => {
     e.stopPropagation();

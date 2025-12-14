@@ -3,7 +3,7 @@ description: Report a bug in CrowdUp
 title: "[BUG]: "
 labels: ["bug"]
 type: bug
-projects: ["CrowdUp"]
+projects: ["CrowdUp-org/4"]
 assignees: []
 body:
   - type: markdown

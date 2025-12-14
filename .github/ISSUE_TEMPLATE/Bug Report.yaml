@@ -1,7 +1,9 @@
 name: Bug Report
 description: Report a bug in CrowdUp
 title: "[BUG]: "
-labels: ["bug", "triage"]
+labels: ["bug"]
+issue_type: bug
+project: CrowdUp
 assignees: []
 body:
   - type: markdown

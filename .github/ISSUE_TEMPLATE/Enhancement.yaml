@@ -1,0 +1,92 @@
+name: Enhancement
+description: Propose an improvement to an existing feature (performance, UX, polish, refactor)
+title: "[ENHANCEMENT]: "
+labels: ["Enhancement ✨"]
+type: Improvement
+projects: ["CrowdUp-org/4"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing an enhancement to CrowdUp!
+
+        Use this template for improvements to existing features — e.g., performance optimizations, UX/UI polish, API refinements, refactors, or incremental behavior changes. For entirely new capabilities, please use the "Feature Request" template.
+
+  - type: input
+    id: area
+    attributes:
+      label: Affected area / component
+      description: Which part of CrowdUp does this enhancement affect?
+      placeholder: "e.g., Feed, Auth, Messaging, PostCard component"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: Describe how the system currently behaves.
+      placeholder: "What currently happens?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed improvement
+      description: Describe the improvement you'd like to see.
+      placeholder: "What change do you propose? Be as specific as possible."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      description: How significant is this improvement?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: What conditions must be met for this enhancement to be considered done?
+      placeholder: "Provide measurable criteria or example scenarios."
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks / Backwards compatibility
+      description: Are there risks or compatibility concerns with this change?
+      placeholder: "Performance impact, migration steps, rollbacks, etc."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: tests-docs
+    attributes:
+      label: Includes
+      description: Will this enhancement include tests or documentation updates?
+      options:
+        - label: Includes test coverage updates
+          required: false
+        - label: Includes documentation updates
+          required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be willing to contribute this change?
+      options:
+        - label: I am willing to submit a PR for this enhancement
+          required: false

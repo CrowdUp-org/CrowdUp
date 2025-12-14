@@ -2,7 +2,7 @@ name: Feature Request
 description: Suggest a new feature for CrowdUp
 title: "[FEATURE]: "
 labels: ["Feature Request 🚀"]
-type: Feature
+type: Improvement
 projects: ["CrowdUp-org/4"]
 assignees: []
 body:
@@ -10,6 +10,8 @@ body:
     attributes:
       value: |
         Thanks for suggesting a new feature for CrowdUp!
+
+        NOTE: If you're proposing an improvement to an existing feature (performance, UX polish, refactor, optimization, incremental enhancement), please use the "Enhancement" template instead. Use this "Feature Request" template for new capabilities or functionality that doesn't exist yet.
         
   - type: textarea
     id: problem

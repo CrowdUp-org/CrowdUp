@@ -33,6 +33,10 @@ See [SETUP.md](./SETUP.md) for detailed setup instructions.
 4. Run dev server: `npm run dev` or `bun dev`
 5. Open [http://localhost:3000](http://localhost:3000)
 
+## Contributing
+
+We welcome contributions! See the repository's issue label guidelines for help categorizing issues and contributing: [.github/ISSUE_TEMPLATE/labels-guidelines.md](.github/ISSUE_TEMPLATE/labels-guidelines.md)
+
 ## Project Structure
 
 ```

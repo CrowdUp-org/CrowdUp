@@ -1,0 +1,71 @@
+name: Task
+description: Create a task for the CrowdUp project
+title: "[TASK]: "
+labels: ["Task ⊙"]
+type: Task
+projects: ["CrowdUp-org/4"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to create a new task for the CrowdUp project.
+        
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: Describe what needs to be done.
+      placeholder: "A clear description of the task to be completed."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What are the requirements for this task to be considered complete?
+      placeholder: |
+        - [ ] Criteria 1
+        - [ ] Criteria 2
+        - [ ] Criteria 3
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this task?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+      
+  - type: input
+    id: estimated-time
+    attributes:
+      label: Estimated Time
+      description: How long do you think this task will take?
+      placeholder: "e.g., 2 hours, 1 day"
+    validations:
+      required: false
+      
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which area of the project does this task relate to?
+      options:
+        - Frontend
+        - Backend
+        - Database
+        - Infrastructure
+        - Testing
+        - Design
+        - Other
+    validations:
+      required: true

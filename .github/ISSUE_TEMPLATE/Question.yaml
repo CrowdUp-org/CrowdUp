@@ -1,0 +1,54 @@
+name: Question
+description: Ask a question about CrowdUp
+title: "[QUESTION]: "
+labels: ["Question ❓"]
+projects: ["CrowdUp-org/4"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in CrowdUp! Use this template to ask questions about the platform.
+        
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know about CrowdUp?
+      placeholder: "I'd like to understand how..."
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What area does your question relate to?
+      options:
+        - Using the Platform
+        - Account Management
+        - Voting System
+        - Submission Process
+        - API/Integration
+        - Privacy/Security
+        - Other
+    validations:
+      required: true
+      
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Provide any additional information that might help us answer your question.
+      placeholder: "More details about my situation..."
+    validations:
+      required: false
+      
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Prior Research
+      description: Please confirm you've done the following before submitting
+      options:
+        - label: I have searched the existing issues and documentation
+          required: true

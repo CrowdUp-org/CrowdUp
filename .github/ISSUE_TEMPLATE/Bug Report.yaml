@@ -68,6 +68,7 @@ body:
       multiple: true
       options:
         - Chrome
+        - Chromium
         - Firefox
         - Safari
         - Microsoft Edge

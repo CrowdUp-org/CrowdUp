@@ -59,6 +59,7 @@ body:
     attributes:
       label: Area
       description: Which area of the project does this task relate to?
+      multiple: true
       options:
         - Frontend
         - Backend

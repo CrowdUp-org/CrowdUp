@@ -106,7 +106,7 @@ export async function signIn(data: SignInData): Promise<{ user: User | null; err
     const { password_hash, ...userWithoutPassword } = user;
 
     // Store session
-    localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+    // Store session by only saving userId
     localStorage.setItem('userId', user.id);
 
     return { user: userWithoutPassword, error: null };
@@ -116,21 +116,13 @@ export async function signIn(data: SignInData): Promise<{ user: User | null; err
 }
 
 export function signOut() {
-  localStorage.removeItem('user');
   localStorage.removeItem('userId');
+  // localStorage.removeItem('user') removed; we no longer store user data in localStorage
 }
 
+// User data is no longer stored in localStorage for security reasons.
 export function getCurrentUser(): User | null {
-  if (typeof window === 'undefined') return null;
-  
-  const userStr = localStorage.getItem('user');
-  if (!userStr) return null;
-  
-  try {
-    return JSON.parse(userStr);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 export function getCurrentUserId(): string | null {
@@ -212,12 +204,8 @@ export async function updateProfile(data: { display_name?: string; username?: st
       return { success: false, error: 'Failed to update profile' };
     }
 
-    // Update local storage
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      const updatedUser = { ...currentUser, ...data };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    }
+    // localStorage user data is no longer updated/stored for security reasons
+    // If needed, update session or server state elsewhere
 
     return { success: true, error: null };
   } catch (error) {

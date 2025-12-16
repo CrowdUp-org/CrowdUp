@@ -3,6 +3,26 @@
 
 import { useEffect, useState, useRef } from "react";
 
+// Helper: allow only http(s) or relative image URLs, block javascript: and data: URIs etc.
+function isSafeImageSrc(src: string): boolean {
+  try {
+    // relative path
+    if (src.startsWith("/") || src.startsWith("./") || src.startsWith("../")) {
+      return true;
+    }
+    const url = new URL(src, window.location.origin); // parse with base for relative
+    const allowedProtocols = ["http:", "https:"];
+    if (!allowedProtocols.includes(url.protocol)) {
+      return false;
+    }
+    // Optionally: restrict host e.g. to window.location.hostname
+    return true;
+  } catch {
+    // URL parsing failed, treat as unsafe
+    return false;
+  }
+}
+
 export const CHANNEL = "ORCHIDS_HOVER_v1" as const;
 const VISUAL_EDIT_MODE_KEY = "orchids_visual_edit_mode" as const;
 const FOCUSED_ELEMENT_KEY = "orchids_focused_element" as const;
@@ -923,13 +943,20 @@ export default function HoverReceiver() {
             imgEl.removeAttribute("srcset");
             imgEl.srcset = "";
 
-            imgEl.src = src;
+            if (isSafeImageSrc(src)) {
+              imgEl.src = src;
 
-            // Update baseline src so flush doesn't treat this as pending change
-            originalSrcRef.current = normalizeImageSrc(src);
-            focusedImageElementRef.current = imgEl;
+              // Update baseline src so flush doesn't treat this as pending change
+              originalSrcRef.current = normalizeImageSrc(src);
+              focusedImageElementRef.current = imgEl;
 
-            imgEl.onload = () => updateFocusBox();
+              imgEl.onload = () => updateFocusBox();
+            } else {
+              // Unsafe src provided - skip or optionally assign a safe placeholder
+              // Optionally, could also assign: imgEl.src = "";
+              // Optionally, log/report:
+              console.warn("Blocked unsafe image src:", src);
+            }
           }
         }
       } else if (e.data?.type === "RESIZE_ELEMENT") {

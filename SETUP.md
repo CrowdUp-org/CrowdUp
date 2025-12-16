@@ -30,13 +30,13 @@
 2. Get your Supabase credentials:
    - Go to Project Settings > API
    - Copy the Project URL
-   - Copy the `anon` public key
+   - Copy the `Publishable key` (from the Publishable key section - new format, can be regenerated)
    - **NEW:** Copy the Secret API key (from Project Settings > API > Secret keys) - this is required for server-side operations
 
 3. Update `.env.local` with required values:
    ```
    NEXT_PUBLIC_SUPABASE_URL=your_project_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
    SUPABASE_SECRET_KEY=your_secret_key
    ```
 
@@ -103,18 +103,20 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Important Notes
 
-### Supabase API Keys (Migration from Legacy Keys)
-CrowdUp has been migrated to use Supabase **Secret API keys** for server-side operations:
-- **`SUPABASE_ANON_KEY`** (public, `NEXT_PUBLIC_` prefix): Used by client-side code for general database queries. This is the legacy "anon" key and can be safely exposed in client-side code.
-- **`SUPABASE_SECRET_KEY`** (secret, no `NEXT_PUBLIC_` prefix): Used only by server-side API routes (e.g., Google OAuth callback) for privileged operations. **Keep this key secure and never expose it in client-side code or version control.**
+### Supabase API Keys (Migration from Legacy JWT Keys)
+CrowdUp uses **Supabase Secret API keys** (`sb_secret_...`) and **Publishable keys** (`sb_publishable_...`) which are the modern, recommended way to authenticate:
+- **`SUPABASE_PUBLISHABLE_KEY`** (public, `NEXT_PUBLIC_` prefix): Replaces the legacy `anon` JWT key. Used by client-side code for general database queries. This is safe to expose in client-side code and can be individually regenerated.
+- **`SUPABASE_SECRET_KEY`** (secret, no `NEXT_PUBLIC_` prefix): Replaces the legacy `service_role` JWT key. Used only by server-side API routes (e.g., Google OAuth callback) for privileged operations. **Keep this key secure and never expose it in client-side code or version control.**
 
-The migration to Secret API keys provides:
-- Individual key rotation (no need to rotate global JWT secret)
+**Why migrate from legacy JWT keys (`anon`/`service_role`)?**
+- Legacy JWT keys cannot be individually rotated without affecting the global JWT secret
+- Individual Secret API keys can be rotated independently and regenerated easily
+- Publishable keys can be regenerated without downtime (unlike legacy `anon` keys)
 - Better security boundaries between client and server operations
-- Clearer access control for privileged backend tasks
-- Easier key management in case of credential exposure
+- Clearer access control model for backend tasks
 
 See [SUPABASE_SECRET_KEY_ROTATION.md](./SUPABASE_SECRET_KEY_ROTATION.md) for instructions on rotating Secret API keys.
+See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for environment setup on various platforms.
 
 ### Row Level Security (RLS)
 This project uses **custom authentication** (not Supabase Auth), so Row Level Security is **disabled by default** in the SQL schema. This means:

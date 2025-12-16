@@ -9,10 +9,10 @@ CrowdUp requires three Supabase environment variables for complete functionality
 | Variable | Visibility | Usage | Required |
 |----------|-----------|-------|----------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Public (`NEXT_PUBLIC_`) | Client-side database queries | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public (`NEXT_PUBLIC_`) | Client-side authentication | Yes |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public (`NEXT_PUBLIC_`) | Client-side authentication (replaces legacy `anon` key) | Yes |
 | `SUPABASE_SECRET_KEY` | **Secret** (no prefix) | Server-side operations (OAuth, privileged actions) | Yes (for OAuth) |
 
-**Important:** Only `SUPABASE_SECRET_KEY` should be treated as a sensitive secret. The other two public keys are safe to expose in client-side code.
+**Important:** Only `SUPABASE_SECRET_KEY` should be treated as a sensitive secret. The other two public keys are safe to expose in client-side code and can be regenerated independently.
 
 ## Environment-Specific Configuration
 
@@ -33,7 +33,7 @@ Create or update `.env.local` in the project root:
 ```bash
 # Public keys (safe to expose)
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx...
 
 # Secret key (keep private!)
 SUPABASE_SECRET_KEY=sb_secret_your_secret_key_here...
@@ -79,8 +79,8 @@ Add the following variables for each environment (Development, Preview, Producti
 | Key | Value | Type |
 |-----|-------|------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL | `NEXT_PUBLIC_` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key | `NEXT_PUBLIC_` |
-| `SUPABASE_SECRET_KEY` | Your Supabase secret key | Standard (secret) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Your Supabase publishable key (`sb_publishable_...`) | `NEXT_PUBLIC_` |
+| `SUPABASE_SECRET_KEY` | Your Supabase secret key (`sb_secret_...`) | Standard (secret) |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Your Google OAuth client ID | `NEXT_PUBLIC_` |
 | `GOOGLE_CLIENT_SECRET` | Your Google OAuth secret | Standard (secret) |
 
@@ -141,7 +141,7 @@ You can also define environment variables in a `vercel.json` file (but **never c
 {
   "env": {
     "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "@supabase_publishable_key",
     "SUPABASE_SECRET_KEY": "@supabase_secret_key"
   }
 }
@@ -171,7 +171,7 @@ If deploying with Docker, pass environment variables at runtime.
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx...
 SUPABASE_SECRET_KEY=sb_secret_...
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
@@ -216,7 +216,7 @@ services:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
       SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY}
       NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
@@ -263,7 +263,8 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
 ```
 
@@ -284,7 +285,7 @@ gcloud builds submit --tag gcr.io/your-project/crowdup
 ```bash
 gcloud run deploy crowdup \
   --image gcr.io/your-project/crowdup \
-  --set-env-vars "NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" \
+  --set-env-vars "NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY" \
   --set-secrets "SUPABASE_SECRET_KEY=supabase-secret-key:latest"
 ```
 
@@ -300,7 +301,7 @@ Add environment variables in `.ebextensions/environment.config`:
 option_settings:
   aws:elasticbeanstalk:application:environment:
     NEXT_PUBLIC_SUPABASE_URL: your_url
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: your_key
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: your_publishable_key
     SUPABASE_SECRET_KEY: your_secret_key
 ```
 
@@ -309,7 +310,7 @@ option_settings:
 ```bash
 heroku config:set SUPABASE_SECRET_KEY=sb_secret_...
 heroku config:set NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-heroku config:set NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+heroku config:set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
 ---

@@ -2,10 +2,10 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'placeholder-key';
 
-// Client-side Supabase client (anon key)
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+// Client-side Supabase client (publishable key)
+export const supabase = createClient<Database>(supabaseUrl, supabasePublishableKey, {
   auth: {
     persistSession: false, // Disable session persistence for better performance
     autoRefreshToken: false,

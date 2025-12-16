@@ -31,10 +31,10 @@ import bcrypt from 'bcryptjs';
 
 ```typescript
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'placeholder-key';
 ```
 
-**Important:** These placeholders only affect build time. At runtime, you MUST provide real values in `.env.local`
+**Important:** These placeholders only affect build time. At runtime, you MUST provide real values in `.env.local` using the modern Publishable key (not legacy `anon` key)
 
 ## Build Output
 
@@ -100,4 +100,4 @@ The project is ready to deploy to:
 
 Remember to set environment variables in your deployment platform:
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (modern key, not legacy `anon` key)

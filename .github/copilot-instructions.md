@@ -12,7 +12,7 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 - Styling: Tailwind CSS + shadcn/ui; use `cn()` from `src/lib/utils.ts` to compose classes. UI atoms live in `src/components/ui/`.
 
 ## Environment & Build
-- Required env (runtime): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`. See `SETUP.md`.
+- Required env (runtime): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (modern key format), and `SUPABASE_SECRET_KEY` (server-side) in `.env.local`. See `SETUP.md`.
 - Build placeholders: `src/lib/supabase.ts` falls back to placeholder URL/key to allow `next build` without envs (see `BUILD_NOTES.md`). Ensure real values at runtime.
 - TypeScript/ESLint: Builds ignore TS/ESLint errors for speed (`next.config.ts`: `typescript.ignoreBuildErrors`, `eslint.ignoreDuringBuilds`). Don’t introduce new errors, even if builds pass.
 - Scripts:
@@ -23,7 +23,7 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 
 ## Database Model (public schema)
 - Core tables: `users`, `posts`, `comments`, `votes` (+ `connections`, `apps`, `companies`, `conversations`, `messages`). Types live in `src/lib/database.types.ts`.
-- RLS: Disabled in the provided schema. The app uses anon key from the client. Treat this as a dev bootstrap; for sensitive changes, prefer server mediation.
+- RLS: Disabled in the provided schema. The app uses the modern Publishable key from the client. Treat this as a dev bootstrap; for sensitive changes, prefer server mediation with the Secret API key.
 - Migrations/schema: Primary DDL in `supabase-schema.sql`. Optional Google OAuth migration exists (`migration-google-oauth.sql`).
 
 ## Project-Specific Conventions

@@ -18,13 +18,13 @@ A fully functional social platform with:
 ### Step 1: Supabase (2 min)
 1. Go to https://supabase.com → Create project
 2. SQL Editor → New Query → Paste `supabase-schema.sql` → Run
-3. Settings → API → Copy URL and anon key
+3. Settings → API → Copy URL and **Publishable key** (modern key format, `sb_publishable_...`)
 
 ### Step 2: Environment (30 sec)
 Create `.env.local`:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_url_here
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key_here
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_key_here
 ```
 
 ### Step 3: Run (1 min)

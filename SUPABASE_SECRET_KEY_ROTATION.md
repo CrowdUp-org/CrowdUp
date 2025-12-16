@@ -6,7 +6,7 @@ This document provides a step-by-step runbook for safely rotating the Supabase S
 
 CrowdUp uses the Supabase Secret API key (`sb_secret_...`) for privileged server-side operations, particularly in the Google OAuth authentication flow. Regular key rotation reduces security risk in case of credential exposure.
 
-**Key rotation does NOT require downtime** if you follow this phased rollout approach.
+Unlike legacy `service_role` JWT keys, modern Secret API keys (`sb_secret_...`) can be rotated independently without affecting other keys or requiring JWT secret rotation. This means **key rotation does NOT require downtime** if you follow this phased rollout approach.
 
 ## Prerequisites
 
@@ -135,6 +135,7 @@ If the new key causes problems:
 - **Monitor key usage** in Supabase logs
 - **Test key rotation** in staging first
 - **Document the rotation** in your incident tracking system
+- **Regenerate Publishable keys** independently to refresh them (unlike legacy `anon` keys)
 
 ### Don'ts ❌
 - **Don't commit secrets to Git** (even deleted commits can expose keys)

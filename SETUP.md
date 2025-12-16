@@ -31,11 +31,13 @@
    - Go to Project Settings > API
    - Copy the Project URL
    - Copy the `anon` public key
+   - **NEW:** Copy the Secret API key (from Project Settings > API > Secret keys) - this is required for server-side operations
 
 3. Update `.env.local` with required values:
    ```
    NEXT_PUBLIC_SUPABASE_URL=your_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_SECRET_KEY=your_secret_key
    ```
 
 4. (Optional) Set up Google OAuth for "Sign in with Google":
@@ -101,6 +103,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Important Notes
 
+### Supabase API Keys (Migration from Legacy Keys)
+CrowdUp has been migrated to use Supabase **Secret API keys** for server-side operations:
+- **`SUPABASE_ANON_KEY`** (public, `NEXT_PUBLIC_` prefix): Used by client-side code for general database queries. This is the legacy "anon" key and can be safely exposed in client-side code.
+- **`SUPABASE_SECRET_KEY`** (secret, no `NEXT_PUBLIC_` prefix): Used only by server-side API routes (e.g., Google OAuth callback) for privileged operations. **Keep this key secure and never expose it in client-side code or version control.**
+
+The migration to Secret API keys provides:
+- Individual key rotation (no need to rotate global JWT secret)
+- Better security boundaries between client and server operations
+- Clearer access control for privileged backend tasks
+- Easier key management in case of credential exposure
+
+See [SUPABASE_SECRET_KEY_ROTATION.md](./SUPABASE_SECRET_KEY_ROTATION.md) for instructions on rotating Secret API keys.
+
 ### Row Level Security (RLS)
 This project uses **custom authentication** (not Supabase Auth), so Row Level Security is **disabled by default** in the SQL schema. This means:
 - All authenticated operations are handled client-side
@@ -110,8 +125,9 @@ This project uses **custom authentication** (not Supabase Auth), so Row Level Se
 ### Security Considerations
 - Passwords are hashed with bcryptjs before storage
 - Auth state is stored in localStorage (client-side)
+- Server-side operations use the Secret API key for elevated privileges
 - For production apps, consider:
   - Server-side session management
   - HTTP-only cookies
   - Supabase Auth integration
-  - API routes for sensitive operations
+  - Regular Secret API key rotation

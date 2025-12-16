@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import DOMPurify from "dompurify";
 
 // Helper: allow only http(s) or relative image URLs, block javascript: and data: URIs etc.
 function isSafeImageSrc(src: string): boolean {
@@ -943,11 +944,14 @@ export default function HoverReceiver() {
             imgEl.removeAttribute("srcset");
             imgEl.srcset = "";
 
-            if (isSafeImageSrc(src)) {
-              imgEl.src = src;
+            // First, sanitize the src value using DOMPurify
+            const sanitizedSrc = DOMPurify.sanitize(src, { ALLOWED_URI_REGEXP: /^(?:(?:https?):|(?:\/))/ });
+
+            if (isSafeImageSrc(sanitizedSrc)) {
+              imgEl.src = sanitizedSrc;
 
               // Update baseline src so flush doesn't treat this as pending change
-              originalSrcRef.current = normalizeImageSrc(src);
+              originalSrcRef.current = normalizeImageSrc(sanitizedSrc);
               focusedImageElementRef.current = imgEl;
 
               imgEl.onload = () => updateFocusBox();

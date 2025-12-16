@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 interface GoogleTokenResponse {
   access_token: string;
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     const googleUser: GoogleUserInfo = await userInfoResponse.json();
 
     // Check if OAuth account already exists
-    const { data: existingOAuthAccount } = await supabase
+    const { data: existingOAuthAccount } = await supabaseAdmin
       .from('oauth_accounts')
       .select('user_id, users(*)')
       .eq('provider', 'google')
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       userId = existingOAuthAccount.user_id;
     } else {
       // Check if user exists with this email
-      const { data: existingUser } = await supabase
+      const { data: existingUser } = await supabaseAdmin
         .from('users')
         .select('id')
         .eq('email', googleUser.email)
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
       if (existingUser) {
         // Link Google account to existing user
         userId = existingUser.id;
-        await supabase.from('oauth_accounts').insert({
+        await supabaseAdmin.from('oauth_accounts').insert({
           user_id: userId,
           provider: 'google',
           provider_user_id: googleUser.id,
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
 
         // Ensure username is unique
         while (true) {
-          const { data: existingUsername } = await supabase
+          const { data: existingUsername } = await supabaseAdmin
             .from('users')
             .select('id')
             .eq('username', finalUsername)
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
           counter++;
         }
 
-        const { data: newUser, error: createError } = await supabase
+        const { data: newUser, error: createError } = await supabaseAdmin
           .from('users')
           .insert({
             username: finalUsername,
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
         userId = newUser.id;
 
         // Create OAuth account link
-        await supabase.from('oauth_accounts').insert({
+        await supabaseAdmin.from('oauth_accounts').insert({
           user_id: userId,
           provider: 'google',
           provider_user_id: googleUser.id,
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get full user details
-    const { data: user } = await supabase
+    const { data: user } = await supabaseAdmin
       .from('users')
       .select('id, username, display_name, email, avatar_url, bio, created_at')
       .eq('id', userId)

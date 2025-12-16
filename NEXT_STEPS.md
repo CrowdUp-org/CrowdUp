@@ -29,7 +29,7 @@
 2. Add these two lines (replace with your actual values):
    ```
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
    ```
 
 ### 5. Install & Run

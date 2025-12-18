@@ -40,7 +40,7 @@ export async function getOrCreateConversation(otherUserId: string): Promise<{ co
     const [participant1, participant2] = [currentUserId, otherUserId].sort();
 
     // Check if conversation exists
-    const { data: existing, error: fetchError } = await supabase
+    const { data: existing } = await supabase
       .from('conversations')
       .select('id')
       .eq('participant1_id', participant1)

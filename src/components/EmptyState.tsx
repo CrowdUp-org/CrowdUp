@@ -26,15 +26,6 @@ interface EmptyStateProps {
   className?: string;
 }
 
-const defaultIcons: Record<string, typeof MessageSquare> = {
-  posts: FileText,
-  search: Search,
-  bookmarks: Bookmark,
-  notifications: Bell,
-  followers: Users,
-  comments: MessageSquare,
-};
-
 export function EmptyState({
   icon,
   title,

@@ -1,7 +1,6 @@
 "use client";
 
 import { TrendingUp, Users } from "lucide-react";
-import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";

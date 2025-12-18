@@ -3,7 +3,7 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Star, MessageCircle, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, Star, MessageCircle, TrendingUp } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";

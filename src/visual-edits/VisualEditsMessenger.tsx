@@ -947,22 +947,38 @@ export default function HoverReceiver() {
             imgEl.removeAttribute("srcset");
             imgEl.srcset = "";
 
-            // First, sanitize the src value using DOMPurify
-            const sanitizedSrc = DOMPurify.sanitize(src, { ALLOWED_URI_REGEXP: /^(?:(?:https?):|(?:\/))/ });
+            // First, sanitize the src value using DOMPurify to remove any dangerous characters.
+            const rawSanitizedSrc = DOMPurify.sanitize(src, {
+              ALLOWED_URI_REGEXP: /^(?:(?:https?):|(?:\/))/,
+            });
 
-            if (isSafeImageSrc(sanitizedSrc)) {
-              imgEl.src = sanitizedSrc;
+            try {
+              // Treat empty or whitespace-only values as unsafe right away.
+              if (!rawSanitizedSrc || !rawSanitizedSrc.trim()) {
+                throw new Error("Empty or invalid src after sanitization");
+              }
 
-              // Update baseline src so flush doesn't treat this as pending change
-              originalSrcRef.current = normalizeImageSrc(sanitizedSrc);
-              focusedImageElementRef.current = imgEl;
+              // Normalize the URL using the current origin as base. This also rejects
+              // malformed URLs by throwing, which we catch below.
+              const url = new URL(rawSanitizedSrc, window.location.origin);
+              const normalizedSrc = url.href;
 
-              imgEl.onload = () => updateFocusBox();
-            } else {
-              // Unsafe src provided - skip or optionally assign a safe placeholder
-              // Optionally, could also assign: imgEl.src = "";
-              // Optionally, log/report:
-              console.warn("Blocked unsafe image src:", src);
+              if (isSafeImageSrc(normalizedSrc)) {
+                imgEl.src = normalizedSrc;
+
+                // Update baseline src so flush doesn't treat this as pending change
+                originalSrcRef.current = normalizeImageSrc(normalizedSrc);
+                focusedImageElementRef.current = imgEl;
+
+                imgEl.onload = () => updateFocusBox();
+              } else {
+                // Unsafe src provided - skip or optionally assign a safe placeholder
+                // Optionally, could also assign: imgEl.src = "";
+                console.warn("Blocked unsafe image src:", src);
+              }
+            } catch {
+              // URL construction failed or sanitization produced an invalid value.
+              console.warn("Blocked invalid image src:", src);
             }
           }
         }

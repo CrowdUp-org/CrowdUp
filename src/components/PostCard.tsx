@@ -104,7 +104,7 @@ export default function PostCard({
       return;
     }
 
-    let newVotes = votes;
+    let newVotes;
     let newUserVote: "up" | "down" | null = voteType;
 
     if (userVote === voteType) {

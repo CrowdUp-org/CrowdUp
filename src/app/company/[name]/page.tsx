@@ -8,7 +8,6 @@ import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUserId } from "@/lib/auth";
-import { compressAndUploadImage } from "@/lib/imageUpload";
 import { formatDistanceToNow } from "date-fns";
 
 interface Company {

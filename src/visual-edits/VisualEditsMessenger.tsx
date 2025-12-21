@@ -3,6 +3,30 @@
 
 import { useEffect, useState, useRef } from "react";
 
+// Helper: validate and normalize image URLs. Returns normalized URL if safe, null otherwise.
+function validateAndNormalizeImageSrc(src: string): string | null {
+  try {
+    // Parse URL with current origin as base to normalize both absolute and relative paths
+    const url = new URL(src, window.location.origin);
+    
+    // Check that protocol is safe (http or https)
+    const allowedProtocols = ["http:", "https:"];
+    if (!allowedProtocols.includes(url.protocol)) {
+      return null;
+    }
+    
+    // Restrict to same-origin images to avoid leaking requests to arbitrary domains
+    if (url.origin !== window.location.origin) {
+      return null;
+    }
+    
+    return url.href;
+  } catch {
+    // URL parsing failed, treat as unsafe
+    return null;
+  }
+}
+
 export const CHANNEL = "ORCHIDS_HOVER_v1" as const;
 const VISUAL_EDIT_MODE_KEY = "orchids_visual_edit_mode" as const;
 const FOCUSED_ELEMENT_KEY = "orchids_focused_element" as const;
@@ -923,13 +947,27 @@ export default function HoverReceiver() {
             imgEl.removeAttribute("srcset");
             imgEl.srcset = "";
 
-            imgEl.src = src;
+            // Validate and sanitize the src value using custom validation
+            // Treat empty or whitespace-only values as unsafe right away.
+            if (!src || !src.trim()) {
+              console.warn("Blocked empty image src");
+            } else {
+              // Validate and normalize using custom security check
+              const normalizedSrc = validateAndNormalizeImageSrc(src);
+              
+              if (normalizedSrc) {
+                imgEl.src = normalizedSrc;
 
-            // Update baseline src so flush doesn't treat this as pending change
-            originalSrcRef.current = normalizeImageSrc(src);
-            focusedImageElementRef.current = imgEl;
+                // Update baseline src so flush doesn't treat this as pending change
+                originalSrcRef.current = normalizeImageSrc(normalizedSrc);
+                focusedImageElementRef.current = imgEl;
 
-            imgEl.onload = () => updateFocusBox();
+                imgEl.onload = () => updateFocusBox();
+              } else {
+                // Unsafe src provided - skip or optionally assign a safe placeholder
+                console.warn("Blocked unsafe image src:", src);
+              }
+            }
           }
         }
       } else if (e.data?.type === "RESIZE_ELEMENT") {

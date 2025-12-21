@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Smartphone, Settings, ExternalLink, BarChart3, Users, Star } from "lucide-react";
+import { Building2, Smartphone, Settings, ExternalLink, Users, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserId } from "@/lib/auth";

@@ -141,7 +141,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       return;
     }
 
-    let newVotes = votes;
+    let newVotes: number;
     let newUserVote: "up" | "down" | null = voteType;
 
     if (userVote === voteType) {

@@ -2,24 +2,24 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import DOMPurify from "dompurify";
 
 // Helper: allow only http(s) or relative image URLs, block javascript: and data: URIs etc.
 function isSafeImageSrc(src: string): boolean {
   try {
-    // relative path
-    if (src.startsWith("/") || src.startsWith("./") || src.startsWith("../")) {
-      return true;
-    }
-    const url = new URL(src, window.location.origin); // parse with base for relative
+    // Parse URL with current origin as base to normalize both absolute and relative paths
+    const url = new URL(src, window.location.origin);
+    
+    // Check that protocol is safe (http or https)
     const allowedProtocols = ["http:", "https:"];
     if (!allowedProtocols.includes(url.protocol)) {
       return false;
     }
+    
     // Restrict to same-origin images to avoid leaking requests to arbitrary domains
     if (url.origin !== window.location.origin) {
       return false;
     }
+    
     return true;
   } catch {
     // URL parsing failed, treat as unsafe
@@ -947,23 +947,19 @@ export default function HoverReceiver() {
             imgEl.removeAttribute("srcset");
             imgEl.srcset = "";
 
-            // First, sanitize the src value using DOMPurify to remove any dangerous characters.
-            const rawSanitizedSrc = DOMPurify.sanitize(src, {
-              ALLOWED_URI_REGEXP: /^(?:(?:https?):|(?:\/))/,
-            });
-
+            // Validate and sanitize the src value using custom validation
             try {
               // Treat empty or whitespace-only values as unsafe right away.
-              if (!rawSanitizedSrc || !rawSanitizedSrc.trim()) {
-                throw new Error("Empty or invalid src after sanitization");
+              if (!src || !src.trim()) {
+                throw new Error("Empty or invalid src");
               }
 
-              // Normalize the URL using the current origin as base. This also rejects
-              // malformed URLs by throwing, which we catch below.
-              const url = new URL(rawSanitizedSrc, window.location.origin);
-              const normalizedSrc = url.href;
-
-              if (isSafeImageSrc(normalizedSrc)) {
+              // Validate using custom security check before setting
+              if (isSafeImageSrc(src)) {
+                // Normalize the URL using the current origin as base
+                const url = new URL(src, window.location.origin);
+                const normalizedSrc = url.href;
+                
                 imgEl.src = normalizedSrc;
 
                 // Update baseline src so flush doesn't treat this as pending change

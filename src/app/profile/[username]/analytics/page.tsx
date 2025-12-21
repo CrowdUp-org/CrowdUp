@@ -3,7 +3,7 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, TrendingUp, MessageCircle, Users, Eye, ThumbsUp } from "lucide-react";
+import { ArrowLeft, MessageCircle, Users, Eye, ThumbsUp } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -25,7 +25,6 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
   const { username } = use(params);
   const router = useRouter();
   const currentUser = getCurrentUser();
-  const [profile, setProfile] = useState<any>(null);
   const [analytics, setAnalytics] = useState<Analytics>({
     totalPosts: 0,
     totalVotes: 0,
@@ -61,7 +60,7 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
       return;
     }
 
-    setProfile(userData);
+
     await fetchAnalytics(userData.id);
   };
 

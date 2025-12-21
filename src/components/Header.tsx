@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Search, Plus, MessageCircle, User, Bell, ChevronDown, Building2, Smartphone, BarChart3, Sun, Moon, Monitor, Bookmark, Settings } from "lucide-react";
+import { User, Bell, ChevronDown, Building2, Smartphone, BarChart3, Sun, Moon, Monitor, Bookmark, Settings } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -94,7 +94,6 @@ function OverlayShadow() {
   );
 }
 import { useTheme } from "@/contexts/ThemeContext";
-import { NotificationDropdown } from "./NotificationDropdown";
 
 export default function Header() {
   const router = useRouter();

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronUp, ChevronDown, Share2, Flag, Send, Users } from "lucide-react";
+import { ChevronUp, ChevronDown, Share2, Flag, Send } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -141,7 +141,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       return;
     }
 
-    let newVotes = votes;
+    let newVotes: number;
     let newUserVote: "up" | "down" | null = voteType;
 
     if (userVote === voteType) {

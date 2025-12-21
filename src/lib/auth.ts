@@ -129,8 +129,8 @@ export function getCurrentUser(): User | null {
   try {
     return JSON.parse(userStr);
   } catch {
-  return null;
-}
+    return null;
+  }
 }
 
 export function getCurrentUserId(): string | null {

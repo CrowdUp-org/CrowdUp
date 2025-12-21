@@ -2,28 +2,28 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import DOMPurify from "dompurify";
 
-// Helper: allow only http(s) or relative image URLs, block javascript: and data: URIs etc.
-function isSafeImageSrc(src: string): boolean {
+// Helper: validate and normalize image URLs. Returns normalized URL if safe, null otherwise.
+function validateAndNormalizeImageSrc(src: string): string | null {
   try {
-    // relative path
-    if (src.startsWith("/") || src.startsWith("./") || src.startsWith("../")) {
-      return true;
-    }
-    const url = new URL(src, window.location.origin); // parse with base for relative
+    // Parse URL with current origin as base to normalize both absolute and relative paths
+    const url = new URL(src, window.location.origin);
+    
+    // Check that protocol is safe (http or https)
     const allowedProtocols = ["http:", "https:"];
     if (!allowedProtocols.includes(url.protocol)) {
-      return false;
+      return null;
     }
+    
     // Restrict to same-origin images to avoid leaking requests to arbitrary domains
     if (url.origin !== window.location.origin) {
-      return false;
+      return null;
     }
-    return true;
+    
+    return url.href;
   } catch {
     // URL parsing failed, treat as unsafe
-    return false;
+    return null;
   }
 }
 
@@ -947,23 +947,15 @@ export default function HoverReceiver() {
             imgEl.removeAttribute("srcset");
             imgEl.srcset = "";
 
-            // First, sanitize the src value using DOMPurify to remove any dangerous characters.
-            const rawSanitizedSrc = DOMPurify.sanitize(src, {
-              ALLOWED_URI_REGEXP: /^(?:(?:https?):|(?:\/))/,
-            });
-
-            try {
-              // Treat empty or whitespace-only values as unsafe right away.
-              if (!rawSanitizedSrc || !rawSanitizedSrc.trim()) {
-                throw new Error("Empty or invalid src after sanitization");
-              }
-
-              // Normalize the URL using the current origin as base. This also rejects
-              // malformed URLs by throwing, which we catch below.
-              const url = new URL(rawSanitizedSrc, window.location.origin);
-              const normalizedSrc = url.href;
-
-              if (isSafeImageSrc(normalizedSrc)) {
+            // Validate and sanitize the src value using custom validation
+            // Treat empty or whitespace-only values as unsafe right away.
+            if (!src || !src.trim()) {
+              console.warn("Blocked empty image src");
+            } else {
+              // Validate and normalize using custom security check
+              const normalizedSrc = validateAndNormalizeImageSrc(src);
+              
+              if (normalizedSrc) {
                 imgEl.src = normalizedSrc;
 
                 // Update baseline src so flush doesn't treat this as pending change
@@ -973,12 +965,8 @@ export default function HoverReceiver() {
                 imgEl.onload = () => updateFocusBox();
               } else {
                 // Unsafe src provided - skip or optionally assign a safe placeholder
-                // Optionally, could also assign: imgEl.src = "";
                 console.warn("Blocked unsafe image src:", src);
               }
-            } catch {
-              // URL construction failed or sanitization produced an invalid value.
-              console.warn("Blocked invalid image src:", src);
             }
           }
         }

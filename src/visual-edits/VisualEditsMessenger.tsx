@@ -16,7 +16,10 @@ function isSafeImageSrc(src: string): boolean {
     if (!allowedProtocols.includes(url.protocol)) {
       return false;
     }
-    // Optionally: restrict host e.g. to window.location.hostname
+    // Restrict to same-origin images to avoid leaking requests to arbitrary domains
+    if (url.origin !== window.location.origin) {
+      return false;
+    }
     return true;
   } catch {
     // URL parsing failed, treat as unsafe

@@ -51,6 +51,7 @@ export default function PostCard({
   const router = useRouter();
   const [votes, setVotes] = useState(initialVotes);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
+  const [isVoting, setIsVoting] = useState(false);
 
   useEffect(() => {
     const fetchUserVote = async () => {
@@ -99,92 +100,101 @@ export default function PostCard({
   const handleVote = async (voteType: "up" | "down", e: React.MouseEvent) => {
     e.stopPropagation();
 
-    const userId = getCurrentUserId();
-    if (!userId) {
-      router.push("/auth/signin");
-      return;
-    }
+    // Prevent race condition from rapid clicking
+    if (isVoting) return;
+    setIsVoting(true);
 
-    // Get post author for reputation awarding
-    const { data: post } = await supabase
-      .from("posts")
-      .select("user_id")
-      .eq("id", postId)
-      .single();
-
-    const postAuthorId = post?.user_id;
-
-    let newVotes;
-    let newUserVote: "up" | "down" | null = voteType;
-
-    if (userVote === voteType) {
-      // Remove vote
-      newUserVote = null;
-      newVotes = votes + (voteType === "up" ? -1 : 1);
-
-      await supabase
-        .from("votes")
-        .delete()
-        .eq("post_id", postId)
-        .eq("user_id", userId);
-
-      // Remove reputation points from post author
-      if (postAuthorId && postAuthorId !== userId) {
-        await awardPoints(
-          postAuthorId,
-          voteType === "up" ? "post_downvoted" : "post_upvoted",
-          { relatedPostId: postId, reason: "Vote removed" }
-        );
+    try {
+      const userId = getCurrentUserId();
+      if (!userId) {
+        router.push("/auth/signin");
+        setIsVoting(false);
+        return;
       }
-    } else {
-      // Add or change vote
-      if (userVote) {
-        newVotes = votes + (voteType === "up" ? 2 : -2);
-        // Handle vote change: remove old points, add new
+
+      // Get post author for reputation awarding
+      const { data: post } = await supabase
+        .from("posts")
+        .select("user_id")
+        .eq("id", postId)
+        .single();
+
+      const postAuthorId = post?.user_id;
+
+      let newVotes;
+      let newUserVote: "up" | "down" | null = voteType;
+
+      if (userVote === voteType) {
+        // Remove vote
+        newUserVote = null;
+        newVotes = votes + (voteType === "up" ? -1 : 1);
+
+        await supabase
+          .from("votes")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", userId);
+
+        // Remove reputation points from post author
         if (postAuthorId && postAuthorId !== userId) {
-          // Remove old vote points
           await awardPoints(
             postAuthorId,
-            userVote === "up" ? "post_downvoted" : "post_upvoted",
-            { relatedPostId: postId, reason: "Vote changed" }
-          );
-          // Add new vote points
-          await awardPoints(
-            postAuthorId,
-            voteType === "up" ? "post_upvoted" : "post_downvoted",
-            { relatedPostId: postId }
+            voteType === "up" ? "post_downvoted" : "post_upvoted",
+            { relatedPostId: postId, reason: "Vote removed" }
           );
         }
       } else {
-        newVotes = votes + (voteType === "up" ? 1 : -1);
-        // Award reputation to post author (not self-votes)
-        if (postAuthorId && postAuthorId !== userId) {
-          await awardPoints(
-            postAuthorId,
-            voteType === "up" ? "post_upvoted" : "post_downvoted",
-            { relatedPostId: postId }
-          );
+        // Add or change vote
+        if (userVote) {
+          newVotes = votes + (voteType === "up" ? 2 : -2);
+          // Handle vote change: remove old points, add new
+          if (postAuthorId && postAuthorId !== userId) {
+            // Remove old vote points
+            await awardPoints(
+              postAuthorId,
+              userVote === "up" ? "post_downvoted" : "post_upvoted",
+              { relatedPostId: postId, reason: "Vote changed" }
+            );
+            // Add new vote points
+            await awardPoints(
+              postAuthorId,
+              voteType === "up" ? "post_upvoted" : "post_downvoted",
+              { relatedPostId: postId }
+            );
+          }
+        } else {
+          newVotes = votes + (voteType === "up" ? 1 : -1);
+          // Award reputation to post author (not self-votes)
+          if (postAuthorId && postAuthorId !== userId) {
+            await awardPoints(
+              postAuthorId,
+              voteType === "up" ? "post_upvoted" : "post_downvoted",
+              { relatedPostId: postId }
+            );
+          }
         }
+
+        await supabase
+          .from("votes")
+          .upsert({
+            post_id: postId,
+            user_id: userId,
+            vote_type: voteType,
+          } as any);
       }
 
+      // Update post votes count
+      // @ts-ignore - Supabase type issue
       await supabase
-        .from("votes")
-        .upsert({
-          post_id: postId,
-          user_id: userId,
-          vote_type: voteType,
-        } as any);
+        .from("posts")
+        .update({ votes: newVotes })
+        .eq("id", postId);
+
+      setVotes(newVotes);
+      setUserVote(newUserVote);
+    } finally {
+      setIsVoting(false);
     }
-
-    // Update post votes count
-    // @ts-ignore - Supabase type issue
-    await supabase
-      .from("posts")
-      .update({ votes: newVotes })
-      .eq("id", postId);
-
-    setVotes(newVotes);
-    setUserVote(newUserVote);
   };
 
   const handlePostClick = () => {

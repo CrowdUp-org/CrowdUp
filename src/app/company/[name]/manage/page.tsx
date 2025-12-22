@@ -26,16 +26,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Settings, 
-  Upload, 
-  Trash2, 
-  Users, 
-  UserPlus, 
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { VerificationForm } from "@/components/ui/verification-form";
+import { getVerificationStatus } from "@/lib/verification";
+import {
+  Settings,
+  Upload,
+  Trash2,
+  Users,
+  UserPlus,
   ExternalLink,
   Shield,
   Crown,
-  Mail
+  Mail,
+  BadgeCheck
 } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -88,6 +92,11 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<'admin' | 'member'>('member');
   const [inviting, setInviting] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<{
+    verified: boolean;
+    status: 'pending' | 'approved' | 'rejected' | null;
+  } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCompanyAndMembers();
@@ -157,6 +166,13 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
 
     if (membersData) {
       setMembers(membersData as any);
+    }
+
+    // Set current user ID and fetch verification status
+    setCurrentUserId(userId);
+    const verStatus = await getVerificationStatus(userId, companyData.id);
+    if (verStatus) {
+      setVerificationStatus(verStatus);
     }
 
     setLoading(false);
@@ -381,7 +397,7 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
 
                     setUploadingLogo(true);
                     const result = await compressAndUploadImage(file, 300, 300, 0.9);
-                    
+
                     if (result.success && result.dataUrl) {
                       setFormData({ ...formData, logo_url: result.dataUrl });
                     } else {
@@ -582,6 +598,30 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Verification */}
+        {company && currentUserId && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BadgeCheck className="h-5 w-5 text-blue-500" />
+                Verification
+              </CardTitle>
+              <CardDescription>
+                Get verified to show you're an official representative
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <VerificationForm
+                userId={currentUserId}
+                companyId={company.id}
+                companyName={company.display_name}
+                currentStatus={verificationStatus?.status}
+                onSuccess={() => fetchCompanyAndMembers()}
+              />
             </CardContent>
           </Card>
         )}

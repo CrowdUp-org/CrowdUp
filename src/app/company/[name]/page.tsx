@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUserId } from "@/lib/auth";
 import { formatDistanceToNow } from "date-fns";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { getVerifiedMembers } from "@/lib/verification";
 
 interface Company {
   id: string;
@@ -32,6 +34,7 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
   const [isOwnerOrAdmin, setIsOwnerOrAdmin] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
+  const [verifiedMembers, setVerifiedMembers] = useState<any[]>([]);
 
   useEffect(() => {
     fetchCompany();
@@ -43,6 +46,7 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
       fetchApps();
       checkOwnership();
       checkFollowStatus();
+      fetchVerifiedMembers();
     }
   }, [company]);
 
@@ -113,7 +117,7 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
       .select("role")
       .eq("company_id", company.id)
       .eq("user_id", userId)
-      .single();
+      .single() as any;
 
     if (data && (data.role === "owner" || data.role === "admin")) {
       setIsOwnerOrAdmin(true);
@@ -172,6 +176,20 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
 
       setIsFollowing(true);
       setFollowerCount(followerCount + 1);
+    }
+  };
+
+  const fetchVerifiedMembers = async () => {
+    if (!company) return;
+    const memberIds = await getVerifiedMembers(company.id);
+    if (memberIds.length > 0) {
+      const { data } = await supabase
+        .from("users")
+        .select("id, username, display_name, avatar_url")
+        .in("id", memberIds);
+      if (data) {
+        setVerifiedMembers(data);
+      }
     }
   };
 
@@ -317,8 +335,37 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
             </div>
           </div>
         )}
-
-        {/* Posts Section */}
+        {/* Verified Team Section */}
+        {verifiedMembers.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold mb-4">Verified Representatives</h2>
+            <div className="flex flex-wrap gap-4">
+              {verifiedMembers.map((member) => (
+                <button
+                  key={member.id}
+                  onClick={() => router.push(`/profile/${member.username}`)}
+                  className="bg-white rounded-xl border p-4 hover:shadow-md transition-all flex items-center gap-3"
+                >
+                  {member.avatar_url ? (
+                    <img
+                      src={member.avatar_url}
+                      alt={member.display_name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-sm">
+                      {member.display_name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-semibold text-gray-900">{member.display_name}</span>
+                    <VerifiedBadge size="md" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div>
           <h2 className="text-2xl font-bold mb-4">
             Posts about {displayName} ({posts.length})

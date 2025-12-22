@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Bell, ChevronDown, Building2, Smartphone, BarChart3, Sun, Moon, Monitor, Bookmark, Settings } from "lucide-react";
+import { User, ChevronDown, Building2, Smartphone, BarChart3, Sun, Moon, Monitor, Bookmark, Settings } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -19,6 +19,7 @@ import {
 } from "./ui/dropdown-menu";
 import { signOut } from "@/lib/auth";
 import svgPaths from "./navbar/svg-paths";
+import { NotificationBell } from "./ui/notification-bell";
 
 type NavItem = "home" | "search" | "add" | "messages" | "profile";
 
@@ -159,11 +160,10 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-50 w-[98%] sm:w-[95%] max-w-7xl rounded-xl sm:rounded-2xl border transition-all duration-300 ${
-        scrolled
-          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg shadow-black/5 dark:shadow-black/20 border-gray-200 dark:border-gray-800"
-          : "bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-md border-gray-200 dark:border-gray-800"
-      }`}
+      className={`fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-50 w-[98%] sm:w-[95%] max-w-7xl rounded-xl sm:rounded-2xl border transition-all duration-300 ${scrolled
+        ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg shadow-black/5 dark:shadow-black/20 border-gray-200 dark:border-gray-800"
+        : "bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-md border-gray-200 dark:border-gray-800"
+        }`}
     >
       <div className="flex items-center justify-between px-3 sm:px-6 md:px-8 py-2.5 sm:py-3.5">
         {/* Logo */}
@@ -196,15 +196,15 @@ export default function Header() {
         {/* Navbar centrale */}
         <div className="relative">
           <div className="backdrop-blur-[5.51px] backdrop-filter bg-[rgba(225,225,225,0.3)] box-border content-stretch flex flex-col items-center justify-center p-[9.643px] rounded-[20px]" data-name="Overlay+OverlayBlur">
-            <div 
-              className="absolute bg-[#909090] h-[57.857px] rounded-[17.564px] shadow-[0px_0px_28px_-3px_#909090] top-[9.64px] w-[96.429px] transition-all duration-300 ease-out" 
+            <div
+              className="absolute bg-[#909090] h-[57.857px] rounded-[17.564px] shadow-[0px_0px_28px_-3px_#909090] top-[9.64px] w-[96.429px] transition-all duration-300 ease-out"
               data-name="Overlay+Shadow"
               style={{
-                left: activeItem === "home" ? "9.64px" : 
-                      activeItem === "search" ? "115.672px" : 
-                      activeItem === "add" ? "221.704px" :
-                      activeItem === "messages" ? "327.736px" : 
-                      "433.768px"
+                left: activeItem === "home" ? "9.64px" :
+                  activeItem === "search" ? "115.672px" :
+                    activeItem === "add" ? "221.704px" :
+                      activeItem === "messages" ? "327.736px" :
+                        "433.768px"
               }}
             />
             <div className="content-stretch flex gap-[9.643px] items-center relative shrink-0 z-10" data-name="Container">
@@ -250,33 +250,8 @@ export default function Header() {
 
         {/* User Section with Notification */}
         <div className="flex items-center gap-1.5 sm:gap-3">
-          {/* Notification Bell - Far Right */}
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-xl transition-all hover:scale-105 hover:bg-gray-100 h-10 w-10 relative"
-                >
-                  <Bell className="h-5 w-5" />
-                  {/* Notification badge */}
-                  <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <div className="px-4 py-3 border-b">
-                  <h3 className="font-semibold">Notifications</h3>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  <div className="p-4 text-center text-gray-500 text-sm">
-                    No new notifications
-                  </div>
-                  {/* Placeholder for future notifications */}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          {/* Notification Bell */}
+          {user && <NotificationBell />}
 
           {user ? (
             <DropdownMenu>

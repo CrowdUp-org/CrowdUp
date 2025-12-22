@@ -468,12 +468,77 @@ export interface Database {
           earned_at?: string
         }
       }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: 'badge' | 'level' | 'verification' | 'milestone'
+          title: string
+          content: string
+          link: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: 'badge' | 'level' | 'verification' | 'milestone'
+          title: string
+          content: string
+          link?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: 'badge' | 'level' | 'verification' | 'milestone'
+          title?: string
+          content?: string
+          link?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+      }
+      user_role_audit: {
+        Row: {
+          id: string
+          target_user_id: string
+          admin_id: string
+          action: 'promote' | 'demote'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          target_user_id: string
+          admin_id: string
+          action: 'promote' | 'demote'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          target_user_id?: string
+          admin_id?: string
+          action?: 'promote' | 'demote'
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_reputation_points: {
+        Args: {
+          p_user_id: string
+          p_action_type: string
+          p_points: number
+          p_related_post_id?: string | null
+          p_related_comment_id?: string | null
+          p_reason?: string | null
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

@@ -262,5 +262,56 @@ export async function getVerifiedMembers(companyId: string): Promise<string[]> {
 
     if (error || !data) return [];
 
-    return data.map((m) => m.user_id);
+    return data.map((m) => m.user_id as string);
+}
+
+/**
+ * Update a user's admin status (admin only)
+ */
+export async function updateUserAdminStatus(
+    userId: string,
+    isAdmin: boolean,
+    currentAdminId: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const { error } = await supabase
+            .from("users")
+            .update({ is_admin: isAdmin } as any)
+            .eq("id", userId);
+
+        if (error) {
+            console.error("User update error:", error);
+            return { success: false, error: "Failed to update user status" };
+        }
+
+        // Log the action
+        await supabase.from("user_role_audit").insert({
+            target_user_id: userId,
+            admin_id: currentAdminId,
+            action: isAdmin ? "promote" : "demote",
+        } as any);
+
+        return { success: true };
+    } catch (error) {
+        console.error("User update error:", error);
+        return { success: false, error: "An unexpected error occurred" };
+    }
+}
+
+/**
+ * Get all users with their reputation and admin status (admin only)
+ */
+export async function getAllUsers(limit: number = 50, offset: number = 0): Promise<any[]> {
+    const { data, error } = await supabase
+        .from("users")
+        .select("id, username, display_name, email, is_admin, reputation_score, reputation_level, created_at")
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+    if (error || !data) {
+        console.error("Get users error:", error);
+        return [];
+    }
+
+    return data;
 }

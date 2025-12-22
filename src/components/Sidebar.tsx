@@ -1,19 +1,31 @@
 "use client";
 
-import { TrendingUp, Users, Trophy } from "lucide-react";
+import { TrendingUp, Users, Trophy, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { getCurrentUserId } from "@/lib/auth";
+import { isCurrentUserAdmin } from "@/lib/verification";
 
 export default function Sidebar() {
   const router = useRouter();
   const [trendingCompanies, setTrendingCompanies] = useState<any[]>([]);
   const [stats, setStats] = useState({ users: 0, posts: 0, companies: 0 });
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetchTrendingCompanies();
     fetchStats();
+    checkAdmin();
   }, []);
+
+  const checkAdmin = async () => {
+    const userId = getCurrentUserId();
+    if (userId) {
+      const admin = await isCurrentUserAdmin(userId);
+      setIsAdmin(admin);
+    }
+  };
 
   const fetchTrendingCompanies = async () => {
     const { data } = await supabase
@@ -89,6 +101,22 @@ export default function Sidebar() {
           </div>
         </div>
       </button>
+
+      {/* Admin Dashboard Link */}
+      {isAdmin && (
+        <button
+          onClick={() => router.push("/admin/users")}
+          className="w-full rounded-2xl bg-blue-600 p-5 text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+        >
+          <div className="flex items-center gap-3">
+            <Shield className="h-6 w-6" />
+            <div className="text-left">
+              <h3 className="font-semibold text-base">Admin Panel</h3>
+              <p className="text-sm text-white/80">Manage users & verification</p>
+            </div>
+          </div>
+        </button>
+      )}
 
       {/* Trending Groups */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">

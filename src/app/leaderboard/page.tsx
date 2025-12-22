@@ -13,15 +13,33 @@ export default function LeaderboardPage() {
     const router = useRouter();
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const pageSize = 50;
 
     useEffect(() => {
-        async function fetchLeaderboard() {
-            const data = await getLeaderboard({ limit: 50 });
-            setLeaderboard(data);
-            setLoading(false);
-        }
-        fetchLeaderboard();
+        fetchLeaderboard(1, true);
     }, []);
+
+    async function fetchLeaderboard(pageNum: number, isInitial: boolean = false) {
+        if (!isInitial) setLoading(true);
+        const data = await getLeaderboard({ limit: pageSize, page: pageNum });
+
+        if (isInitial) {
+            setLeaderboard(data);
+        } else {
+            setLeaderboard(prev => [...prev, ...data]);
+        }
+
+        setHasMore(data.length === pageSize);
+        setLoading(false);
+    }
+
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchLeaderboard(nextPage);
+    };
 
     const getRankIcon = (rank: number) => {
         switch (rank) {
@@ -146,6 +164,24 @@ export default function LeaderboardPage() {
                         </div>
                     )}
                 </div>
+
+                {hasMore && !loading && leaderboard.length > 0 && (
+                    <div className="mt-8 flex justify-center">
+                        <Button
+                            onClick={handleLoadMore}
+                            variant="outline"
+                            className="bg-white hover:bg-gray-50 border-gray-200 px-8 h-12 rounded-full font-semibold text-gray-700 shadow-sm transition-all hover:translate-y-[-1px] active:translate-y-[1px]"
+                        >
+                            Load More Contributors
+                        </Button>
+                    </div>
+                )}
+
+                {loading && leaderboard.length > 0 && (
+                    <div className="mt-8 text-center text-gray-500 italic">
+                        Fetching more contributors...
+                    </div>
+                )}
             </main>
         </div>
     );

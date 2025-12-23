@@ -21,6 +21,11 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser, updateProfile } from "@/lib/auth";
 import { formatDistanceToNow, format } from "date-fns";
+<<<<<<< HEAD
+=======
+import { ReputationCard } from "@/components/ui/reputation-card";
+import { ReputationBadge } from "@/components/ui/reputation-badge";
+>>>>>>> 9b0f965 (feat: Implement User Reputation and Credibility System)
 
 interface UserProfile {
   id: string;
@@ -28,6 +33,11 @@ interface UserProfile {
   display_name: string;
   bio: string | null;
   avatar_url: string | null;
+<<<<<<< HEAD
+=======
+  reputation_score: number;
+  reputation_level: string;
+>>>>>>> 9b0f965 (feat: Implement User Reputation and Credibility System)
   created_at: string;
 }
 
@@ -78,7 +88,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     // Fetch user profile
     const { data: userData, error: userError } = await supabase
       .from("users")
+<<<<<<< HEAD
       .select("id, username, display_name, bio, avatar_url, created_at")
+=======
+      .select("id, username, display_name, bio, avatar_url, reputation_score, reputation_level, created_at")
+>>>>>>> 9b0f965 (feat: Implement User Reputation and Credibility System)
       .eq("username", username)
       .single();
 
@@ -98,7 +112,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
     if (!postsError && postsData) {
       setPosts(postsData);
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> 9b0f965 (feat: Implement User Reputation and Credibility System)
       // Fetch comment counts
       const postIds = postsData.map(p => p.id);
       if (postIds.length > 0) {
@@ -315,8 +333,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                     </div>
                   </DialogContent>
                 </Dialog>
+<<<<<<< HEAD
                 <Button 
                   variant="outline" 
+=======
+                <Button
+                  variant="outline"
+>>>>>>> 9b0f965 (feat: Implement User Reputation and Credibility System)
                   className="gap-2"
                   onClick={() => router.push("/settings")}
                 >
@@ -341,9 +364,30 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               </p>
               <p className="text-sm text-gray-600">Total Votes</p>
             </div>
+<<<<<<< HEAD
           </div>
         </div>
 
+=======
+            <div className="text-center">
+              <ReputationBadge
+                level={profile.reputation_level}
+                score={profile.reputation_score}
+                size="md"
+              />
+              <p className="text-sm text-gray-600 mt-1">Reputation</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Reputation Card */}
+        <ReputationCard
+          score={profile.reputation_score}
+          level={profile.reputation_level}
+          className="mb-6"
+        />
+
+>>>>>>> 9b0f965 (feat: Implement User Reputation and Credibility System)
         {/* Tabs */}
         <div className="bg-white rounded-2xl border shadow-sm mb-6">
           <div className="flex items-center gap-4 px-6 py-3 border-b">

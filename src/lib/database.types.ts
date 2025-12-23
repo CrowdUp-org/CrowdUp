@@ -18,6 +18,9 @@ export interface Database {
           password_hash: string
           avatar_url: string | null
           bio: string | null
+          reputation_score: number
+          reputation_level: string
+          is_admin: boolean
           created_at: string
           updated_at: string
         }
@@ -29,6 +32,9 @@ export interface Database {
           password_hash: string
           avatar_url?: string | null
           bio?: string | null
+          reputation_score?: number
+          reputation_level?: string
+          is_admin?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -40,6 +46,9 @@ export interface Database {
           password_hash?: string
           avatar_url?: string | null
           bio?: string | null
+          reputation_score?: number
+          reputation_level?: string
+          is_admin?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -271,6 +280,11 @@ export interface Database {
           company_id: string
           user_id: string
           role: 'owner' | 'admin' | 'member'
+          verified: boolean
+          verification_status: 'pending' | 'approved' | 'rejected' | null
+          verification_date: string | null
+          verification_documents: Json | null
+          verification_notes: string | null
           created_at: string
         }
         Insert: {
@@ -278,6 +292,11 @@ export interface Database {
           company_id: string
           user_id: string
           role: 'owner' | 'admin' | 'member'
+          verified?: boolean
+          verification_status?: 'pending' | 'approved' | 'rejected' | null
+          verification_date?: string | null
+          verification_documents?: Json | null
+          verification_notes?: string | null
           created_at?: string
         }
         Update: {
@@ -285,6 +304,11 @@ export interface Database {
           company_id?: string
           user_id?: string
           role?: 'owner' | 'admin' | 'member'
+          verified?: boolean
+          verification_status?: 'pending' | 'approved' | 'rejected' | null
+          verification_date?: string | null
+          verification_documents?: Json | null
+          verification_notes?: string | null
           created_at?: string
         }
       }

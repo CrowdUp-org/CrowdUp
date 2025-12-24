@@ -126,8 +126,10 @@ Before your app can work, you need to set up the database:
 2. Select your project
 3. Navigate to **SQL Editor**
 4. Create a new query
-5. Copy the contents of `supabase-schema.sql` from the CrowdUp repository
-6. Run the query
+5. Get the schema from the repository:
+   - **GitHub:** [supabase-schema.sql](https://github.com/CrowdUp-org/CrowdUp/blob/main/supabase-schema.sql)
+   - **Raw file:** Copy from [here](https://raw.githubusercontent.com/CrowdUp-org/CrowdUp/main/supabase-schema.sql)
+6. Paste and run the query
 7. Verify tables are created under **Table Editor**
 
 Required tables:
@@ -299,7 +301,7 @@ To deploy updates:
 docker build -t crowdup-test .
 docker run -p 7860:7860 \
   -e NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co \
-  -e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... \
+  -e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here \
   crowdup-test
 
 # If working, push to Space

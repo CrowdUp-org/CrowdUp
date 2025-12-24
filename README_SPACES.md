@@ -40,8 +40,8 @@ To run this Space, you need to configure the following secrets in your Space set
 
 2. **NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY**
    - Your Supabase publishable/anon key
-   - Starts with: `eyJ...`
-   - Get it from: Supabase Dashboard → Project Settings → API → Project API keys → `anon` `public`
+   - Starts with: `eyJhbG...` (JWT format)
+   - Get it from: Supabase Dashboard → Project Settings → API → Project API keys → `anon` / `public` key
 
 3. **SUPABASE_SECRET_KEY** (Optional but recommended)
    - Your Supabase secret/service_role key
@@ -66,7 +66,10 @@ To run this Space, you need to configure the following secrets in your Space set
 
 2. **Set up Supabase**
    - Create a free Supabase project at [supabase.com](https://supabase.com)
-   - Run the SQL schema from the original repository's `supabase-schema.sql`
+   - Get the SQL schema from:
+     - GitHub: [supabase-schema.sql](https://github.com/CrowdUp-org/CrowdUp/blob/main/supabase-schema.sql)
+     - Raw file: [Download here](https://raw.githubusercontent.com/CrowdUp-org/CrowdUp/main/supabase-schema.sql)
+   - Run the schema in your Supabase SQL Editor
    - Copy your API credentials
 
 3. **Configure Space Secrets**

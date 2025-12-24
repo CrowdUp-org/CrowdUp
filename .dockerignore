@@ -64,8 +64,7 @@ next-env.d.ts
 prototype-from-figma
 UI design screenshots
 
-# Migration files (not needed in production)
+# Migration files (not needed in production image, but keep schema for reference)
 migration-*.sql
-supabase-schema.sql
-supabase_migrations
 reputation-hardening.sql
+# Note: supabase-schema.sql is kept for documentation purposes

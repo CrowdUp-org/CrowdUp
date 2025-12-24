@@ -2,6 +2,8 @@
 
 This guide explains how to deploy the CrowdUp application to Hugging Face Spaces using Docker.
 
+**Important Note:** When deploying to Hugging Face Spaces, you must rename `README_SPACES.md` to `README.md`. This file contains the metadata that Hugging Face uses to configure your Space (SDK type, port, emoji, etc.).
+
 ## Overview
 
 Hugging Face Spaces is a platform for hosting ML demos and applications. It supports Docker-based deployments, making it perfect for running Next.js applications like CrowdUp.
@@ -295,7 +297,10 @@ To deploy updates:
 
 # Build Docker image locally to test
 docker build -t crowdup-test .
-docker run -p 7860:7860 -e NEXT_PUBLIC_SUPABASE_URL=xxx crowdup-test
+docker run -p 7860:7860 \
+  -e NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co \
+  -e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... \
+  crowdup-test
 
 # If working, push to Space
 cd /path/to/your/space/repo

@@ -2,6 +2,8 @@
 
 This repository is ready to deploy to Hugging Face Spaces! Follow these simple steps:
 
+**📝 Important:** You must rename `README_SPACES.md` to `README.md` when deploying to Spaces. This file contains the metadata (sdk, port, emoji) that configures your Space.
+
 ## 1. Create a Space
 
 1. Go to [Hugging Face Spaces](https://huggingface.co/new-space)
@@ -23,6 +25,9 @@ cd your-space-name
 # Add this repository as a remote
 git remote add crowdup https://github.com/CrowdUp-org/CrowdUp.git
 git pull crowdup main --allow-unrelated-histories
+
+# IMPORTANT: Rename README_SPACES.md to README.md
+mv README_SPACES.md README.md
 
 # Push to your Space
 git push origin main

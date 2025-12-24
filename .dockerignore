@@ -55,8 +55,10 @@ next-env.d.ts
 *~
 
 # Documentation (keep essential docs)
+# Note: For Hugging Face Spaces, rename README_SPACES.md to README.md during deployment
 *.md
 !README.md
+!README_SPACES.md
 
 # Prototype and test files
 prototype-from-figma

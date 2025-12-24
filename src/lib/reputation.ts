@@ -145,51 +145,27 @@ export async function awardPoints(
             return { success: false, error: 'Invalid action type or no points to award' };
         }
 
-        // Get current user reputation
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('reputation_score')
-            .eq('id', userId)
-            .single();
+        // Call the atomic database function
+        const { data, error } = await supabase.rpc('award_reputation_points', {
+            p_user_id: userId,
+            p_action_type: actionType,
+            p_points: points,
+            p_related_post_id: options?.relatedPostId || null,
+            p_related_comment_id: options?.relatedCommentId || null,
+            p_reason: options?.reason || null
+        });
 
-        if (userError || !user) {
-            return { success: false, error: 'User not found' };
+        if (error) {
+            console.error('Error awarding points via RPC:', error);
+            return { success: false, error: error.message };
         }
 
-        const newScore = Math.max(0, (user.reputation_score || 0) + points);
-        const newLevel = calculateLevel(newScore);
-
-        // Update user reputation (trigger will update level)
-        const { error: updateError } = await supabase
-            .from('users')
-            .update({
-                reputation_score: newScore,
-                reputation_level: newLevel
-            })
-            .eq('id', userId);
-
-        if (updateError) {
-            return { success: false, error: 'Failed to update reputation' };
+        const result = data as { success: boolean, error?: string, new_score?: number };
+        if (!result.success) {
+            return { success: false, error: result.error || 'Failed to award points' };
         }
 
-        // Record in history
-        const { error: historyError } = await supabase
-            .from('reputation_history')
-            .insert({
-                user_id: userId,
-                action_type: actionType,
-                points_change: points,
-                related_post_id: options?.relatedPostId || null,
-                related_comment_id: options?.relatedCommentId || null,
-                reason: options?.reason || null,
-            });
-
-        if (historyError) {
-            console.error('Failed to record reputation history:', historyError);
-            // Don't fail the operation if history recording fails
-        }
-
-        return { success: true, error: null, newScore };
+        return { success: true, error: null, newScore: result.new_score };
     } catch (error) {
         console.error('Error awarding points:', error);
         return { success: false, error: 'An error occurred while awarding points' };
@@ -223,7 +199,8 @@ export async function getUserReputation(userId: string): Promise<ReputationData 
  */
 export async function getReputationHistory(
     userId: string,
-    limit: number = 20
+    limit: number = 20,
+    offset: number = 0
 ): Promise<ReputationHistoryItem[]> {
     try {
         const { data, error } = await supabase
@@ -238,7 +215,7 @@ export async function getReputationHistory(
       `)
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
-            .limit(limit);
+            .range(offset, offset + limit - 1);
 
         if (error || !data) {
             return [];
@@ -272,23 +249,24 @@ export async function getReputationHistory(
 }
 
 /**
- * Get leaderboard
+ * Get leaderboard with pagination
  */
 export async function getLeaderboard(
     options?: {
         limit?: number;
-        timeFilter?: 'all' | 'month' | 'week';
+        page?: number;
     }
 ): Promise<LeaderboardEntry[]> {
     try {
         const limit = options?.limit || 50;
+        const page = options?.page || 1;
+        const offset = (page - 1) * limit;
 
-        // For all-time, just get top users by reputation score
         const { data, error } = await supabase
             .from('users')
             .select('id, username, display_name, avatar_url, reputation_score, reputation_level')
             .order('reputation_score', { ascending: false })
-            .limit(limit);
+            .range(offset, offset + limit - 1);
 
         if (error || !data) {
             return [];

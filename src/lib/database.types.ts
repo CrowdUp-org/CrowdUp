@@ -387,12 +387,158 @@ export interface Database {
           updated_at?: string
         }
       }
+      reputation_history: {
+        Row: {
+          id: string
+          user_id: string
+          action_type: 'post_created' | 'post_upvoted' | 'post_downvoted' | 'post_acknowledged' | 'post_implemented' | 'comment_upvoted' | 'reported_content' | 'manual_adjustment'
+          points_change: number
+          related_post_id: string | null
+          related_comment_id: string | null
+          reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          action_type: 'post_created' | 'post_upvoted' | 'post_downvoted' | 'post_acknowledged' | 'post_implemented' | 'comment_upvoted' | 'reported_content' | 'manual_adjustment'
+          points_change: number
+          related_post_id?: string | null
+          related_comment_id?: string | null
+          reason?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          action_type?: 'post_created' | 'post_upvoted' | 'post_downvoted' | 'post_acknowledged' | 'post_implemented' | 'comment_upvoted' | 'reported_content' | 'manual_adjustment'
+          points_change?: number
+          related_post_id?: string | null
+          related_comment_id?: string | null
+          reason?: string | null
+          created_at?: string
+        }
+      }
+      badges: {
+        Row: {
+          id: string
+          name: string
+          description: string
+          icon: string
+          requirement_type: 'posts_count' | 'upvotes_received' | 'reputation_score' | 'days_active' | 'implementations' | 'comments_count'
+          requirement_value: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description: string
+          icon: string
+          requirement_type: 'posts_count' | 'upvotes_received' | 'reputation_score' | 'days_active' | 'implementations' | 'comments_count'
+          requirement_value: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string
+          icon?: string
+          requirement_type?: 'posts_count' | 'upvotes_received' | 'reputation_score' | 'days_active' | 'implementations' | 'comments_count'
+          requirement_value?: number
+          created_at?: string
+        }
+      }
+      user_badges: {
+        Row: {
+          id: string
+          user_id: string
+          badge_id: string
+          earned_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          badge_id: string
+          earned_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          badge_id?: string
+          earned_at?: string
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: 'badge' | 'level' | 'verification' | 'milestone'
+          title: string
+          content: string
+          link: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          type: 'badge' | 'level' | 'verification' | 'milestone'
+          title: string
+          content: string
+          link?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: 'badge' | 'level' | 'verification' | 'milestone'
+          title?: string
+          content?: string
+          link?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+      }
+      user_role_audit: {
+        Row: {
+          id: string
+          target_user_id: string
+          admin_id: string
+          action: 'promote' | 'demote'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          target_user_id: string
+          admin_id: string
+          action: 'promote' | 'demote'
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          target_user_id?: string
+          admin_id?: string
+          action?: 'promote' | 'demote'
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_reputation_points: {
+        Args: {
+          p_user_id: string
+          p_action_type: string
+          p_points: number
+          p_related_post_id?: string | null
+          p_related_comment_id?: string | null
+          p_reason?: string | null
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

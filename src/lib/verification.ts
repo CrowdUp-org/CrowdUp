@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "./supabase";
+import { createNotification } from "./notifications";
 import type { Json } from "./database.types";
 
 /**
@@ -184,6 +185,17 @@ export async function approveVerification(
     notes?: string
 ): Promise<{ success: boolean; error?: string }> {
     try {
+        // Get membership info to send notification
+        const { data: membership, error: fetchError } = await supabase
+            .from("company_members")
+            .select("user_id, company_id, companies(display_name)")
+            .eq("id", membershipId)
+            .single();
+
+        if (fetchError || !membership) {
+            return { success: false, error: "Membership not found" };
+        }
+
         const { error } = await supabase
             .from("company_members")
             .update({
@@ -198,6 +210,16 @@ export async function approveVerification(
             console.error("Approval error:", error);
             return { success: false, error: "Failed to approve verification" };
         }
+
+        // Send notification
+        const companyName = (membership.companies as any)?.display_name || "your company";
+        await createNotification(
+            membership.user_id,
+            'verification',
+            'Verification Approved! ✅',
+            `Good news! Your verification request for ${companyName} has been approved.`,
+            `/company/${(membership.company_id)}`
+        );
 
         return { success: true };
     } catch (error) {
@@ -214,6 +236,17 @@ export async function rejectVerification(
     notes: string
 ): Promise<{ success: boolean; error?: string }> {
     try {
+        // Get membership info to send notification
+        const { data: membership, error: fetchError } = await supabase
+            .from("company_members")
+            .select("user_id, company_id, companies(display_name)")
+            .eq("id", membershipId)
+            .single();
+
+        if (fetchError || !membership) {
+            return { success: false, error: "Membership not found" };
+        }
+
         const { error } = await supabase
             .from("company_members")
             .update({
@@ -227,6 +260,16 @@ export async function rejectVerification(
             console.error("Rejection error:", error);
             return { success: false, error: "Failed to reject verification" };
         }
+
+        // Send notification
+        const companyName = (membership.companies as any)?.display_name || "your company";
+        await createNotification(
+            membership.user_id,
+            'verification',
+            'Verification Rejected ❌',
+            `Your verification request for ${companyName} was not approved. Reason: ${notes}`,
+            `/company/${(membership.company_id)}`
+        );
 
         return { success: true };
     } catch (error) {

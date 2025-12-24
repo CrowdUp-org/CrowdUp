@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { createNotification } from './notifications';
 
 // =====================================================
 // Reputation Level Definitions
@@ -145,6 +146,9 @@ export async function awardPoints(
             return { success: false, error: 'Invalid action type or no points to award' };
         }
 
+        // Get current level before update
+        const currentLevel = await getUserReputation(userId);
+
         // Call the atomic database function
         const { data, error } = await supabase.rpc('award_reputation_points', {
             p_user_id: userId,
@@ -164,6 +168,21 @@ export async function awardPoints(
         if (!result.success) {
             return { success: false, error: result.error || 'Failed to award points' };
         }
+
+        // Check for level up
+        const newLevel = calculateLevel(result.new_score || 0);
+        if (currentLevel && newLevel !== currentLevel.level && result.new_score! > currentLevel.score) {
+            await createNotification(
+                userId,
+                'level',
+                'Reputation Level Up!',
+                `Congratulations! You've reached the ${REPUTATION_LEVELS[newLevel].name} level.`,
+                `/profile/${(await supabase.from('users').select('username').eq('id', userId).single()).data?.username}`
+            );
+        }
+
+        // Check for badges
+        await checkAndAwardBadges(userId);
 
         return { success: true, error: null, newScore: result.new_score };
     } catch (error) {
@@ -399,6 +418,15 @@ export async function checkAndAwardBadges(userId: string): Promise<void> {
                         user_id: userId,
                         badge_id: badge.id,
                     });
+
+                // Send notification
+                await createNotification(
+                    userId,
+                    'badge',
+                    'New Badge Earned!',
+                    `You've earned the ${badge.name} badge: ${badge.description}`,
+                    `/profile/${(await supabase.from('users').select('username').eq('id', userId).single()).data?.username}`
+                );
             }
         }
     } catch (error) {

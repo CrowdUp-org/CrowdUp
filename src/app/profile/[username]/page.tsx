@@ -21,6 +21,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { getCurrentUser, updateProfile } from "@/lib/auth";
 import { formatDistanceToNow, format } from "date-fns";
+import { ReputationCard } from "@/components/ui/reputation-card";
+import { ReputationBadge } from "@/components/ui/reputation-badge";
 
 interface UserProfile {
   id: string;
@@ -28,6 +30,8 @@ interface UserProfile {
   display_name: string;
   bio: string | null;
   avatar_url: string | null;
+  reputation_score: number;
+  reputation_level: string;
   created_at: string;
 }
 
@@ -78,7 +82,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     // Fetch user profile
     const { data: userData, error: userError } = await supabase
       .from("users")
-      .select("id, username, display_name, bio, avatar_url, created_at")
+      .select("id, username, display_name, bio, avatar_url, reputation_score, reputation_level, created_at")
       .eq("username", username)
       .single();
 
@@ -98,7 +102,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
     if (!postsError && postsData) {
       setPosts(postsData);
-      
       // Fetch comment counts
       const postIds = postsData.map(p => p.id);
       if (postIds.length > 0) {
@@ -315,8 +318,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="gap-2"
                   onClick={() => router.push("/settings")}
                 >
@@ -341,8 +344,23 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               </p>
               <p className="text-sm text-gray-600">Total Votes</p>
             </div>
+            <div className="text-center">
+              <ReputationBadge
+                level={profile.reputation_level}
+                score={profile.reputation_score}
+                size="md"
+              />
+              <p className="text-sm text-gray-600 mt-1">Reputation</p>
+            </div>
           </div>
         </div>
+
+        {/* Reputation Card */}
+        <ReputationCard
+          score={profile.reputation_score}
+          level={profile.reputation_level}
+          className="mb-6"
+        />
 
         {/* Tabs */}
         <div className="bg-white rounded-2xl border shadow-sm mb-6">

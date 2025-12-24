@@ -1,304 +1,287 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { use, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import {
+    getPendingRequests,
+    approveVerification,
+    rejectVerification,
+    isCurrentUserAdmin,
+    type VerificationRequest,
+} from "@/lib/verification";
 import { getCurrentUserId } from "@/lib/auth";
 import {
-    getPendingVerifications,
-    approveVerification,
-    rejectVerification
-} from "@/app/actions/verification";
-import { Shield, CheckCircle2, XCircle, AlertCircle, Loader2 } from "lucide-react";
+    CheckCircle,
+    XCircle,
+    Building2,
+    User,
+    Mail,
+    Briefcase,
+    Clock,
+    Shield,
+    Loader2,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { toast } from "sonner"; // Assuming sonner is used, given sonner.tsx exists
-
-interface VerificationRequest {
-    id: string;
-    role: string;
-    created_at: string;
-    verification_status: string;
-    verification_date: string;
-    verification_notes: string | null;
-    users: {
-        id: string;
-        username: string;
-        display_name: string;
-        email: string;
-        avatar_url: string | null;
-    };
-    companies: {
-        id: string;
-        name: string;
-        display_name: string;
-        logo_url: string | null;
-    };
-}
 
 export default function AdminVerificationPage() {
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [requests, setRequests] = useState<VerificationRequest[]>([]);
     const [processingId, setProcessingId] = useState<string | null>(null);
-
-    // Rejection dialog state
-    const [rejectingId, setRejectingId] = useState<string | null>(null);
-    const [rejectionReason, setRejectionReason] = useState("");
-    const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+    const [rejectNotes, setRejectNotes] = useState<{ [key: string]: string }>({});
+    const [showRejectForm, setShowRejectForm] = useState<string | null>(null);
 
     useEffect(() => {
-        checkAdminAndFetch();
+        checkAdminAndLoadRequests();
     }, []);
 
-    const checkAdminAndFetch = async () => {
-        try {
-            const userId = getCurrentUserId();
-            if (!userId) {
-                router.push("/auth/signin");
-                return;
-            }
-
-            // Check admin status client-side first
-            const { data: userData } = await supabase
-                .from("users")
-                .select("is_platform_admin")
-                .eq("id", userId)
-                .single();
-
-            if (!userData?.is_platform_admin) {
-                router.push("/dashboard"); // Redirect non-admins
-                return;
-            }
-
-            setIsAdmin(true);
-
-            // Fetch requests using server action
-            const data = await getPendingVerifications(userId);
-            setRequests(data as any); // Casting because of loose types in server action return
-        } catch (error) {
-            console.error("Error loading verification page:", error);
-            toast.error("Failed to load verification requests");
-        } finally {
-            setLoading(false);
+    const checkAdminAndLoadRequests = async () => {
+        const userId = getCurrentUserId();
+        if (!userId) {
+            router.push("/auth/signin");
+            return;
         }
+
+        const adminCheck = await isCurrentUserAdmin(userId);
+        if (!adminCheck) {
+            router.push("/");
+            return;
+        }
+
+        setIsAdmin(true);
+        await loadRequests();
+        setLoading(false);
+    };
+
+    const loadRequests = async () => {
+        const pending = await getPendingRequests();
+        setRequests(pending);
     };
 
     const handleApprove = async (requestId: string) => {
-        try {
-            setProcessingId(requestId);
-            const userId = getCurrentUserId();
-            if (!userId) return;
-
-            await approveVerification(userId, requestId);
-            toast.success("Request approved");
-
-            // Remove from list
-            setRequests(prev => prev.filter(r => r.id !== requestId));
-        } catch (error) {
-            console.error("Error approving:", error);
-            toast.error("Failed to approve request");
-        } finally {
-            setProcessingId(null);
+        setProcessingId(requestId);
+        const result = await approveVerification(requestId);
+        if (result.success) {
+            await loadRequests();
         }
+        setProcessingId(null);
     };
 
-    const openRejectDialog = (requestId: string) => {
-        setRejectingId(requestId);
-        setRejectionReason("");
-        setRejectDialogOpen(true);
-    };
-
-    const handleReject = async () => {
-        if (!rejectingId || !rejectionReason.trim()) return;
-
-        try {
-            setProcessingId(rejectingId);
-            const userId = getCurrentUserId();
-            if (!userId) return;
-
-            await rejectVerification(userId, rejectingId, rejectionReason);
-            toast.success("Request rejected");
-
-            // Remove from list
-            setRequests(prev => prev.filter(r => r.id !== rejectingId));
-            setRejectDialogOpen(false);
-        } catch (error) {
-            console.error("Error rejecting:", error);
-            toast.error("Failed to reject request");
-        } finally {
-            setProcessingId(null);
-            setRejectingId(null);
+    const handleReject = async (requestId: string) => {
+        const notes = rejectNotes[requestId] || "Verification rejected";
+        setProcessingId(requestId);
+        const result = await rejectVerification(requestId, notes);
+        if (result.success) {
+            setShowRejectForm(null);
+            await loadRequests();
         }
+        setProcessingId(null);
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <div className="min-h-screen bg-background">
+                <Header />
+                <div className="flex items-center justify-center h-[60vh]">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                </div>
             </div>
         );
     }
 
-    if (!isAdmin) return null; // Should have redirected
+    if (!isAdmin) {
+        return null;
+    }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-background">
             <Header />
-            <main className="mx-auto max-w-7xl px-6 pt-24 pb-8">
+            <main className="container max-w-4xl mx-auto px-4 py-8">
                 <div className="flex items-center gap-3 mb-8">
-                    <Shield className="h-8 w-8 text-blue-600" />
+                    <Shield className="w-8 h-8 text-blue-500" />
                     <div>
                         <h1 className="text-2xl font-bold">Verification Requests</h1>
-                        <p className="text-gray-600">Manage company verification requests</p>
+                        <p className="text-muted-foreground">
+                            Review and manage company representative verification requests
+                        </p>
                     </div>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Pending Requests</CardTitle>
-                        <CardDescription>
-                            {requests.length === 0
-                                ? "No pending verification requests found."
-                                : `Found ${requests.length} pending requests.`}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {requests.length > 0 && (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Company</TableHead>
-                                        <TableHead>Representative</TableHead>
-                                        <TableHead>Role</TableHead>
-                                        <TableHead>Requested</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {requests.map((request) => (
-                                        <TableRow key={request.id}>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar className="h-9 w-9 bg-gray-100 border">
-                                                        {request.companies.logo_url ? (
-                                                            <AvatarImage src={request.companies.logo_url} />
-                                                        ) : (
-                                                            <AvatarFallback>{request.companies.display_name.charAt(0)}</AvatarFallback>
-                                                        )}
-                                                    </Avatar>
-                                                    <div>
-                                                        <p className="font-medium">{request.companies.display_name}</p>
-                                                        <p className="text-xs text-gray-500">@{request.companies.name}</p>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarImage src={request.users.avatar_url || undefined} />
-                                                        <AvatarFallback>{request.users.display_name.charAt(0)}</AvatarFallback>
-                                                    </Avatar>
-                                                    <div>
-                                                        <p className="text-sm font-medium">{request.users.display_name}</p>
-                                                        <p className="text-xs text-gray-500">{request.users.email}</p>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline">
-                                                    {request.role === 'owner' ? 'Owner' : 'Admin'}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-sm text-gray-500">
-                                                {request.verification_date && formatDistanceToNow(new Date(request.verification_date), { addSuffix: true })}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="bg-green-50 text-green-700 hover:bg-green-100 hover:text-green-800 border-green-200"
-                                                        onClick={() => handleApprove(request.id)}
-                                                        disabled={!!processingId}
-                                                    >
-                                                        {processingId === request.id ? (
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        ) : (
-                                                            <><CheckCircle2 className="h-4 w-4 mr-1" /> Approve</>
-                                                        )}
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 border-red-200"
-                                                        onClick={() => openRejectDialog(request.id)}
-                                                        disabled={!!processingId}
-                                                    >
-                                                        <XCircle className="h-4 w-4 mr-1" /> Reject
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* Rejection Dialog */}
-                <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Reject Verification Request</DialogTitle>
-                            <DialogDescription>
-                                Please provide a reason for rejecting this request. This will be visible to the user.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                            <Textarea
-                                placeholder="Reason for rejection (e.g., identity mismatch, insufficient documents...)"
-                                value={rejectionReason}
-                                onChange={(e) => setRejectionReason(e.target.value)}
-                                rows={4}
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>Cancel</Button>
-                            <Button
-                                variant="destructive"
-                                onClick={handleReject}
-                                disabled={!rejectionReason.trim() || !!processingId}
+                {requests.length === 0 ? (
+                    <div className="text-center py-12 bg-card rounded-lg border border-border">
+                        <VerifiedBadge size="lg" className="mx-auto mb-4 opacity-50" />
+                        <h3 className="text-lg font-medium mb-2">No Pending Requests</h3>
+                        <p className="text-muted-foreground">
+                            All verification requests have been processed.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {requests.map((request) => (
+                            <div
+                                key={request.id}
+                                className="bg-card rounded-lg border border-border p-6"
                             >
-                                {processingId ? "Rejecting..." : "Reject Request"}
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-4">
+                                        {/* Company Info */}
+                                        <div className="flex items-center gap-2">
+                                            {request.company?.logo_url ? (
+                                                <img
+                                                    src={request.company.logo_url}
+                                                    alt={request.company.display_name}
+                                                    className="w-10 h-10 rounded-lg object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <Building2 className="w-5 h-5 text-primary" />
+                                                </div>
+                                            )}
+                                            <div>
+                                                <div className="font-semibold">
+                                                    {request.company?.display_name || "Unknown Company"}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">
+                                                    @{request.company?.name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Clock className="w-4 h-4" />
+                                        {formatDistanceToNow(new Date(request.created_at), {
+                                            addSuffix: true,
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* User Info */}
+                                <div className="flex items-center gap-3 mb-4 p-3 bg-muted/50 rounded-lg">
+                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <User className="w-4 h-4 text-primary" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="font-medium">
+                                            {request.user?.display_name || "Unknown User"}
+                                        </div>
+                                        <div className="text-sm text-muted-foreground">
+                                            @{request.user?.username}
+                                        </div>
+                                    </div>
+                                    <div className="text-xs px-2 py-1 rounded bg-primary/10 text-primary capitalize">
+                                        {request.role}
+                                    </div>
+                                </div>
+
+                                {/* Verification Documents */}
+                                {request.verification_documents && (
+                                    <div className="space-y-2 mb-4 p-3 bg-muted/30 rounded-lg">
+                                        {request.verification_documents.businessEmail && (
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <Mail className="w-4 h-4 text-muted-foreground" />
+                                                <span className="text-muted-foreground">Email:</span>
+                                                <span className="font-medium">
+                                                    {request.verification_documents.businessEmail}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {request.verification_documents.roleDescription && (
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <Briefcase className="w-4 h-4 text-muted-foreground" />
+                                                <span className="text-muted-foreground">Role:</span>
+                                                <span>
+                                                    {request.verification_documents.roleDescription}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {request.verification_documents.additionalNotes && (
+                                            <div className="text-sm mt-2">
+                                                <span className="text-muted-foreground">Notes: </span>
+                                                <span>
+                                                    {request.verification_documents.additionalNotes}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Actions */}
+                                {showRejectForm === request.id ? (
+                                    <div className="space-y-3">
+                                        <Textarea
+                                            placeholder="Reason for rejection..."
+                                            value={rejectNotes[request.id] || ""}
+                                            onChange={(e) =>
+                                                setRejectNotes({
+                                                    ...rejectNotes,
+                                                    [request.id]: e.target.value,
+                                                })
+                                            }
+                                            rows={2}
+                                        />
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                                onClick={() => handleReject(request.id)}
+                                                disabled={processingId === request.id}
+                                            >
+                                                {processingId === request.id ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <XCircle className="w-4 h-4 mr-1" />
+                                                        Confirm Reject
+                                                    </>
+                                                )}
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setShowRejectForm(null)}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="default"
+                                            size="sm"
+                                            onClick={() => handleApprove(request.id)}
+                                            disabled={processingId === request.id}
+                                            className="bg-green-600 hover:bg-green-700"
+                                        >
+                                            {processingId === request.id ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <CheckCircle className="w-4 h-4 mr-1" />
+                                                    Approve
+                                                </>
+                                            )}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowRejectForm(request.id)}
+                                            className="text-red-500 border-red-500/20 hover:bg-red-500/10"
+                                        >
+                                            <XCircle className="w-4 h-4 mr-1" />
+                                            Reject
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </main>
         </div>
     );

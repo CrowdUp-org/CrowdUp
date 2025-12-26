@@ -1,4 +1,11 @@
 # CrowdUp
+## Documentation Index
+- [SETUP.md](SETUP.md) — Installation and environment setup
+- [FEATURES.md](FEATURES.md) — Features, usage guides, and workflows
+- [API.md](API.md) — Client-first API and backend documentation
+- [DEPLOYMENT.md](DEPLOYMENT.md) — Deployment strategies and production notes
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) — Common issues and solutions
+
 
 A social feedback platform where users can submit and vote on bug reports, feature requests, and complaints about various companies and products.
 

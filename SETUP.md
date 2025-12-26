@@ -1,5 +1,23 @@
 # CrowdUp Setup Guide
 
+## Quick Start (5 minutes)
+
+1. Go to https://supabase.com → Create a new project
+2. SQL Editor → New Query → Paste contents of `supabase-schema.sql` → Run
+3. Create `.env.local` with:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx...
+   ```
+4. Install & run:
+   ```
+   npm install
+   npm run dev
+   ```
+5. Open http://localhost:3000 → Sign up → Create a post → Vote
+
+---
+
 ## Prerequisites
 
 - Node.js 18+ or Bun
@@ -51,6 +69,8 @@
      NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
      GOOGLE_CLIENT_SECRET=your_client_secret
      ```
+
+ Tip: See Google OAuth details in [docs/archive/GOOGLE_OAUTH_SETUP.md](docs/archive/GOOGLE_OAUTH_SETUP.md).
 
 ### 4. Install Dependencies
 

@@ -1,74 +1,79 @@
-# AI Coding Assistant Guide for CrowdUp
+# CrowdUp – Copilot Coding Agent Guide
 
-This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a database and storage. It implements a client-side auth model and leans on direct Supabase queries from the client. Follow the patterns below to be productive and consistent.
+## What this repo is
+- CrowdUp is a Next.js 15 (App Router) social feedback app: users post and vote on bug reports, feature requests, complaints; includes comments, follows, messaging, company/app pages, leaderboard/reputation, notifications, search/trending feeds.
+- Client-first data access via Supabase; auth stored client-side; messaging and voting use Supabase realtime.
+- Frontend styling: Tailwind + shadcn/ui primitives, motion/three effects in places.
+- License: CC BY-NC-ND 4.0.
 
-## Architecture & Data Flow
+## Stack & tooling
+- Runtime: Node 20 (CI uses `actions/setup-node@v4` with 20). Package manager: npm. TypeScript 5.
+- Framework: Next.js 15.4.x (App Router); React 19.
+- Styling: Tailwind CSS 4, shadcn/ui components in `src/components/ui/*`.
+- Supabase client in `src/lib/supabase.ts`; database schema SQL in root (`supabase-schema.sql`, `migration-*.sql`, `supabase_migrations/`).
+- Lint/format/typecheck: ESLint (config in `eslint.config.mjs`), Prettier (no custom config found, uses defaults), TypeScript (`tsconfig.json`). CI also runs `npx tsc --noEmit`.
+- Images: `next.config.ts` allows all hosts; build ignores TS/ESLint errors (see below), but CI still typechecks and lints.
+- Path alias: `@/* -> ./src/*` (tsconfig `paths`).
 
-- UI: React components and pages under `src/app/**` (App Router). Example feed and sorting in `src/app/page.tsx`.
-- State: Lightweight client state; auth context in `src/contexts/AuthContext.tsx` reads from localStorage.
-- Data: Direct `@supabase/supabase-js` client (`src/lib/supabase.ts`) used in client components for CRUD.
-- Auth: Custom client-side auth in `src/lib/auth.ts` using `bcryptjs`. Sessions are stored in `localStorage` (`user` and `userId`). Middleware (`src/middleware.ts`) does not gate routes.
-- Algorithm: Feed ranking logic in `src/lib/algorithm.ts` (engagement, velocity, recency, personalization, diversity) used by homepage.
-- Messaging: 1:1 conversations + messages via `src/lib/messaging.ts` with realtime `postgres_changes` subscription channels.
-- Styling: Tailwind CSS + shadcn/ui; use `cn()` from `src/lib/utils.ts` to compose classes. UI atoms live in `src/components/ui/`.
+## Layout map (high signal spots)
+- App entry: `src/app/layout.tsx`, global styles `src/app/globals.css`, home feed `src/app/page.tsx`.
+- Feature routes under `src/app/`: auth (`auth/*`), messaging (`messages/page.tsx`), profile (`profile/[username]`), leaderboard, trending, search, settings, company/app pages, posts (`post/[id]`), create flows.
+- Components: `src/components/` (PostCard voting logic, NotificationDropdown, Sidebar, Header, etc.), shadcn primitives in `src/components/ui/*`, Google OAuth button in `src/components/auth/GoogleSignInButton.tsx`.
+- Lib utilities: `src/lib/algorithm.ts` (ranking), `auth.ts`, `messaging.ts`, `notifications.ts`, `reputation.ts`, `imageUpload.ts`, `supabase.ts`, `database.types.ts`, `utils.ts`, `verification.ts`.
+- Contexts/hooks: `src/contexts/*`, `src/hooks/*` plus subdir `src/lib/hooks`.
+- Visual Edits: `src/visual-edits/` with Turbopack loader wired via `next.config.ts` (loader at `src/visual-edits/component-tagger-loader.js`).
+- Middleware: `src/middleware.ts` (mostly passthrough; no auth gate).
+- Config at root: `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, `postcss.config.mjs`, `tailwind` via PostCSS 4 entry, `package.json`, `next-env.d.ts`.
+- Docs/examples: `docs/`, `prototype-from-figma/` (ignored by CI), `UI design screenshots/`.
 
-## Environment & Build
+## Environment & secrets
+- `.env.local` expected with: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`.
+- `src/lib/supabase.ts` includes placeholder defaults so `next build` can run without envs, but real runtime requires valid Supabase project.
+- No other required secrets observed; Stripe dependency present but not wired in CI configs.
 
-- Required env (runtime): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (modern key format), and `SUPABASE_SECRET_KEY` (server-side) in `.env.local`. See `SETUP.md`.
-- Build placeholders: `src/lib/supabase.ts` falls back to placeholder URL/key to allow `next build` without envs (see `BUILD_NOTES.md`). Ensure real values at runtime.
-- TypeScript/ESLint: Builds ignore TS/ESLint errors for speed (`next.config.ts`: `typescript.ignoreBuildErrors`, `eslint.ignoreDuringBuilds`). Don’t introduce new errors, even if builds pass.
-- Scripts:
-  - `npm run dev` (Turbopack, with visual-edits loader)
-  - `npm run build` → `npm start`
-  - `npm run lint`
-- Port: Docs reference 3000/3001; default Next.js dev is 3000 unless overridden.
+## Commands (observed from package.json & CI)
+> Commands were not executed in this writing environment; they mirror CI and README. Prefer these sequences and only deviate if they fail.
 
-## Database Model (public schema)
+- Install: `npm install` (or `npm ci` to match lockfile in CI). Always install before any other step.
+- Dev server (Turbopack): `npm run dev` (defaults to port 3000). Uses Turbopack; visual-edits loader applied to `*.jsx/tsx`.
+- Build: `npm run build` (Next.js production build; `next.config.ts` ignores TS/ESLint errors during build). Still ensure typecheck/lint pass because CI checks them separately.
+- Start (after build): `npm start`.
+- Lint: `npm run lint` (ESLint; see `eslint.config.mjs` for import rules). Build ignores lint errors, but CI fails on them.
+- Typecheck: `npx tsc --noEmit` (run separately; required in CI `quality` job).
+- Prettier check: `npx prettier --check .` (CI runs this; no repo config means default Prettier behavior).
+- Tests: no test script present; CI does not run tests.
 
-- Core tables: `users`, `posts`, `comments`, `votes` (+ `connections`, `apps`, `companies`, `conversations`, `messages`). Types live in `src/lib/database.types.ts`.
-- RLS: Disabled in the provided schema. The app uses the modern Publishable key from the client. Treat this as a dev bootstrap; for sensitive changes, prefer server mediation with the Secret API key.
-- Migrations/schema: Primary DDL in `supabase-schema.sql`. Optional Google OAuth migration exists (`migration-google-oauth.sql`).
+Recommended local validation sequence (mirrors CI):
+```
+npm ci          # or npm install
+npx prettier --check .
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+If formatting fails, run `npx prettier --write .` selectively. If lint fails on import cycles/paths, check `@/*` alias resolution and file extensions.
 
-## Project-Specific Conventions
+## CI/CD expectations
+- GitHub Actions workflow `.github/workflows/ci.yml` runs on PRs to `main`/`develop` (ignores docs/markdown/figma assets):
+  - Job `quality`: `npm ci`, then Prettier check, ESLint, TypeScript noEmit.
+  - Job `build`: depends on `quality`; runs `npm ci` then `npm run build`.
+  - Job `codeql`: weekly + PR/merge_group; JavaScript/TypeScript autobuild.
+- No auto-deploy from PRs. Production deploy is private.
 
-- Client-first data access: Prefer `supabase.from(...).select/insert/update` directly in client components/hooks unless a server boundary is explicitly introduced.
-- Auth helpers: Use `getCurrentUser()`/`getCurrentUserId()` from `src/lib/auth.ts` for gating actions and `signIn/signUp/signOut` for flows.
-- Voting pattern: See `src/components/PostCard.tsx` for upsert/delete in `votes` and denormalized `posts.votes` update. Mirror this interaction model for similar counters.
-- Feed ranking: Use `rankPosts()` and related helpers from `src/lib/algorithm.ts` when adding feeds that need “featured/trending/personalized” sorts.
-- Realtime: Use `supabase.channel(...).on('postgres_changes', ...)` as in `subscribeToMessages()` for live updates.
-- UI patterns: Use shadcn primitives from `src/components/ui` and the `cn()` utility. Keep Tailwind utility classes idiomatic; prefer existing styling patterns.
-- Visual Edits: Turbopack loader (`next.config.ts`) injects tags used by `src/visual-edits/VisualEditsMessenger.tsx`. Keep this import in `src/app/layout.tsx`.
+## Behavioral notes & pitfalls
+- `next.config.ts` sets `typescript.ignoreBuildErrors` and `eslint.ignoreDuringBuilds` to true; build may succeed even with issues, but CI will fail—always fix lint/type errors.
+- All remote images allowed; be cautious when adding external hosts if privacy/security matters.
+- ESLint import plugin enforces resolved paths and forbids cycles/useless segments; watch for barrel imports that create cycles.
+- `tsconfig` uses `moduleResolution: "bundler"`; avoid relying on `require`/CJS patterns.
+- Repo path alias `@/` is common; update tsconfig if adding new root dirs.
+- Turbopack loader: any new JSX/TSX file will receive the visual-edits loader; keep it compatible (standard ES modules). Loader path: `src/visual-edits/component-tagger-loader.js`.
+- No tests present; changes rely on lint/type/build + manual checks.
 
-## Typical Workflows
+## Root inventory (quick orientation)
+- Key files: `package.json`, `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, `postcss.config.mjs`, `components.json` (shadcn?), `supabase-schema.sql`, multiple `migration-*.sql`, `supabase_migrations/messages.sql`, `README.md`, `LICENSE.md`.
+- App source: `src/` as described above. Static assets: `public/`.
+- Docs/examples: `docs/`, `prototype-from-figma/` (Vite demo), `UI design screenshots/`.
 
-- Install + run:
-  ```bash
-  npm install
-  npm run dev
-  ```
-- Build + preview:
-  ```bash
-  npm run build
-  npm start
-  ```
-- Initialize DB: open Supabase → run `supabase-schema.sql` (see `QUICK_START.md`, `RUN_THIS_NOW.md`).
-
-## When Adding Features
-
-- Data writes: Use the existing client Supabase pattern; return `{ success/error }` shaped results like in `auth.ts` and `messaging.ts`.
-- Access control: Gate UI actions with `getCurrentUserId()`; redirect to `/auth/signin` when unauthenticated (see `PostCard.tsx`).
-- Types: Extend `Database` in `src/lib/database.types.ts` if you add tables/columns; keep enums and union types in sync with SQL.
-- Pages: Place new routes under `src/app/<route>/page.tsx`; keep server components minimal if they don’t align with the client-first access pattern.
-- Performance: Batch reads and use `.in(...)` queries as seen on the home feed for comment counts; avoid N+1 fetches.
-
-## Key Files (jump-starters)
-
-- `src/app/page.tsx` — feed, sorting, data shaping
-- `src/lib/algorithm.ts` — ranking utilities
-- `src/lib/auth.ts` — client auth/session helpers
-- `src/lib/messaging.ts` — conversations/messages + realtime
-- `src/components/PostCard.tsx` — vote flows + UI patterns
-- `src/lib/supabase.ts` — configured Supabase client
-- `next.config.ts` — build flags, visual-edits loader
-
-If anything above is unclear or missing, tell the maintainer what specific flow or file needs elaboration, and propose a concrete addition to this guide.
+## How to use these instructions
+- Prefer the command sequences above; they mirror CI. If something fails, re-run installs, then lint → typecheck → build in that order.
+- Trust this file first. Only search the codebase if information here is missing or clearly incorrect.

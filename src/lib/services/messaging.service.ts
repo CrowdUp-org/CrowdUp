@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase } from "../supabase";
 import { getCurrentUserId } from "./auth";
 
 export interface ConversationWithUser {

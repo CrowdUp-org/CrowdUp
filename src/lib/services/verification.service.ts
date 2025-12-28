@@ -1,7 +1,7 @@
 "use client";
 
-import { supabase } from "./supabase";
-import { createNotification } from "./notifications";
+import { supabase } from "../supabase";
+import { createNotification } from "./notifications.service";
 import type { Json } from "./database.types";
 
 /**

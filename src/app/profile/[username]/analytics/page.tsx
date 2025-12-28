@@ -51,11 +51,11 @@ export default function ProfileAnalyticsPage({
 
   const fetchProfileAndAnalytics = async () => {
     // Fetch user profile
-    const { data: userData } = await supabase
+    const { data: userData } = (await supabase
       .from("users")
       .select("*")
       .eq("username", username)
-      .single();
+      .single()) as any;
 
     if (!userData) {
       router.push("/");
@@ -73,50 +73,55 @@ export default function ProfileAnalyticsPage({
 
   const fetchAnalytics = async (userId: string) => {
     // Fetch posts
-    const { data: posts } = await supabase
+    const { data: posts } = (await supabase
       .from("posts")
       .select("*")
       .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })) as any;
 
-    const totalPosts = posts?.length || 0;
-    const totalVotes = posts?.reduce((sum, post) => sum + post.votes, 0) || 0;
+    const totalPosts = (posts as any)?.length || 0;
+    const totalVotes =
+      (posts as any)?.reduce((sum: any, post: any) => sum + post.votes, 0) || 0;
 
     // Count by type
     const bugReports =
-      posts?.filter((p) => p.type === "Bug Report").length || 0;
+      (posts as any)?.filter((p: any) => p.type === "Bug Report").length || 0;
     const featureRequests =
-      posts?.filter((p) => p.type === "Feature Request").length || 0;
-    const complaints = posts?.filter((p) => p.type === "Complaint").length || 0;
+      (posts as any)?.filter((p: any) => p.type === "Feature Request").length ||
+      0;
+    const complaints =
+      (posts as any)?.filter((p: any) => p.type === "Complaint").length || 0;
 
     // Fetch comments on user's posts
-    const postIds = posts?.map((p) => p.id) || [];
+    const postIds = (posts as any)?.map((p: any) => p.id) || [];
     let totalComments = 0;
     if (postIds.length > 0) {
-      const { data: comments } = await supabase
+      const { data: comments } = (await supabase
         .from("comments")
         .select("id")
-        .in("post_id", postIds);
+        .in("post_id", postIds)) as any;
       totalComments = comments?.length || 0;
     }
 
     // Fetch followers
-    const { data: followers } = await supabase
+    const { data: followers } = (await supabase
       .from("connections")
       .select("id")
-      .eq("following_id", userId);
+      .eq("following_id", userId)) as any;
 
     // Fetch following
-    const { data: following } = await supabase
+    const { data: following } = (await supabase
       .from("connections")
       .select("id")
-      .eq("follower_id", userId);
+      .eq("follower_id", userId)) as any;
 
     // Get top posts (by votes)
-    const topPosts = posts?.sort((a, b) => b.votes - a.votes).slice(0, 5) || [];
+    const topPosts =
+      (posts as any)?.sort((a: any, b: any) => b.votes - a.votes).slice(0, 5) ||
+      [];
 
     // Get recent activity
-    const recentActivity = posts?.slice(0, 10) || [];
+    const recentActivity = (posts as any)?.slice(0, 10) || [];
 
     setAnalytics({
       totalPosts,

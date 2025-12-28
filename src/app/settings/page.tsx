@@ -103,14 +103,13 @@ export default function SettingsPage() {
       return;
     }
 
-    const { error: updateError } = await supabase
-      .from("users")
+    const { error: updateError } = (await (supabase.from("users") as any)
       .update({
         display_name: formData.display_name,
         bio: formData.bio,
         avatar_url: formData.avatar_url || null,
       })
-      .eq("id", userId);
+      .eq("id", userId)) as any;
 
     if (updateError) {
       setError("Failed to update profile. Please try again.");
@@ -188,10 +187,10 @@ export default function SettingsPage() {
     const userId = getCurrentUserId();
     if (!userId) return;
 
-    await supabase.from("user_settings").upsert({
+    (await supabase.from("user_settings").upsert({
       user_id: userId,
       privacy_settings: { ...privacySettings, [key]: value },
-    });
+    } as any)) as any;
   };
 
   const handleNotificationUpdate = async (
@@ -203,10 +202,10 @@ export default function SettingsPage() {
     const userId = getCurrentUserId();
     if (!userId) return;
 
-    await supabase.from("user_settings").upsert({
+    (await supabase.from("user_settings").upsert({
       user_id: userId,
       notification_settings: { ...notificationSettings, [key]: value },
-    });
+    } as any)) as any;
   };
 
   const handleExportData = async () => {

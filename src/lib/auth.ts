@@ -30,22 +30,22 @@ export async function signUp(
 ): Promise<{ user: User | null; error: string | null }> {
   try {
     // Check if username exists
-    const { data: existingUsername } = await supabase
+    const { data: existingUsername } = (await supabase
       .from("users")
       .select("id")
       .eq("username", data.username)
-      .single();
+      .single()) as any;
 
     if (existingUsername) {
       return { user: null, error: "Username already taken" };
     }
 
     // Check if email exists
-    const { data: existingEmail } = await supabase
+    const { data: existingEmail } = (await supabase
       .from("users")
       .select("id")
       .eq("email", data.email)
-      .single();
+      .single()) as any;
 
     if (existingEmail) {
       return { user: null, error: "Email already registered" };
@@ -55,16 +55,16 @@ export async function signUp(
     const password_hash = await bcrypt.hash(data.password, SALT_ROUNDS);
 
     // Create user
-    const { data: newUser, error } = await supabase
+    const { data: newUser, error } = (await supabase
       .from("users")
       .insert({
         username: data.username,
         display_name: data.display_name,
         email: data.email,
         password_hash,
-      })
+      } as any)
       .select("id, username, display_name, email, avatar_url, bio, created_at")
-      .single();
+      .single()) as any;
 
     if (error) {
       return { user: null, error: error.message };
@@ -73,7 +73,7 @@ export async function signUp(
     // Store session
     if (newUser) {
       localStorage.setItem("user", JSON.stringify(newUser));
-      localStorage.setItem("userId", newUser.id);
+      localStorage.setItem("userId", (newUser as any).id);
     }
 
     return { user: newUser, error: null };
@@ -102,18 +102,21 @@ export async function signIn(
     const user = users[0];
 
     // Verify password
-    const isValid = await bcrypt.compare(data.password, user.password_hash);
+    const isValid = await bcrypt.compare(
+      data.password,
+      (user as any).password_hash,
+    );
 
     if (!isValid) {
       return { user: null, error: "Invalid credentials" };
     }
 
     // Remove password_hash from user object
-    const { password_hash, ...userWithoutPassword } = user;
+    const { password_hash, ...userWithoutPassword } = user as any;
 
     // Store session
     localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-    localStorage.setItem("userId", user.id);
+    localStorage.setItem("userId", (user as any).id);
 
     return { user: userWithoutPassword, error: null };
   } catch (error) {
@@ -166,7 +169,10 @@ export async function changePassword(
     }
 
     // Verify current password
-    const isValid = await bcrypt.compare(currentPassword, user.password_hash);
+    const isValid = await bcrypt.compare(
+      currentPassword,
+      (user as any).password_hash,
+    );
     if (!isValid) {
       return { success: false, error: "Current password is incorrect" };
     }
@@ -175,10 +181,9 @@ export async function changePassword(
     const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
     // Update password
-    const { error: updateError } = await supabase
-      .from("users")
+    const { error: updateError } = (await (supabase.from("users") as any)
       .update({ password_hash: newPasswordHash })
-      .eq("id", userId);
+      .eq("id", userId)) as any;
 
     if (updateError) {
       return { success: false, error: "Failed to update password" };
@@ -206,12 +211,12 @@ export async function updateProfile(data: {
 
     // If username is being changed, check if it's available
     if (data.username) {
-      const { data: existingUser } = await supabase
+      const { data: existingUser } = (await supabase
         .from("users")
         .select("id")
         .eq("username", data.username)
         .neq("id", userId)
-        .single();
+        .single()) as any;
 
       if (existingUser) {
         return { success: false, error: "Username already taken" };
@@ -219,10 +224,9 @@ export async function updateProfile(data: {
     }
 
     // Update user
-    const { error: updateError } = await supabase
-      .from("users")
+    const { error: updateError } = (await (supabase.from("users") as any)
       .update(data)
-      .eq("id", userId);
+      .eq("id", userId)) as any;
 
     if (updateError) {
       return { success: false, error: "Failed to update profile" };

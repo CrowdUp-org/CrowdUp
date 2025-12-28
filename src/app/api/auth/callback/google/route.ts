@@ -87,12 +87,12 @@ export async function GET(request: NextRequest) {
     const googleUser: GoogleUserInfo = await userInfoResponse.json();
 
     // Check if OAuth account already exists
-    const { data: existingOAuthAccount } = await supabaseAdmin
+    const { data: existingOAuthAccount } = (await supabaseAdmin
       .from("oauth_accounts")
       .select("user_id, users(*)")
       .eq("provider", "google")
       .eq("provider_user_id", googleUser.id)
-      .single();
+      .single()) as any;
 
     let userId: string;
 
@@ -109,13 +109,13 @@ export async function GET(request: NextRequest) {
 
       if (existingUser) {
         // Link Google account to existing user
-        userId = existingUser.id;
-        await supabaseAdmin.from("oauth_accounts").insert({
+        userId = (existingUser as any).id;
+        await (supabaseAdmin.from("oauth_accounts").insert({
           user_id: userId,
           provider: "google",
           provider_user_id: googleUser.id,
           email: googleUser.email,
-        });
+        } as any) as any);
       } else {
         // Create new user
         const username = googleUser.email
@@ -127,18 +127,18 @@ export async function GET(request: NextRequest) {
 
         // Ensure username is unique
         while (true) {
-          const { data: existingUsername } = await supabaseAdmin
+          const { data: existingUsername } = (await supabaseAdmin
             .from("users")
             .select("id")
             .eq("username", finalUsername)
-            .single();
+            .single()) as any;
 
           if (!existingUsername) break;
           finalUsername = `${username}${counter}`;
           counter++;
         }
 
-        const { data: newUser, error: createError } = await supabaseAdmin
+        const { data: newUser, error: createError } = (await supabaseAdmin
           .from("users")
           .insert({
             username: finalUsername,
@@ -146,9 +146,9 @@ export async function GET(request: NextRequest) {
             email: googleUser.email,
             password_hash: null, // OAuth users don't have a password
             avatar_url: googleUser.picture,
-          })
+          } as any)
           .select("id")
-          .single();
+          .single()) as any;
 
         if (createError || !newUser) {
           throw new Error("Failed to create user");
@@ -157,21 +157,21 @@ export async function GET(request: NextRequest) {
         userId = newUser.id;
 
         // Create OAuth account link
-        await supabaseAdmin.from("oauth_accounts").insert({
+        (await supabaseAdmin.from("oauth_accounts").insert({
           user_id: userId,
           provider: "google",
           provider_user_id: googleUser.id,
           email: googleUser.email,
-        });
+        } as any)) as any;
       }
     }
 
     // Get full user details
-    const { data: user } = await supabaseAdmin
+    const { data: user } = (await supabaseAdmin
       .from("users")
       .select("id, username, display_name, email, avatar_url, bio, created_at")
       .eq("id", userId)
-      .single();
+      .single()) as any;
 
     if (!user) {
       throw new Error("User not found after creation");

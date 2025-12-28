@@ -75,7 +75,7 @@ export default function CreateCompanyPage() {
       return;
     }
 
-    const { data, error: insertError } = await supabase
+    const { data, error: insertError } = (await supabase
       .from("companies")
       .insert({
         name: urlName,
@@ -84,9 +84,9 @@ export default function CreateCompanyPage() {
         website: formData.website || null,
         logo_url: formData.logo_url || null,
         category: formData.category || null,
-      })
+      } as any)
       .select()
-      .single();
+      .single()) as any;
 
     if (insertError) {
       setError("Failed to create company. Please try again.");
@@ -96,11 +96,11 @@ export default function CreateCompanyPage() {
 
     if (data) {
       // Add creator as company member
-      await supabase.from("company_members").insert({
+      (await supabase.from("company_members").insert({
         company_id: data.id,
         user_id: userId,
         role: "owner",
-      });
+      } as any)) as any;
 
       router.push(`/company/${data.name}`);
     }

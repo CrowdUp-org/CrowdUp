@@ -100,7 +100,7 @@ export async function requestVerification(
     }
 
     // Check if already verified or pending
-    if (membership.verification_status === "pending") {
+    if ((membership as any).verification_status === "pending") {
       return {
         success: false,
         error: "A verification request is already pending",
@@ -113,13 +113,14 @@ export async function requestVerification(
       submittedAt: new Date().toISOString(),
     };
 
-    const { error: updateError } = await supabase
-      .from("company_members")
+    const { error: updateError } = (await (
+      supabase.from("company_members") as any
+    )
       .update({
         verification_status: "pending",
         verification_documents: verificationDocs as unknown as Json,
-      } as any)
-      .eq("id", membership.id);
+      })
+      .eq("id", (membership as any).id)) as any;
 
     if (updateError) {
       console.error("Verification request error:", updateError);
@@ -154,13 +155,13 @@ export async function getVerificationStatus(
   if (error || !data) return null;
 
   return {
-    verified: data.verified || false,
-    status: data.verification_status as
+    verified: (data as any).verified || false,
+    status: (data as any).verification_status as
       | "pending"
       | "approved"
       | "rejected"
       | null,
-    notes: data.verification_notes,
+    notes: (data as any).verification_notes,
   };
 }
 
@@ -168,7 +169,7 @@ export async function getVerificationStatus(
  * Get all pending verification requests (admin only)
  */
 export async function getPendingRequests(): Promise<VerificationRequest[]> {
-  const { data, error } = await supabase
+  const { data, error } = (await supabase
     .from("company_members")
     .select(
       `
@@ -187,7 +188,7 @@ export async function getPendingRequests(): Promise<VerificationRequest[]> {
     `,
     )
     .eq("verification_status", "pending")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })) as any;
 
   if (error) {
     console.error("Error fetching pending requests:", error);
@@ -222,15 +223,14 @@ export async function approveVerification(
       return { success: false, error: "Membership not found" };
     }
 
-    const { error } = await supabase
-      .from("company_members")
+    const { error } = (await (supabase.from("company_members") as any)
       .update({
         verification_status: "approved",
         verified: true,
         verification_date: new Date().toISOString(),
         verification_notes: notes || "Verification approved",
-      } as any)
-      .eq("id", membershipId);
+      })
+      .eq("id", membershipId)) as any;
 
     if (error) {
       console.error("Approval error:", error);
@@ -239,13 +239,13 @@ export async function approveVerification(
 
     // Send notification
     const companyName =
-      (membership.companies as any)?.display_name || "your company";
+      (membership as any).companies?.display_name || "your company";
     await createNotification(
-      membership.user_id,
+      (membership as any).user_id,
       "verification",
       "Verification Approved! ✅",
       `Good news! Your verification request for ${companyName} has been approved.`,
-      `/company/${membership.company_id}`,
+      `/company/${(membership as any).company_id}`,
     );
 
     return { success: true };
@@ -274,14 +274,13 @@ export async function rejectVerification(
       return { success: false, error: "Membership not found" };
     }
 
-    const { error } = await supabase
-      .from("company_members")
+    const { error } = (await (supabase.from("company_members") as any)
       .update({
         verification_status: "rejected",
         verified: false,
         verification_notes: notes,
-      } as any)
-      .eq("id", membershipId);
+      })
+      .eq("id", membershipId)) as any;
 
     if (error) {
       console.error("Rejection error:", error);
@@ -290,13 +289,13 @@ export async function rejectVerification(
 
     // Send notification
     const companyName =
-      (membership.companies as any)?.display_name || "your company";
+      (membership as any).companies?.display_name || "your company";
     await createNotification(
-      membership.user_id,
+      (membership as any).user_id,
       "verification",
       "Verification Rejected ❌",
       `Your verification request for ${companyName} was not approved. Reason: ${notes}`,
-      `/company/${membership.company_id}`,
+      `/company/${(membership as any).company_id}`,
     );
 
     return { success: true };
@@ -318,7 +317,7 @@ export async function isCurrentUserAdmin(userId: string): Promise<boolean> {
 
   if (error || !data) return false;
 
-  return data.is_admin === true;
+  return (data as any).is_admin === true;
 }
 
 /**
@@ -333,7 +332,7 @@ export async function getVerifiedMembers(companyId: string): Promise<string[]> {
 
   if (error || !data) return [];
 
-  return data.map((m) => m.user_id as string);
+  return (data as any[]).map((m) => m.user_id as string);
 }
 
 /**
@@ -345,10 +344,9 @@ export async function updateUserAdminStatus(
   currentAdminId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await supabase
-      .from("users")
-      .update({ is_admin: isAdmin } as any)
-      .eq("id", userId);
+    const { error } = (await (supabase.from("users") as any)
+      .update({ is_admin: isAdmin })
+      .eq("id", userId)) as any;
 
     if (error) {
       console.error("User update error:", error);
@@ -356,11 +354,11 @@ export async function updateUserAdminStatus(
     }
 
     // Log the action
-    await supabase.from("user_role_audit").insert({
+    (await supabase.from("user_role_audit").insert({
       target_user_id: userId,
       admin_id: currentAdminId,
       action: isAdmin ? "promote" : "demote",
-    } as any);
+    } as any)) as any;
 
     return { success: true };
   } catch (error) {

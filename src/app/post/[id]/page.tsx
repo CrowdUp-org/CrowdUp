@@ -75,7 +75,7 @@ export default function PostDetailPage({
   }, [id]);
 
   const fetchPost = async () => {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("posts")
       .select(
         `
@@ -84,7 +84,7 @@ export default function PostDetailPage({
       `,
       )
       .eq("id", id)
-      .single();
+      .single()) as any;
 
     if (!error && data) {
       setPost(data as Post);
@@ -94,7 +94,7 @@ export default function PostDetailPage({
   };
 
   const fetchComments = async () => {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("comments")
       .select(
         `
@@ -103,7 +103,7 @@ export default function PostDetailPage({
       `,
       )
       .eq("post_id", id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })) as any;
 
     if (!error && data) {
       setComments(data as Comment[]);
@@ -111,7 +111,7 @@ export default function PostDetailPage({
   };
 
   const fetchUpvoters = async () => {
-    const { data } = await supabase
+    const { data } = (await supabase
       .from("votes")
       .select(
         `
@@ -121,7 +121,7 @@ export default function PostDetailPage({
       )
       .eq("post_id", id)
       .eq("vote_type", "up")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })) as any;
 
     if (data) {
       setUpvoters(data);
@@ -132,12 +132,12 @@ export default function PostDetailPage({
     const userId = getCurrentUserId();
     if (!userId) return;
 
-    const { data } = await supabase
+    const { data } = (await supabase
       .from("votes")
       .select("vote_type")
       .eq("post_id", id)
       .eq("user_id", userId)
-      .single();
+      .single()) as any;
 
     if (data) {
       setUserVote(data.vote_type as "up" | "down");
@@ -170,14 +170,16 @@ export default function PostDetailPage({
         newVotes = votes + (voteType === "up" ? 1 : -1);
       }
 
-      await supabase.from("votes").upsert({
+      (await supabase.from("votes").upsert({
         post_id: id,
         user_id: userId,
         vote_type: voteType,
-      });
+      } as any)) as any;
     }
 
-    await supabase.from("posts").update({ votes: newVotes }).eq("id", id);
+    (await (supabase.from("posts") as any)
+      .update({ votes: newVotes })
+      .eq("id", id)) as any;
 
     setVotes(newVotes);
     setUserVote(newUserVote);
@@ -194,11 +196,11 @@ export default function PostDetailPage({
 
     setSubmitting(true);
 
-    const { error } = await supabase.from("comments").insert({
+    const { error } = (await supabase.from("comments").insert({
       post_id: id,
       user_id: userId,
       content: commentText.trim(),
-    });
+    } as any)) as any;
 
     if (!error) {
       setCommentText("");

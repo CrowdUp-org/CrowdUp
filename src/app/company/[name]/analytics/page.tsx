@@ -40,11 +40,11 @@ export default function CompanyAnalyticsPage({
   }, [name]);
 
   const fetchCompanyAndCheck = async () => {
-    const { data: companyData } = await supabase
+    const { data: companyData } = (await supabase
       .from("companies")
       .select("*")
       .eq("name", name.toLowerCase())
-      .single();
+      .single()) as any;
 
     if (!companyData) {
       router.push("/");
@@ -60,12 +60,12 @@ export default function CompanyAnalyticsPage({
       return;
     }
 
-    const { data: memberData } = await supabase
+    const { data: memberData } = (await supabase
       .from("company_members")
       .select("role")
       .eq("company_id", companyData.id)
       .eq("user_id", userId)
-      .single();
+      .single()) as any;
 
     if (
       !memberData ||
@@ -81,35 +81,37 @@ export default function CompanyAnalyticsPage({
 
   const fetchAnalytics = async (companyData: any) => {
     // Fetch posts
-    const { data: posts } = await supabase
+    const { data: posts } = (await supabase
       .from("posts")
       .select("*")
-      .ilike("company", companyData.display_name);
+      .ilike("company", companyData.display_name)) as any;
 
-    const totalPosts = posts?.length || 0;
-    const totalVotes = posts?.reduce((sum, post) => sum + post.votes, 0) || 0;
+    const totalPosts = (posts as any)?.length || 0;
+    const totalVotes =
+      (posts as any)?.reduce((sum: any, post: any) => sum + post.votes, 0) || 0;
 
     // Fetch comments for these posts
-    const postIds = posts?.map((p) => p.id) || [];
+    const postIds = (posts as any)?.map((p: any) => p.id) || [];
     let totalComments = 0;
     if (postIds.length > 0) {
-      const { data: comments } = await supabase
+      const { data: comments } = (await supabase
         .from("comments")
         .select("id")
-        .in("post_id", postIds);
+        .in("post_id", postIds)) as any;
       totalComments = comments?.length || 0;
     }
 
     // Fetch apps
-    const { data: apps } = await supabase
+    const { data: apps } = (await supabase
       .from("apps")
       .select("*")
-      .eq("company_id", companyData.id);
+      .eq("company_id", companyData.id)) as any;
 
     const totalApps = apps?.length || 0;
 
     // Recent activity (last 10 posts)
-    const { data: recentPosts } = await supabase
+    // Recent activity (last 10 posts)
+    const { data: recentPosts } = (await supabase
       .from("posts")
       .select(
         `
@@ -119,7 +121,7 @@ export default function CompanyAnalyticsPage({
       )
       .ilike("company", companyData.display_name)
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(10)) as any;
 
     setAnalytics({
       totalPosts,

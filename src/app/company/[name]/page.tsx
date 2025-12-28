@@ -164,29 +164,27 @@ export default function CompanyPage({
 
     if (isFollowing) {
       // Unfollow
-      await supabase
+      (await supabase
         .from("company_follows")
         .delete()
-        .eq("company_id", company.id)
-        .eq("user_id", userId);
+        .eq("company_id", company!.id)
+        .eq("user_id", userId)) as any;
 
-      await supabase
-        .from("companies")
+      (await (supabase.from("companies") as any)
         .update({ follower_count: Math.max(0, followerCount - 1) })
-        .eq("id", company.id);
+        .eq("id", company!.id)) as any;
 
       setIsFollowing(false);
       setFollowerCount(Math.max(0, followerCount - 1));
     } else {
       // Follow
-      await supabase
+      (await supabase
         .from("company_follows")
-        .insert({ company_id: company.id, user_id: userId });
+        .insert({ company_id: company!.id, user_id: userId } as any)) as any;
 
-      await supabase
-        .from("companies")
+      (await (supabase.from("companies") as any)
         .update({ follower_count: followerCount + 1 })
-        .eq("id", company.id);
+        .eq("id", company!.id)) as any;
 
       setIsFollowing(true);
       setFollowerCount(followerCount + 1);

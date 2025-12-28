@@ -68,7 +68,7 @@ export default function CreateAppPage() {
 
     setLoading(true);
 
-    const { data, error: insertError } = await supabase
+    const { data, error: insertError } = (await supabase
       .from("apps")
       .insert({
         user_id: userId,
@@ -78,9 +78,9 @@ export default function CreateAppPage() {
         logo_url: formData.logo_url || null,
         category: formData.category,
         company_id: formData.company_id || null,
-      })
+      } as any)
       .select()
-      .single();
+      .single()) as any;
 
     if (insertError) {
       setError("Failed to create app. Please try again.");

@@ -39,7 +39,7 @@ export default function AppAnalyticsPage({
   }, [id]);
 
   const fetchAppAndCheck = async () => {
-    const { data: appData } = await supabase
+    const { data: appData } = (await supabase
       .from("apps")
       .select(
         `
@@ -48,7 +48,7 @@ export default function AppAnalyticsPage({
       `,
       )
       .eq("id", id)
-      .single();
+      .single()) as any;
 
     if (!appData) {
       router.push("/");
@@ -75,7 +75,7 @@ export default function AppAnalyticsPage({
 
   const fetchAnalytics = async () => {
     // Fetch all reviews
-    const { data: reviews } = await supabase
+    const { data: reviews } = (await supabase
       .from("app_reviews")
       .select(
         `
@@ -84,7 +84,7 @@ export default function AppAnalyticsPage({
       `,
       )
       .eq("app_id", id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })) as any;
 
     if (!reviews || reviews.length === 0) {
       setLoading(false);

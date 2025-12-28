@@ -24,13 +24,13 @@ export async function createNotification(
   link: string | null = null,
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    const { error } = await supabase.from("notifications").insert({
+    const { error } = (await supabase.from("notifications").insert({
       user_id: userId,
       type,
       title,
       content,
       link,
-    });
+    } as any)) as any;
 
     if (error) {
       console.error("Error creating notification:", error);
@@ -76,10 +76,9 @@ export async function getNotifications(
  */
 export async function markAsRead(notificationId: string): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from("notifications")
+    const { error } = (await (supabase.from("notifications") as any)
       .update({ is_read: true })
-      .eq("id", notificationId);
+      .eq("id", notificationId)) as any;
 
     return !error;
   } catch (error) {
@@ -93,11 +92,10 @@ export async function markAsRead(notificationId: string): Promise<boolean> {
  */
 export async function markAllAsRead(userId: string): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from("notifications")
+    const { error } = (await (supabase.from("notifications") as any)
       .update({ is_read: true })
       .eq("user_id", userId)
-      .eq("is_read", false);
+      .eq("is_read", false)) as any;
 
     return !error;
   } catch (error) {

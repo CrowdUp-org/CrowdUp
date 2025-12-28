@@ -147,9 +147,7 @@ export default function AppManagePage({
       return;
     }
 
-    // @ts-ignore - Supabase type issue
-    const { error: updateError } = await supabase
-      .from("apps")
+    const { error: updateError } = (await (supabase.from("apps") as any)
       .update({
         name: formData.name,
         description: formData.description,
@@ -158,7 +156,7 @@ export default function AppManagePage({
         category: formData.category,
         company_id: formData.company_id || null,
       })
-      .eq("id", id);
+      .eq("id", id)) as any;
 
     if (updateError) {
       setError("Failed to update app. Please try again.");

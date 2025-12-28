@@ -72,13 +72,13 @@ function SearchPageContent() {
   const fetchFollowingStatus = async () => {
     if (!currentUserId) return;
 
-    const { data } = await supabase
+    const { data } = (await supabase
       .from("connections")
       .select("following_id")
-      .eq("follower_id", currentUserId);
+      .eq("follower_id", currentUserId)) as any;
 
     if (data) {
-      setFollowingIds(new Set(data.map((c) => c.following_id)));
+      setFollowingIds(new Set(data.map((c: any) => c.following_id)));
     }
   };
 
@@ -117,10 +117,10 @@ function SearchPageContent() {
       });
     } else {
       // Follow
-      await supabase.from("connections").insert({
+      (await supabase.from("connections").insert({
         follower_id: currentUserId,
         following_id: userId,
-      });
+      } as any)) as any;
 
       setFollowingIds((prev) => new Set(prev).add(userId));
     }
@@ -131,7 +131,7 @@ function SearchPageContent() {
     const query = searchQuery.toLowerCase().trim();
 
     // Search posts
-    const { data: postsData } = await supabase
+    const { data: postsData } = (await supabase
       .from("posts")
       .select(
         `
@@ -143,19 +143,19 @@ function SearchPageContent() {
         `title.ilike.%${query}%,description.ilike.%${query}%,company.ilike.%${query}%`,
       )
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(20)) as any;
 
     setPosts(postsData || []);
 
     // Search users
-    const { data: usersData } = await supabase
+    const { data: usersData } = (await supabase
       .from("users")
       .select("*")
       .or(
         `username.ilike.%${query}%,display_name.ilike.%${query}%,bio.ilike.%${query}%`,
       )
       .neq("id", currentUserId || "")
-      .limit(20);
+      .limit(20)) as any;
 
     setUsers(usersData || []);
 
@@ -168,7 +168,9 @@ function SearchPageContent() {
 
     if (companiesData) {
       const uniqueCompanies = Array.from(
-        new Map(companiesData.map((c: any) => [c.company, c])).values(),
+        new Map(
+          (companiesData as any).map((c: any) => [c.company, c]),
+        ).values(),
       );
       setCompanies(uniqueCompanies);
     }

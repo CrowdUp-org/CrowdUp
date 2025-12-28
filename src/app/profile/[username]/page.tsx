@@ -86,13 +86,13 @@ export default function ProfilePage({
 
   const fetchProfile = async () => {
     // Fetch user profile
-    const { data: userData, error: userError } = await supabase
+    const { data: userData, error: userError } = (await supabase
       .from("users")
       .select(
         "id, username, display_name, bio, avatar_url, reputation_score, reputation_level, created_at",
       )
       .eq("username", username)
-      .single();
+      .single()) as any;
 
     if (userError || !userData) {
       setLoading(false);
@@ -102,21 +102,21 @@ export default function ProfilePage({
     setProfile(userData);
 
     // Fetch user posts
-    const { data: postsData, error: postsError } = await supabase
+    const { data: postsData, error: postsError } = (await supabase
       .from("posts")
       .select("*")
-      .eq("user_id", userData.id)
-      .order("created_at", { ascending: false });
+      .eq("user_id", (userData as any).id)
+      .order("created_at", { ascending: false })) as any;
 
     if (!postsError && postsData) {
       setPosts(postsData);
       // Fetch comment counts
-      const postIds = postsData.map((p) => p.id);
+      const postIds = postsData.map((p: any) => p.id);
       if (postIds.length > 0) {
-        const { data: commentsData } = await supabase
+        const { data: commentsData } = (await supabase
           .from("comments")
           .select("post_id")
-          .in("post_id", postIds);
+          .in("post_id", postIds)) as any;
 
         if (commentsData) {
           const counts: Record<string, number> = {};

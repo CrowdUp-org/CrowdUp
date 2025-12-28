@@ -118,7 +118,7 @@ export default function AppDetailPage({
   }, [app]);
 
   const fetchApp = async () => {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("apps")
       .select(
         `
@@ -128,7 +128,7 @@ export default function AppDetailPage({
       `,
       )
       .eq("id", id)
-      .single();
+      .single()) as any;
 
     if (!error && data) {
       setApp(data as AppData);
@@ -137,7 +137,7 @@ export default function AppDetailPage({
   };
 
   const fetchReviews = async () => {
-    const { data } = await supabase
+    const { data } = (await supabase
       .from("app_reviews")
       .select(
         `
@@ -146,7 +146,7 @@ export default function AppDetailPage({
       `,
       )
       .eq("app_id", id)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })) as any;
 
     if (data) {
       setReviews(data as Review[]);
@@ -190,13 +190,12 @@ export default function AppDetailPage({
 
     setSubmitting(true);
 
-    // @ts-ignore - Supabase type issue
-    const { error } = await supabase.from("app_reviews").upsert({
+    const { error } = (await supabase.from("app_reviews").upsert({
       app_id: id,
       user_id: userId,
       rating,
       review_text: reviewText.trim() || null,
-    });
+    } as any)) as any;
 
     if (!error) {
       // Update app average rating
@@ -207,16 +206,14 @@ export default function AppDetailPage({
 
       if (allReviews) {
         const avg =
-          allReviews.reduce((sum, r: any) => sum + r.rating, 0) /
-          allReviews.length;
-        // @ts-ignore - Supabase type issue
-        await supabase
-          .from("apps")
+          (allReviews as any).reduce((sum: any, r: any) => sum + r.rating, 0) /
+          (allReviews as any).length;
+        (await (supabase.from("apps") as any)
           .update({
             average_rating: Math.round(avg * 100) / 100,
-            total_reviews: allReviews.length,
+            total_reviews: (allReviews as any).length,
           })
-          .eq("id", id);
+          .eq("id", id)) as any;
       }
 
       fetchApp();
@@ -247,8 +244,7 @@ export default function AppDetailPage({
       return;
     }
 
-    const { error } = await supabase
-      .from("apps")
+    const { error } = (await (supabase.from("apps") as any)
       .update({
         name: editFormData.name,
         description: editFormData.description,
@@ -256,7 +252,7 @@ export default function AppDetailPage({
         logo_url: editFormData.logo_url || null,
         category: editFormData.category,
       })
-      .eq("id", id);
+      .eq("id", id)) as any;
 
     if (error) {
       setEditError("Failed to update app. Please try again.");

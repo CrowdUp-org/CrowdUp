@@ -171,14 +171,14 @@ export async function awardPoints(
     const currentLevel = await getUserReputation(userId);
 
     // Call the atomic database function
-    const { data, error } = await supabase.rpc("award_reputation_points", {
+    const { data, error } = (await supabase.rpc("award_reputation_points", {
       p_user_id: userId,
       p_action_type: actionType,
       p_points: points,
       p_related_post_id: options?.relatedPostId || null,
       p_related_comment_id: options?.relatedCommentId || null,
       p_reason: options?.reason || null,
-    });
+    } as any)) as any;
 
     if (error) {
       console.error("Error awarding points via RPC:", error);
@@ -204,12 +204,16 @@ export async function awardPoints(
       newLevel !== currentLevel.level &&
       result.new_score! > currentLevel.score
     ) {
+      const usernameResult = (await (supabase.from("users") as any)
+        .select("username")
+        .eq("id", userId)
+        .single()) as any;
       await createNotification(
         userId,
         "level",
         "Reputation Level Up!",
         `Congratulations! You've reached the ${REPUTATION_LEVELS[newLevel].name} level.`,
-        `/profile/${(await supabase.from("users").select("username").eq("id", userId).single()).data?.username}`,
+        `/profile/${usernameResult.data?.username || ""}`,
       );
     }
 
@@ -230,11 +234,11 @@ export async function getUserReputation(
   userId: string,
 ): Promise<ReputationData | null> {
   try {
-    const { data: user, error } = await supabase
+    const { data: user, error } = (await supabase
       .from("users")
       .select("reputation_score, reputation_level")
       .eq("id", userId)
-      .single();
+      .single()) as any;
 
     if (error || !user) {
       return null;
@@ -256,7 +260,7 @@ export async function getReputationHistory(
   offset: number = 0,
 ): Promise<ReputationHistoryItem[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("reputation_history")
       .select(
         `
@@ -270,30 +274,32 @@ export async function getReputationHistory(
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1);
+      .range(offset, offset + limit - 1)) as any;
 
     if (error || !data) {
       return [];
     }
 
     // Fetch post titles for related posts
-    const postIds = data
-      .filter((item) => item.related_post_id)
-      .map((item) => item.related_post_id);
+    const postIds = (data as any)
+      .filter((item: any) => item.related_post_id)
+      .map((item: any) => item.related_post_id);
 
     let postTitles: Record<string, string> = {};
     if (postIds.length > 0) {
-      const { data: posts } = await supabase
+      const { data: posts } = (await supabase
         .from("posts")
         .select("id, title")
-        .in("id", postIds);
+        .in("id", postIds)) as any;
 
       if (posts) {
-        postTitles = Object.fromEntries(posts.map((p) => [p.id, p.title]));
+        postTitles = Object.fromEntries(
+          (posts as any).map((p: any) => [p.id, p.title]),
+        );
       }
     }
 
-    return data.map((item) => ({
+    return (data as any).map((item: any) => ({
       ...item,
       post_title: item.related_post_id
         ? postTitles[item.related_post_id]
@@ -317,19 +323,19 @@ export async function getLeaderboard(options?: {
     const page = options?.page || 1;
     const offset = (page - 1) * limit;
 
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("users")
       .select(
         "id, username, display_name, avatar_url, reputation_score, reputation_level",
       )
       .order("reputation_score", { ascending: false })
-      .range(offset, offset + limit - 1);
+      .range(offset, offset + limit - 1)) as any;
 
     if (error || !data) {
       return [];
     }
 
-    return data.map((user, index) => ({
+    return (data as any).map((user: any, index: any) => ({
       ...user,
       rank: index + 1,
     }));
@@ -352,7 +358,7 @@ export async function getUserBadges(userId: string): Promise<
   }[]
 > {
   try {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("user_badges")
       .select(
         `
@@ -366,13 +372,13 @@ export async function getUserBadges(userId: string): Promise<
       `,
       )
       .eq("user_id", userId)
-      .order("earned_at", { ascending: false });
+      .order("earned_at", { ascending: false })) as any;
 
     if (error || !data) {
       return [];
     }
 
-    return data.map((item) => ({
+    return (data as any).map((item: any) => ({
       id: item.id,
       earned_at: item.earned_at,
       name: (item.badges as any)?.name || "",
@@ -391,11 +397,11 @@ export async function getUserBadges(userId: string): Promise<
 export async function checkAndAwardBadges(userId: string): Promise<void> {
   try {
     // Get user stats
-    const { data: user } = await supabase
+    const { data: user } = (await supabase
       .from("users")
       .select("reputation_score")
       .eq("id", userId)
-      .single();
+      .single()) as any;
 
     if (!user) return;
 
@@ -405,14 +411,14 @@ export async function checkAndAwardBadges(userId: string): Promise<void> {
       .eq("user_id", userId);
 
     // Get total upvotes received on user's posts
-    const { data: posts } = await supabase
+    const { data: posts } = (await supabase
       .from("posts")
       .select("id")
-      .eq("user_id", userId);
+      .eq("user_id", userId)) as any;
 
     let totalUpvotes = 0;
     if (posts && posts.length > 0) {
-      const postIds = posts.map((p) => p.id);
+      const postIds = (posts as any).map((p: any) => p.id);
       const { count } = await supabase
         .from("votes")
         .select("id", { count: "exact", head: true })
@@ -422,48 +428,57 @@ export async function checkAndAwardBadges(userId: string): Promise<void> {
     }
 
     // Get all badges user doesn't have
-    const { data: userBadges } = await supabase
+    const { data: userBadges } = (await supabase
       .from("user_badges")
       .select("badge_id")
-      .eq("user_id", userId);
+      .eq("user_id", userId)) as any;
 
-    const earnedBadgeIds = new Set((userBadges || []).map((b) => b.badge_id));
+    const earnedBadgeIds = new Set(
+      (userBadges || []).map((b: any) => b.badge_id),
+    );
 
     // Get all badges
-    const { data: allBadges } = await supabase.from("badges").select("*");
+    const { data: allBadges } = (await supabase
+      .from("badges")
+      .select("*")) as any;
 
     if (!allBadges) return;
 
     // Check each badge
-    for (const badge of allBadges) {
-      if (earnedBadgeIds.has(badge.id)) continue;
+    for (const badge of allBadges as any[]) {
+      if (earnedBadgeIds.has((badge as any).id)) continue;
 
       let qualified = false;
-      switch (badge.requirement_type) {
+      switch ((badge as any).requirement_type) {
         case "posts_count":
-          qualified = (postsCount || 0) >= badge.requirement_value;
+          qualified = (postsCount || 0) >= (badge as any).requirement_value;
           break;
         case "upvotes_received":
-          qualified = totalUpvotes >= badge.requirement_value;
+          qualified = totalUpvotes >= (badge as any).requirement_value;
           break;
         case "reputation_score":
-          qualified = (user.reputation_score || 0) >= badge.requirement_value;
+          qualified =
+            (user!.reputation_score || 0) >= (badge as any).requirement_value;
           break;
       }
 
       if (qualified) {
-        await supabase.from("user_badges").insert({
+        (await (supabase.from("user_badges").insert({
           user_id: userId,
-          badge_id: badge.id,
-        });
+          badge_id: (badge as any).id,
+        } as any) as any)) as any;
 
         // Send notification
+        const badgeUsernameResult = (await (supabase.from("users") as any)
+          .select("username")
+          .eq("id", userId)
+          .single()) as any;
         await createNotification(
           userId,
           "badge",
           "New Badge Earned!",
-          `You've earned the ${badge.name} badge: ${badge.description}`,
-          `/profile/${(await supabase.from("users").select("username").eq("id", userId).single()).data?.username}`,
+          `You've earned the ${(badge as any).name} badge: ${(badge as any).description}`,
+          `/profile/${badgeUsernameResult.data?.username || ""}`,
         );
       }
     }

@@ -50,7 +50,7 @@ export async function getOrCreateConversation(
       .single();
 
     if (existing) {
-      return { conversationId: existing.id, error: null };
+      return { conversationId: (existing as any).id, error: null };
     }
 
     // Create new conversation
@@ -59,7 +59,7 @@ export async function getOrCreateConversation(
       .insert({
         participant1_id: participant1,
         participant2_id: participant2,
-      })
+      } as any)
       .select("id")
       .single();
 
@@ -67,7 +67,7 @@ export async function getOrCreateConversation(
       return { conversationId: null, error: "Failed to create conversation" };
     }
 
-    return { conversationId: newConv.id, error: null };
+    return { conversationId: (newConv as any).id, error: null };
   } catch (error) {
     return { conversationId: null, error: "An error occurred" };
   }
@@ -101,7 +101,7 @@ export async function getUserConversations(): Promise<{
 
     // Get user details and last messages for each conversation
     const conversationsWithDetails = await Promise.all(
-      conversations.map(async (conv) => {
+      conversations.map(async (conv: any) => {
         const otherUserId =
           conv.participant1_id === currentUserId
             ? conv.participant2_id
@@ -118,7 +118,7 @@ export async function getUserConversations(): Promise<{
         const { data: lastMessage } = await supabase
           .from("messages")
           .select("content, created_at, sender_id")
-          .eq("conversation_id", conv.id)
+          .eq("conversation_id", (conv as any).id)
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
@@ -127,12 +127,12 @@ export async function getUserConversations(): Promise<{
         const { count: unreadCount } = await supabase
           .from("messages")
           .select("*", { count: "exact", head: true })
-          .eq("conversation_id", conv.id)
+          .eq("conversation_id", (conv as any).id)
           .eq("read", false)
           .neq("sender_id", currentUserId);
 
         return {
-          id: conv.id,
+          id: (conv as any).id,
           otherUser: userData || {
             id: otherUserId,
             username: "unknown",
@@ -187,11 +187,11 @@ export async function sendMessage(
       return { success: false, error: "Not authenticated" };
     }
 
-    const { error } = await supabase.from("messages").insert({
+    const { error } = (await supabase.from("messages").insert({
       conversation_id: conversationId,
       sender_id: currentUserId,
       content: content.trim(),
-    });
+    } as any)) as any;
 
     if (error) {
       return { success: false, error: "Failed to send message" };
@@ -213,12 +213,11 @@ export async function markMessagesAsRead(
     const currentUserId = getCurrentUserId();
     if (!currentUserId) return;
 
-    await supabase
-      .from("messages")
+    const { error } = (await (supabase.from("messages") as any)
       .update({ read: true })
       .eq("conversation_id", conversationId)
       .neq("sender_id", currentUserId)
-      .eq("read", false);
+      .eq("read", false)) as any;
   } catch (error) {
     console.error("Failed to mark messages as read:", error);
   }
@@ -258,8 +257,12 @@ export async function getUserConnections(): Promise<{
     }
 
     // Find mutual connections (users who follow each other)
-    const followingIds = new Set(following?.map((f) => f.following_id) || []);
-    const followerIds = new Set(followers?.map((f) => f.follower_id) || []);
+    const followingIds = new Set(
+      (following as any[])?.map((f) => f.following_id) || [],
+    );
+    const followerIds = new Set(
+      (followers as any[])?.map((f) => f.follower_id) || [],
+    );
     const mutualIds = [...followingIds].filter((id) => followerIds.has(id));
 
     if (mutualIds.length === 0) {

@@ -213,7 +213,10 @@ export default function UserManagementPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <ReputationBadge score={user.reputation_score} />
+                      <ReputationBadge
+                        score={user.reputation_score}
+                        level={user.reputation_level}
+                      />
                     </td>
                     <td className="px-6 py-4 text-gray-600 text-sm">
                       {format(new Date(user.created_at), "MMM d, yyyy")}

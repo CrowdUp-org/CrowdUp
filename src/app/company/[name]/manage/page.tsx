@@ -133,34 +133,32 @@ export default function CompanyManagePage({
       return;
     }
 
-    setCompany(companyData);
+    setCompany(companyData as any);
     setFormData({
-      display_name: companyData.display_name,
-      description: companyData.description || "",
-      website: companyData.website || "",
-      logo_url: companyData.logo_url || "",
-      category: companyData.category || "",
+      display_name: (companyData as any).display_name,
+      description: (companyData as any).description || "",
+      website: (companyData as any).website || "",
+      logo_url: (companyData as any).logo_url || "",
+      category: (companyData as any).category || "",
     });
 
-    // Check user role
-    const { data: memberData } = await supabase
+    const { data: memberData } = (await supabase
       .from("company_members")
       .select("role")
-      .eq("company_id", companyData.id)
+      .eq("company_id", (companyData as any).id)
       .eq("user_id", userId)
-      .single();
+      .single()) as any;
 
     if (!memberData) {
       router.push(`/company/${name}`);
       return;
     }
 
-    const userRole = memberData.role;
+    const userRole = (memberData as any).role;
     setIsOwner(userRole === "owner");
     setIsOwnerOrAdmin(userRole === "owner" || userRole === "admin");
 
-    // Fetch all members
-    const { data: membersData } = await supabase
+    const { data: membersData } = (await supabase
       .from("company_members")
       .select(
         `
@@ -175,8 +173,8 @@ export default function CompanyManagePage({
         )
       `,
       )
-      .eq("company_id", companyData.id)
-      .order("created_at", { ascending: true });
+      .eq("company_id", (companyData as any).id)
+      .order("created_at", { ascending: true })) as any;
 
     if (membersData) {
       setMembers(membersData as any);
@@ -184,7 +182,10 @@ export default function CompanyManagePage({
 
     // Set current user ID and fetch verification status
     setCurrentUserId(userId);
-    const verStatus = await getVerificationStatus(userId, companyData.id);
+    const verStatus = await getVerificationStatus(
+      userId,
+      (companyData as any).id,
+    );
     if (verStatus) {
       setVerificationStatus(verStatus);
     }
@@ -203,8 +204,7 @@ export default function CompanyManagePage({
       return;
     }
 
-    const { error: updateError } = await supabase
-      .from("companies")
+    const { error: updateError } = (await (supabase.from("companies") as any)
       .update({
         display_name: formData.display_name,
         description: formData.description,
@@ -212,7 +212,7 @@ export default function CompanyManagePage({
         logo_url: formData.logo_url || null,
         category: formData.category || null,
       })
-      .eq("id", company!.id);
+      .eq("id", company!.id)) as any;
 
     if (updateError) {
       setError("Failed to update company. Please try again.");
@@ -249,12 +249,12 @@ export default function CompanyManagePage({
     }
 
     // Check if already a member
-    const { data: existingMember } = await supabase
+    const { data: existingMember } = (await supabase
       .from("company_members")
       .select("id")
       .eq("company_id", company!.id)
-      .eq("user_id", userData.id)
-      .single();
+      .eq("user_id", (userData as any).id)
+      .single()) as any;
 
     if (existingMember) {
       setError("User is already a member");
@@ -263,13 +263,13 @@ export default function CompanyManagePage({
     }
 
     // Add member
-    const { error: insertError } = await supabase
+    const { error: insertError } = (await supabase
       .from("company_members")
       .insert({
         company_id: company!.id,
-        user_id: userData.id,
+        user_id: (userData as any).id,
         role: newMemberRole,
-      });
+      } as any)) as any;
 
     if (insertError) {
       setError("Failed to add member");
@@ -305,10 +305,11 @@ export default function CompanyManagePage({
     memberId: string,
     newRole: "admin" | "member",
   ) => {
-    const { error: updateError } = await supabase
-      .from("company_members")
+    const { error: updateError } = (await (
+      supabase.from("company_members") as any
+    )
       .update({ role: newRole })
-      .eq("id", memberId);
+      .eq("id", memberId)) as any;
 
     if (!updateError) {
       setSuccess("Role updated");

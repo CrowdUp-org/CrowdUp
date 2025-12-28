@@ -49,7 +49,11 @@ interface Comment {
   };
 }
 
-export default function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PostDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const currentUser = getCurrentUser();
@@ -73,10 +77,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const fetchPost = async () => {
     const { data, error } = await supabase
       .from("posts")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .eq("id", id)
       .single();
 
@@ -90,10 +96,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const fetchComments = async () => {
     const { data, error } = await supabase
       .from("comments")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .eq("post_id", id)
       .order("created_at", { ascending: false });
 
@@ -105,10 +113,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const fetchUpvoters = async () => {
     const { data } = await supabase
       .from("votes")
-      .select(`
+      .select(
+        `
         vote_type,
         users (username, display_name, avatar_url)
-      `)
+      `,
+      )
       .eq("post_id", id)
       .eq("vote_type", "up")
       .order("created_at", { ascending: false });
@@ -147,7 +157,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     if (userVote === voteType) {
       newUserVote = null;
       newVotes = votes + (voteType === "up" ? -1 : 1);
-      
+
       await supabase
         .from("votes")
         .delete()
@@ -160,19 +170,14 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
         newVotes = votes + (voteType === "up" ? 1 : -1);
       }
 
-      await supabase
-        .from("votes")
-        .upsert({
-          post_id: id,
-          user_id: userId,
-          vote_type: voteType,
-        });
+      await supabase.from("votes").upsert({
+        post_id: id,
+        user_id: userId,
+        vote_type: voteType,
+      });
     }
 
-    await supabase
-      .from("posts")
-      .update({ votes: newVotes })
-      .eq("id", id);
+    await supabase.from("posts").update({ votes: newVotes }).eq("id", id);
 
     setVotes(newVotes);
     setUserVote(newUserVote);
@@ -218,7 +223,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   };
 
   const handleReport = () => {
-    alert("Report functionality coming soon! This post has been flagged for review.");
+    alert(
+      "Report functionality coming soon! This post has been flagged for review.",
+    );
   };
 
   if (loading) {
@@ -263,7 +270,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
       textColor: "text-blue-600",
       borderColor: "border-blue-200",
     },
-    "Complaint": {
+    Complaint: {
       icon: "⚠️",
       bgColor: "bg-yellow-50",
       textColor: "text-yellow-600",
@@ -288,31 +295,41 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                 onClick={() => handleVote("up")}
                 className={cn(
                   "h-10 w-10 transition-all hover:scale-110",
-                  userVote === "up" && "text-green-600 bg-green-50"
+                  userVote === "up" && "text-green-600 bg-green-50",
                 )}
               >
                 <ChevronUp className="h-6 w-6" />
               </Button>
-              <Dialog open={upvotersDialogOpen} onOpenChange={setUpvotersDialogOpen}>
+              <Dialog
+                open={upvotersDialogOpen}
+                onOpenChange={setUpvotersDialogOpen}
+              >
                 <DialogTrigger asChild>
-                  <button className={cn(
-                    "text-2xl font-bold hover:underline cursor-pointer",
-                    userVote === "up" && "text-green-600",
-                    userVote === "down" && "text-red-600"
-                  )}>
+                  <button
+                    className={cn(
+                      "text-2xl font-bold hover:underline cursor-pointer",
+                      userVote === "up" && "text-green-600",
+                      userVote === "down" && "text-red-600",
+                    )}
+                  >
                     {votes}
                   </button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px] max-h-[600px] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Upvoted by {upvoters.length} {upvoters.length === 1 ? 'person' : 'people'}</DialogTitle>
+                    <DialogTitle>
+                      Upvoted by {upvoters.length}{" "}
+                      {upvoters.length === 1 ? "person" : "people"}
+                    </DialogTitle>
                     <DialogDescription>
                       People who upvoted this post
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-3 py-4">
                     {upvoters.length === 0 ? (
-                      <p className="text-center text-gray-500 py-8">No upvotes yet</p>
+                      <p className="text-center text-gray-500 py-8">
+                        No upvotes yet
+                      </p>
                     ) : (
                       upvoters.map((vote: any, index: number) => (
                         <button
@@ -325,16 +342,26 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                         >
                           <Avatar className="h-10 w-10 bg-gradient-to-br from-yellow-400 to-orange-500">
                             {vote.users.avatar_url ? (
-                              <img src={vote.users.avatar_url} alt={vote.users.display_name} className="h-full w-full object-cover" />
+                              <img
+                                src={vote.users.avatar_url}
+                                alt={vote.users.display_name}
+                                className="h-full w-full object-cover"
+                              />
                             ) : (
                               <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
-                                {vote.users.display_name.charAt(0).toUpperCase()}
+                                {vote.users.display_name
+                                  .charAt(0)
+                                  .toUpperCase()}
                               </AvatarFallback>
                             )}
                           </Avatar>
                           <div className="text-left">
-                            <p className="font-semibold">{vote.users.display_name}</p>
-                            <p className="text-sm text-gray-500">@{vote.users.username}</p>
+                            <p className="font-semibold">
+                              {vote.users.display_name}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              @{vote.users.username}
+                            </p>
                           </div>
                         </button>
                       ))
@@ -348,7 +375,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                 onClick={() => handleVote("down")}
                 className={cn(
                   "h-10 w-10 transition-all hover:scale-110",
-                  userVote === "down" && "text-red-600 bg-red-50"
+                  userVote === "down" && "text-red-600 bg-red-50",
                 )}
               >
                 <ChevronDown className="h-6 w-6" />
@@ -358,13 +385,23 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
             {/* Content */}
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                <Badge className={cn(config.bgColor, config.textColor, "border", config.borderColor, "font-medium")}>
+                <Badge
+                  className={cn(
+                    config.bgColor,
+                    config.textColor,
+                    "border",
+                    config.borderColor,
+                    "font-medium",
+                  )}
+                >
                   <span className="mr-1">{config.icon}</span>
                   {post.type}
                 </Badge>
                 <span className="text-gray-300">•</span>
                 <button
-                  onClick={() => router.push(`/company/${post.company.toLowerCase()}`)}
+                  onClick={() =>
+                    router.push(`/company/${post.company.toLowerCase()}`)
+                  }
                   className="text-sm font-medium hover:underline"
                   style={{ color: post.company_color }}
                 >
@@ -373,7 +410,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
               </div>
 
               <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-              <p className="text-gray-700 mb-6 leading-relaxed whitespace-pre-wrap">{post.description}</p>
+              <p className="text-gray-700 mb-6 leading-relaxed whitespace-pre-wrap">
+                {post.description}
+              </p>
 
               {/* Author Info */}
               <div className="flex items-center justify-between pb-6 border-b">
@@ -389,13 +428,20 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                   <div>
                     <p className="font-semibold">{post.users.display_name}</p>
                     <p className="text-sm text-gray-500">
-                      {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(post.created_at), {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                 </button>
 
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="gap-2" onClick={handleShare}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={handleShare}
+                  >
                     <Share2 className="h-4 w-4" />
                     Share
                   </Button>
@@ -410,7 +456,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
 
         {/* Comments Section */}
         <div className="rounded-2xl border bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-bold mb-6">{comments.length} Comments</h2>
+          <h2 className="text-2xl font-bold mb-6">
+            {comments.length} Comments
+          </h2>
 
           {/* Add Comment */}
           {currentUser ? (
@@ -460,7 +508,9 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
               {comments.map((comment) => (
                 <div key={comment.id} className="flex items-start gap-4">
                   <button
-                    onClick={() => router.push(`/profile/${comment.users.username}`)}
+                    onClick={() =>
+                      router.push(`/profile/${comment.users.username}`)
+                    }
                     className="hover:opacity-70 transition-opacity"
                   >
                     <Avatar className="h-10 w-10 bg-gradient-to-br from-yellow-400 to-orange-500">
@@ -472,16 +522,23 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <button
-                        onClick={() => router.push(`/profile/${comment.users.username}`)}
+                        onClick={() =>
+                          router.push(`/profile/${comment.users.username}`)
+                        }
                         className="font-semibold hover:underline"
                       >
                         {comment.users.display_name}
                       </button>
                       <span className="text-sm text-gray-500">
-                        • {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        •{" "}
+                        {formatDistanceToNow(new Date(comment.created_at), {
+                          addSuffix: true,
+                        })}
                       </span>
                     </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {comment.content}
+                    </p>
                   </div>
                 </div>
               ))}

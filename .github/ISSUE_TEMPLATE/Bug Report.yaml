@@ -10,7 +10,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-        
+
   - type: input
     id: version
     attributes:
@@ -19,7 +19,7 @@ body:
       placeholder: "e.g., v1.2.3 or commit hash"
     validations:
       required: true
-      
+
   - type: textarea
     id: steps-to-reproduce
     attributes:
@@ -32,7 +32,7 @@ body:
         4. See error
     validations:
       required: true
-      
+
   - type: textarea
     id: expected-behavior
     attributes:
@@ -41,7 +41,7 @@ body:
       placeholder: "A clear description of what you expected to happen."
     validations:
       required: true
-      
+
   - type: textarea
     id: actual-behavior
     attributes:
@@ -50,7 +50,7 @@ body:
       placeholder: "A clear description of what actually happened."
     validations:
       required: true
-      
+
   - type: textarea
     id: screenshots
     attributes:
@@ -59,7 +59,7 @@ body:
       placeholder: "Drag and drop images here"
     validations:
       required: false
-      
+
   - type: dropdown
     id: browsers
     attributes:
@@ -76,7 +76,7 @@ body:
         - Other
     validations:
       required: false
-      
+
   - type: textarea
     id: additional-context
     attributes:

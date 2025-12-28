@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
@@ -25,12 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Settings, 
-  Upload, 
-  Trash2,
-  ExternalLink
-} from "lucide-react";
+import { Settings, Upload, Trash2, ExternalLink } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -48,7 +49,11 @@ interface AppData {
   company_id: string | null;
 }
 
-export default function AppManagePage({ params }: { params: Promise<{ id: string }> }) {
+export default function AppManagePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const [app, setApp] = useState<AppData | null>(null);
@@ -115,13 +120,15 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
 
     const { data } = await supabase
       .from("company_members")
-      .select(`
+      .select(
+        `
         companies (
           id,
           name,
           display_name
         )
-      `)
+      `,
+      )
       .eq("user_id", userId);
 
     if (data) {
@@ -206,10 +213,7 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <ExternalLink className="h-4 w-4 mr-2" />
               View Page
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/dashboard")}
-            >
+            <Button variant="outline" onClick={() => router.push("/dashboard")}>
               Back to Dashboard
             </Button>
           </div>
@@ -234,7 +238,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <Settings className="h-5 w-5" />
               App Information
             </CardTitle>
-            <CardDescription>Update your app details and branding</CardDescription>
+            <CardDescription>
+              Update your app details and branding
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Logo */}
@@ -242,7 +248,11 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <div className="relative">
                 <Avatar className="h-24 w-24 bg-gradient-to-br from-blue-500 to-purple-600">
                   {formData.logo_url ? (
-                    <img src={formData.logo_url} alt="Logo" className="h-full w-full object-cover" />
+                    <img
+                      src={formData.logo_url}
+                      alt="Logo"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-3xl">
                       {formData.name.charAt(0).toUpperCase()}
@@ -259,8 +269,13 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
                     if (!file) return;
 
                     setUploadingLogo(true);
-                    const result = await compressAndUploadImage(file, 300, 300, 0.9);
-                    
+                    const result = await compressAndUploadImage(
+                      file,
+                      300,
+                      300,
+                      0.9,
+                    );
+
                     if (result.success && result.dataUrl) {
                       setFormData({ ...formData, logo_url: result.dataUrl });
                     } else {
@@ -272,7 +287,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
                 <Button
                   size="icon"
                   type="button"
-                  onClick={() => document.getElementById("logo-upload")?.click()}
+                  onClick={() =>
+                    document.getElementById("logo-upload")?.click()
+                  }
                   disabled={uploadingLogo}
                   className="absolute bottom-0 right-0 rounded-full h-8 w-8"
                 >
@@ -302,7 +319,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="mt-2"
               />
             </div>
@@ -312,7 +331,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 className="mt-2 resize-none"
                 rows={4}
               />
@@ -324,7 +345,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
                 <Input
                   id="app_url"
                   value={formData.app_url}
-                  onChange={(e) => setFormData({ ...formData, app_url: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, app_url: e.target.value })
+                  }
                   className="mt-2"
                   placeholder="https://app.example.com"
                 />
@@ -333,7 +356,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
                 <Label htmlFor="category">Category *</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value })
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select category" />
@@ -358,7 +383,9 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <Label htmlFor="company">Link to Company (Optional)</Label>
               <Select
                 value={formData.company_id}
-                onValueChange={(value) => setFormData({ ...formData, company_id: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, company_id: value })
+                }
               >
                 <SelectTrigger className="mt-2">
                   <SelectValue placeholder="Select a company" />
@@ -389,26 +416,29 @@ export default function AppManagePage({ params }: { params: Promise<{ id: string
               <Trash2 className="h-5 w-5" />
               Danger Zone
             </CardTitle>
-            <CardDescription>Permanent actions that cannot be undone</CardDescription>
+            <CardDescription>
+              Permanent actions that cannot be undone
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive">
-                  Delete App
-                </Button>
+                <Button variant="destructive">Delete App</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the app page
-                    and all associated data including reviews.
+                    This action cannot be undone. This will permanently delete
+                    the app page and all associated data including reviews.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteApp} className="bg-red-600">
+                  <AlertDialogAction
+                    onClick={handleDeleteApp}
+                    className="bg-red-600"
+                  >
                     Delete App
                   </AlertDialogAction>
                 </AlertDialogFooter>

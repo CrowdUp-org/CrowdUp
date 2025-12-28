@@ -57,7 +57,8 @@ export default function CreateCompanyPage() {
     }
 
     // Generate URL-friendly name from display name if not provided
-    const urlName = formData.name || formData.display_name.toLowerCase().replace(/\s+/g, '-');
+    const urlName =
+      formData.name || formData.display_name.toLowerCase().replace(/\s+/g, "-");
 
     setLoading(true);
 
@@ -95,13 +96,11 @@ export default function CreateCompanyPage() {
 
     if (data) {
       // Add creator as company member
-      await supabase
-        .from("company_members")
-        .insert({
-          company_id: data.id,
-          user_id: userId,
-          role: "owner",
-        });
+      await supabase.from("company_members").insert({
+        company_id: data.id,
+        user_id: userId,
+        role: "owner",
+      });
 
       router.push(`/company/${data.name}`);
     }
@@ -131,14 +130,19 @@ export default function CreateCompanyPage() {
 
             {/* Display Name */}
             <div>
-              <Label htmlFor="display_name" className="text-base font-semibold mb-2 block">
+              <Label
+                htmlFor="display_name"
+                className="text-base font-semibold mb-2 block"
+              >
                 Company Name *
               </Label>
               <Input
                 id="display_name"
                 placeholder="Acme Corporation"
                 value={formData.display_name}
-                onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, display_name: e.target.value })
+                }
                 className="h-12"
                 required
               />
@@ -149,31 +153,45 @@ export default function CreateCompanyPage() {
 
             {/* URL Name */}
             <div>
-              <Label htmlFor="name" className="text-base font-semibold mb-2 block">
+              <Label
+                htmlFor="name"
+                className="text-base font-semibold mb-2 block"
+              >
                 URL Name (Optional)
               </Label>
               <Input
                 id="name"
                 placeholder="acme-corporation"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    name: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+                  })
+                }
                 className="h-12"
               />
               <p className="text-xs text-gray-500 mt-1">
-                URL-friendly name (e.g., "acme-corp"). Leave blank to auto-generate from company name
+                URL-friendly name (e.g., "acme-corp"). Leave blank to
+                auto-generate from company name
               </p>
             </div>
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-base font-semibold mb-2 block">
+              <Label
+                htmlFor="description"
+                className="text-base font-semibold mb-2 block"
+              >
                 Description *
               </Label>
               <Textarea
                 id="description"
                 placeholder="Tell us about your company, what you do, and your mission..."
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 rows={6}
                 className="resize-none"
                 required
@@ -182,12 +200,17 @@ export default function CreateCompanyPage() {
 
             {/* Category */}
             <div>
-              <Label htmlFor="category" className="text-base font-semibold mb-2 block">
+              <Label
+                htmlFor="category"
+                className="text-base font-semibold mb-2 block"
+              >
                 Industry (Optional)
               </Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, category: value })
+                }
               >
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select industry..." />
@@ -195,13 +218,19 @@ export default function CreateCompanyPage() {
                 <SelectContent>
                   <SelectItem value="Technology">💻 Technology</SelectItem>
                   <SelectItem value="Social Media">👥 Social Media</SelectItem>
-                  <SelectItem value="Entertainment">🎮 Entertainment</SelectItem>
+                  <SelectItem value="Entertainment">
+                    🎮 Entertainment
+                  </SelectItem>
                   <SelectItem value="E-commerce">🛍️ E-commerce</SelectItem>
                   <SelectItem value="Finance">💰 Finance</SelectItem>
                   <SelectItem value="Healthcare">❤️ Healthcare</SelectItem>
                   <SelectItem value="Education">📚 Education</SelectItem>
-                  <SelectItem value="Transportation">🚗 Transportation</SelectItem>
-                  <SelectItem value="Food & Beverage">🍔 Food & Beverage</SelectItem>
+                  <SelectItem value="Transportation">
+                    🚗 Transportation
+                  </SelectItem>
+                  <SelectItem value="Food & Beverage">
+                    🍔 Food & Beverage
+                  </SelectItem>
                   <SelectItem value="Travel">✈️ Travel</SelectItem>
                   <SelectItem value="Gaming">🎯 Gaming</SelectItem>
                   <SelectItem value="Other">📦 Other</SelectItem>
@@ -211,7 +240,10 @@ export default function CreateCompanyPage() {
 
             {/* Website */}
             <div>
-              <Label htmlFor="website" className="text-base font-semibold mb-2 block">
+              <Label
+                htmlFor="website"
+                className="text-base font-semibold mb-2 block"
+              >
                 Website (Optional)
               </Label>
               <Input
@@ -219,7 +251,9 @@ export default function CreateCompanyPage() {
                 type="url"
                 placeholder="https://www.yourcompany.com"
                 value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, website: e.target.value })
+                }
                 className="h-12"
               />
             </div>
@@ -248,8 +282,13 @@ export default function CreateCompanyPage() {
                       if (!file) return;
 
                       setUploadingLogo(true);
-                      const result = await compressAndUploadImage(file, 300, 300, 0.85);
-                      
+                      const result = await compressAndUploadImage(
+                        file,
+                        300,
+                        300,
+                        0.85,
+                      );
+
                       if (result.success && result.dataUrl) {
                         setFormData({ ...formData, logo_url: result.dataUrl });
                       } else {
@@ -261,7 +300,9 @@ export default function CreateCompanyPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => document.getElementById("logo-upload")?.click()}
+                    onClick={() =>
+                      document.getElementById("logo-upload")?.click()
+                    }
                     disabled={uploadingLogo}
                     className="w-full gap-2"
                   >
@@ -290,12 +331,12 @@ export default function CreateCompanyPage() {
             {formData.logo_url && (
               <div className="border rounded-xl p-4 bg-gray-50">
                 <p className="text-sm font-medium mb-2">Logo Preview:</p>
-                <img 
-                  src={formData.logo_url} 
-                  alt="Logo preview" 
+                <img
+                  src={formData.logo_url}
+                  alt="Logo preview"
                   className="h-16 w-16 rounded-lg object-cover"
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.style.display = "none";
                   }}
                 />
               </div>

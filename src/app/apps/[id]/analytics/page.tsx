@@ -17,7 +17,11 @@ interface Analytics {
   recentReviews: any[];
 }
 
-export default function AppAnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AppAnalyticsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const [app, setApp] = useState<any>(null);
@@ -37,10 +41,12 @@ export default function AppAnalyticsPage({ params }: { params: Promise<{ id: str
   const fetchAppAndCheck = async () => {
     const { data: appData } = await supabase
       .from("apps")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .eq("id", id)
       .single();
 
@@ -71,10 +77,12 @@ export default function AppAnalyticsPage({ params }: { params: Promise<{ id: str
     // Fetch all reviews
     const { data: reviews } = await supabase
       .from("app_reviews")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .eq("app_id", id)
       .order("created_at", { ascending: false });
 
@@ -84,13 +92,21 @@ export default function AppAnalyticsPage({ params }: { params: Promise<{ id: str
     }
 
     // Calculate rating distribution
-    const distribution: { [key: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const distribution: { [key: number]: number } = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
     reviews.forEach((review: any) => {
       distribution[review.rating]++;
     });
 
     // Calculate average
-    const avg = reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length;
+    const avg =
+      reviews.reduce((sum: number, review: any) => sum + review.rating, 0) /
+      reviews.length;
 
     setAnalytics({
       averageRating: Math.round(avg * 10) / 10,
@@ -143,7 +159,9 @@ export default function AppAnalyticsPage({ params }: { params: Promise<{ id: str
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card className="p-6 bg-white border shadow-sm rounded-2xl">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600">Average Rating</p>
+              <p className="text-sm font-medium text-gray-600">
+                Average Rating
+              </p>
               <Star className="h-5 w-5 text-orange-500" />
             </div>
             <div className="flex items-end gap-2">
@@ -181,10 +199,11 @@ export default function AppAnalyticsPage({ params }: { params: Promise<{ id: str
           <div className="space-y-3">
             {[5, 4, 3, 2, 1].map((rating) => {
               const count = analytics.ratingDistribution[rating] || 0;
-              const percentage = analytics.totalReviews > 0 
-                ? (count / analytics.totalReviews) * 100 
-                : 0;
-              
+              const percentage =
+                analytics.totalReviews > 0
+                  ? (count / analytics.totalReviews) * 100
+                  : 0;
+
               return (
                 <div key={rating} className="flex items-center gap-4">
                   <div className="flex items-center gap-1 w-16">
@@ -214,17 +233,24 @@ export default function AppAnalyticsPage({ params }: { params: Promise<{ id: str
           ) : (
             <div className="space-y-6">
               {analytics.recentReviews.map((review: any) => (
-                <div key={review.id} className="border-b pb-6 last:border-0 last:pb-0">
+                <div
+                  key={review.id}
+                  className="border-b pb-6 last:border-0 last:pb-0"
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <button
-                        onClick={() => router.push(`/profile/${review.users.username}`)}
+                        onClick={() =>
+                          router.push(`/profile/${review.users.username}`)
+                        }
                         className="font-semibold hover:underline"
                       >
                         {review.users.display_name}
                       </button>
                       <p className="text-sm text-gray-500">
-                        {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(review.created_at), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
                     <div className="flex items-center">

@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 type Theme = "light" | "dark" | "system";
 
@@ -34,15 +40,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (!mounted) return;
 
     const root = document.documentElement;
-    
+
     const getSystemTheme = () => {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
     };
 
     const applyTheme = (t: Theme) => {
       const resolved = t === "system" ? getSystemTheme() : t;
       setResolvedTheme(resolved);
-      
+
       if (resolved === "dark") {
         root.classList.add("dark");
       } else {
@@ -59,7 +67,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         applyTheme("system");
       }
     };
-    
+
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme, mounted]);

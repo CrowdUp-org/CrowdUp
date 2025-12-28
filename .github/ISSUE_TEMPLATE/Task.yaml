@@ -10,7 +10,7 @@ body:
     attributes:
       value: |
         Use this template to create a new task for the CrowdUp project.
-        
+
   - type: textarea
     id: description
     attributes:
@@ -19,7 +19,7 @@ body:
       placeholder: "A clear description of the task to be completed."
     validations:
       required: true
-      
+
   - type: textarea
     id: acceptance-criteria
     attributes:
@@ -31,7 +31,7 @@ body:
         - [ ] Criteria 3
     validations:
       required: true
-      
+
   - type: dropdown
     id: priority
     attributes:
@@ -44,7 +44,7 @@ body:
         - Critical
     validations:
       required: true
-      
+
   - type: input
     id: estimated-time
     attributes:
@@ -53,7 +53,7 @@ body:
       placeholder: "e.g., 2 hours, 1 day"
     validations:
       required: false
-      
+
   - type: dropdown
     id: area
     attributes:

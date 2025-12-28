@@ -68,7 +68,9 @@ export default function SignUpPage() {
               Up
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Create an account</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Create an account
+          </h1>
           <p className="text-gray-600 mt-2">Join the community today</p>
         </div>
 
@@ -86,12 +88,13 @@ export default function SignUpPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">Or continue with email</span>
+              <span className="px-4 bg-white text-gray-500">
+                Or continue with email
+              </span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input

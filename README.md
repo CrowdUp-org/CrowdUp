@@ -85,12 +85,14 @@ SUPABASE_SECRET_KEY="<your-service-role-key>"
 ```
 
 Notes:
+
 - `src/lib/supabase.ts` includes placeholder URL/key fallbacks allowing `next build` without envs. Provide real values at runtime.
 - Treat the client-first pattern as a development bootstrap. For sensitive operations, prefer server mediation with the Secret API key.
 
 ## Setup (Local Development)
 
 Follow the wiki for end-to-end guidance:
+
 - Getting Started: https://github.com/CrowdUp-org/CrowdUp/wiki/Getting-Started
 - Features: https://github.com/CrowdUp-org/CrowdUp/wiki/Features
 - Troubleshooting: https://github.com/CrowdUp-org/CrowdUp/wiki/Troubleshooting
@@ -135,10 +137,12 @@ npm run lint
 ## Contributing
 
 This public repository exists to accept contributions via PRs. Please review the wiki before opening a PR:
+
 - Contributing: https://github.com/CrowdUp-org/CrowdUp/wiki/Contributing
 - Development Conventions: https://github.com/CrowdUp-org/CrowdUp/wiki/Development-Conventions
 
 Guidelines (summary):
+
 - Branch naming: `type/scope-description` (e.g., `feature/feed-personalization`).
 - Conventional Commits: `feat|fix|docs|refactor|chore|test|perf`.
 - PR checklist: up-to-date with `main`, passes `npm run lint` and `npm run build`, documented changes and test steps.
@@ -147,11 +151,13 @@ Guidelines (summary):
 ## Deployment & Operations
 
 Production deployment and operations are private and managed by the maintainer and a collaborator. Contributions do not grant deploy access and PRs do not trigger deployments. For administrators, a restricted Deployment page exists:
+
 - Deployment (restricted): https://github.com/CrowdUp-org/CrowdUp/wiki/Deployment
 
 ## Troubleshooting
 
 See the wiki for common issues and solutions:
+
 - Troubleshooting: https://github.com/CrowdUp-org/CrowdUp/wiki/Troubleshooting
 
 ## License

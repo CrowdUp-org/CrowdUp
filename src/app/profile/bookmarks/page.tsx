@@ -31,7 +31,9 @@ export default function BookmarksPage() {
   const router = useRouter();
   const [posts, setPosts] = useState<BookmarkedPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
+    {},
+  );
 
   useEffect(() => {
     const userId = getCurrentUserId();
@@ -46,11 +48,14 @@ export default function BookmarksPage() {
   const fetchBookmarkedPosts = async (userId: string) => {
     try {
       // Get bookmarked post IDs
-      const { data: bookmarks, error: bookmarksError } = await supabase
+      const { data: bookmarks, error: bookmarksError } = (await supabase
         .from("bookmarks")
         .select("post_id")
         .eq("user_id", userId)
-        .order("created_at", { ascending: false }) as { data: any[] | null; error: any };
+        .order("created_at", { ascending: false })) as {
+        data: any[] | null;
+        error: any;
+      };
 
       if (bookmarksError || !bookmarks || bookmarks.length === 0) {
         setLoading(false);
@@ -62,10 +67,12 @@ export default function BookmarksPage() {
       // Fetch the actual posts
       const { data: postsData, error: postsError } = await supabase
         .from("posts")
-        .select(`
+        .select(
+          `
           *,
           users (username, display_name)
-        `)
+        `,
+        )
         .in("id", postIds);
 
       if (!postsError && postsData) {
@@ -109,7 +116,9 @@ export default function BookmarksPage() {
             <Bookmark className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Saved Posts</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              Saved Posts
+            </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {posts.length} {posts.length === 1 ? "post" : "posts"} saved
             </p>
@@ -136,8 +145,12 @@ export default function BookmarksPage() {
                 description={post.description}
                 votes={post.votes}
                 author={post.users?.display_name || "Unknown"}
-                authorInitial={(post.users?.display_name || "U").charAt(0).toUpperCase()}
-                timestamp={formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                authorInitial={(post.users?.display_name || "U")
+                  .charAt(0)
+                  .toUpperCase()}
+                timestamp={formatDistanceToNow(new Date(post.created_at), {
+                  addSuffix: true,
+                })}
                 comments={commentCounts[post.id] || 0}
                 status={(post.status as any) || "open"}
               />

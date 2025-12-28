@@ -17,14 +17,14 @@ export interface ImageUploadResult {
  */
 export async function uploadImageToDataUrl(
   file: File,
-  maxSizeKB: number = 500
+  maxSizeKB: number = 500,
 ): Promise<ImageUploadResult> {
   try {
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       return {
         success: false,
-        error: 'Please select a valid image file',
+        error: "Please select a valid image file",
       };
     }
 
@@ -52,7 +52,7 @@ export async function uploadImageToDataUrl(
   } catch (error) {
     return {
       success: false,
-      error: 'Failed to process image',
+      error: "Failed to process image",
     };
   }
 }
@@ -69,14 +69,14 @@ export async function compressAndUploadImage(
   file: File,
   maxWidth: number = 400,
   maxHeight: number = 400,
-  quality: number = 0.8
+  quality: number = 0.8,
 ): Promise<ImageUploadResult> {
   try {
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       return {
         success: false,
-        error: 'Please select a valid image file',
+        error: "Please select a valid image file",
       };
     }
 
@@ -99,22 +99,22 @@ export async function compressAndUploadImage(
     }
 
     // Create canvas and draw resized image
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    
+    const ctx = canvas.getContext("2d");
+
     if (!ctx) {
       return {
         success: false,
-        error: 'Failed to create canvas context',
+        error: "Failed to create canvas context",
       };
     }
 
     ctx.drawImage(img, 0, 0, width, height);
 
     // Convert to data URL
-    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+    const dataUrl = canvas.toDataURL("image/jpeg", quality);
 
     // Clean up
     URL.revokeObjectURL(img.src);
@@ -126,7 +126,7 @@ export async function compressAndUploadImage(
   } catch (error) {
     return {
       success: false,
-      error: 'Failed to process image',
+      error: "Failed to process image",
     };
   }
 }

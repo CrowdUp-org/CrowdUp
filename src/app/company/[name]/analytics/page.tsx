@@ -17,7 +17,11 @@ interface Analytics {
   recentActivity: any[];
 }
 
-export default function CompanyAnalyticsPage({ params }: { params: Promise<{ name: string }> }) {
+export default function CompanyAnalyticsPage({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}) {
   const { name } = use(params);
   const router = useRouter();
   const [company, setCompany] = useState<any>(null);
@@ -63,7 +67,10 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
       .eq("user_id", userId)
       .single();
 
-    if (!memberData || (memberData.role !== "owner" && memberData.role !== "admin")) {
+    if (
+      !memberData ||
+      (memberData.role !== "owner" && memberData.role !== "admin")
+    ) {
       router.push(`/company/${name}`);
       return;
     }
@@ -83,7 +90,7 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
     const totalVotes = posts?.reduce((sum, post) => sum + post.votes, 0) || 0;
 
     // Fetch comments for these posts
-    const postIds = posts?.map(p => p.id) || [];
+    const postIds = posts?.map((p) => p.id) || [];
     let totalComments = 0;
     if (postIds.length > 0) {
       const { data: comments } = await supabase
@@ -104,10 +111,12 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
     // Recent activity (last 10 posts)
     const { data: recentPosts } = await supabase
       .from("posts")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .ilike("company", companyData.display_name)
       .order("created_at", { ascending: false })
       .limit(10);
@@ -155,7 +164,9 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{company?.display_name} Analytics</h1>
+            <h1 className="text-3xl font-bold">
+              {company?.display_name} Analytics
+            </h1>
             <p className="text-gray-600">Track your company's performance</p>
           </div>
         </div>
@@ -184,7 +195,9 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
 
           <Card className="p-6 bg-white border shadow-sm rounded-2xl">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600">Total Comments</p>
+              <p className="text-sm font-medium text-gray-600">
+                Total Comments
+              </p>
               <MessageCircle className="h-5 w-5 text-orange-500" />
             </div>
             <p className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
@@ -219,11 +232,15 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                          post.type === "Bug Report" ? "bg-red-100 text-red-700" :
-                          post.type === "Feature Request" ? "bg-blue-100 text-blue-700" :
-                          "bg-yellow-100 text-yellow-700"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                            post.type === "Bug Report"
+                              ? "bg-red-100 text-red-700"
+                              : post.type === "Feature Request"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
                           {post.type}
                         </span>
                         <span className="text-sm text-gray-500">
@@ -231,10 +248,14 @@ export default function CompanyAnalyticsPage({ params }: { params: Promise<{ nam
                         </span>
                       </div>
                       <h3 className="font-semibold mb-1">{post.title}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">{post.description}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {post.description}
+                      </p>
                     </div>
                     <div className="text-right ml-4">
-                      <p className="text-sm font-medium text-gray-900">{post.votes} votes</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {post.votes} votes
+                      </p>
                     </div>
                   </div>
                 </button>

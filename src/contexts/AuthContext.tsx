@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { User, getCurrentUser } from "@/lib/auth";
 
 interface AuthContextType {

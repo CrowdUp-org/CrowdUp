@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -39,7 +45,7 @@ import {
   Shield,
   Crown,
   Mail,
-  BadgeCheck
+  BadgeCheck,
 } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -60,7 +66,7 @@ interface Company {
 
 interface Member {
   id: string;
-  role: 'owner' | 'admin' | 'member';
+  role: "owner" | "admin" | "member";
   created_at: string;
   users: {
     id: string;
@@ -70,7 +76,11 @@ interface Member {
   };
 }
 
-export default function CompanyManagePage({ params }: { params: Promise<{ name: string }> }) {
+export default function CompanyManagePage({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}) {
   const { name } = use(params);
   const router = useRouter();
   const [company, setCompany] = useState<Company | null>(null);
@@ -90,11 +100,13 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
     category: "",
   });
   const [newMemberEmail, setNewMemberEmail] = useState("");
-  const [newMemberRole, setNewMemberRole] = useState<'admin' | 'member'>('member');
+  const [newMemberRole, setNewMemberRole] = useState<"admin" | "member">(
+    "member",
+  );
   const [inviting, setInviting] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<{
     verified: boolean;
-    status: 'pending' | 'approved' | 'rejected' | null;
+    status: "pending" | "approved" | "rejected" | null;
   } | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
@@ -144,13 +156,14 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
     }
 
     const userRole = memberData.role;
-    setIsOwner(userRole === 'owner');
-    setIsOwnerOrAdmin(userRole === 'owner' || userRole === 'admin');
+    setIsOwner(userRole === "owner");
+    setIsOwnerOrAdmin(userRole === "owner" || userRole === "admin");
 
     // Fetch all members
     const { data: membersData } = await supabase
       .from("company_members")
-      .select(`
+      .select(
+        `
         id,
         role,
         created_at,
@@ -160,7 +173,8 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
           display_name,
           avatar_url
         )
-      `)
+      `,
+      )
       .eq("company_id", companyData.id)
       .order("created_at", { ascending: true });
 
@@ -287,7 +301,10 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
     }
   };
 
-  const handleChangeRole = async (memberId: string, newRole: 'admin' | 'member') => {
+  const handleChangeRole = async (
+    memberId: string,
+    newRole: "admin" | "member",
+  ) => {
     const { error: updateError } = await supabase
       .from("company_members")
       .update({ role: newRole })
@@ -343,10 +360,7 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
               <ExternalLink className="h-4 w-4 mr-2" />
               View Page
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/dashboard")}
-            >
+            <Button variant="outline" onClick={() => router.push("/dashboard")}>
               Back to Dashboard
             </Button>
           </div>
@@ -371,7 +385,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
               <Settings className="h-5 w-5" />
               Company Information
             </CardTitle>
-            <CardDescription>Update your company details and branding</CardDescription>
+            <CardDescription>
+              Update your company details and branding
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Logo */}
@@ -379,7 +395,11 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
               <div className="relative">
                 <Avatar className="h-24 w-24 bg-gradient-to-br from-yellow-400 to-orange-500">
                   {formData.logo_url ? (
-                    <img src={formData.logo_url} alt="Logo" className="h-full w-full object-cover" />
+                    <img
+                      src={formData.logo_url}
+                      alt="Logo"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-3xl">
                       {formData.display_name.charAt(0).toUpperCase()}
@@ -396,7 +416,12 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                     if (!file) return;
 
                     setUploadingLogo(true);
-                    const result = await compressAndUploadImage(file, 300, 300, 0.9);
+                    const result = await compressAndUploadImage(
+                      file,
+                      300,
+                      300,
+                      0.9,
+                    );
 
                     if (result.success && result.dataUrl) {
                       setFormData({ ...formData, logo_url: result.dataUrl });
@@ -409,7 +434,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                 <Button
                   size="icon"
                   type="button"
-                  onClick={() => document.getElementById("logo-upload")?.click()}
+                  onClick={() =>
+                    document.getElementById("logo-upload")?.click()
+                  }
                   disabled={uploadingLogo}
                   className="absolute bottom-0 right-0 rounded-full h-8 w-8"
                 >
@@ -439,7 +466,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
               <Input
                 id="display_name"
                 value={formData.display_name}
-                onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, display_name: e.target.value })
+                }
                 className="mt-2"
               />
             </div>
@@ -449,7 +478,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 className="mt-2 resize-none"
                 rows={4}
               />
@@ -461,7 +492,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                 <Input
                   id="website"
                   value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, website: e.target.value })
+                  }
                   className="mt-2"
                   placeholder="https://example.com"
                 />
@@ -470,7 +503,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                 <Label htmlFor="category">Industry</Label>
                 <Select
                   value={formData.category}
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, category: value })
+                  }
                 >
                   <SelectTrigger className="mt-2">
                     <SelectValue placeholder="Select industry" />
@@ -504,7 +539,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                 <Users className="h-5 w-5" />
                 Team Members
               </CardTitle>
-              <CardDescription>Manage your company team and permissions</CardDescription>
+              <CardDescription>
+                Manage your company team and permissions
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Add Member */}
@@ -519,7 +556,10 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
                   />
-                  <Select value={newMemberRole} onValueChange={(v) => setNewMemberRole(v as any)}>
+                  <Select
+                    value={newMemberRole}
+                    onValueChange={(v) => setNewMemberRole(v as any)}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -529,7 +569,11 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                     </SelectContent>
                   </Select>
                 </div>
-                <Button onClick={handleInviteMember} disabled={inviting} size="sm">
+                <Button
+                  onClick={handleInviteMember}
+                  disabled={inviting}
+                  size="sm"
+                >
                   <Mail className="h-4 w-4 mr-2" />
                   {inviting ? "Inviting..." : "Send Invite"}
                 </Button>
@@ -545,7 +589,10 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
                         {member.users.avatar_url ? (
-                          <img src={member.users.avatar_url} alt={member.users.display_name} />
+                          <img
+                            src={member.users.avatar_url}
+                            alt={member.users.display_name}
+                          />
                         ) : (
                           <AvatarFallback>
                             {member.users.display_name.charAt(0).toUpperCase()}
@@ -553,17 +600,21 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                         )}
                       </Avatar>
                       <div>
-                        <p className="font-semibold">{member.users.display_name}</p>
-                        <p className="text-sm text-gray-500">@{member.users.username}</p>
+                        <p className="font-semibold">
+                          {member.users.display_name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          @{member.users.username}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {member.role === 'owner' ? (
+                      {member.role === "owner" ? (
                         <Badge className="bg-yellow-500">
                           <Crown className="h-3 w-3 mr-1" />
                           Owner
                         </Badge>
-                      ) : member.role === 'admin' ? (
+                      ) : member.role === "admin" ? (
                         <Badge variant="secondary">
                           <Shield className="h-3 w-3 mr-1" />
                           Admin
@@ -571,11 +622,13 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                       ) : (
                         <Badge variant="outline">Member</Badge>
                       )}
-                      {isOwner && member.role !== 'owner' && (
+                      {isOwner && member.role !== "owner" && (
                         <div className="flex gap-1">
                           <Select
                             value={member.role}
-                            onValueChange={(v) => handleChangeRole(member.id, v as any)}
+                            onValueChange={(v) =>
+                              handleChangeRole(member.id, v as any)
+                            }
                           >
                             <SelectTrigger className="h-8 w-24">
                               <SelectValue />
@@ -588,7 +641,9 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleRemoveMember(member.id, member.users.id)}
+                            onClick={() =>
+                              handleRemoveMember(member.id, member.users.id)
+                            }
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
@@ -634,26 +689,32 @@ export default function CompanyManagePage({ params }: { params: Promise<{ name: 
                 <Trash2 className="h-5 w-5" />
                 Danger Zone
               </CardTitle>
-              <CardDescription>Permanent actions that cannot be undone</CardDescription>
+              <CardDescription>
+                Permanent actions that cannot be undone
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive">
-                    Delete Company
-                  </Button>
+                  <Button variant="destructive">Delete Company</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete the company page,
-                      remove all members, and delete all associated data.
+                      This action cannot be undone. This will permanently delete
+                      the company page, remove all members, and delete all
+                      associated data.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteCompany} className="bg-red-600">
+                    <AlertDialogAction
+                      onClick={handleDeleteCompany}
+                      className="bg-red-600"
+                    >
                       Delete Company
                     </AlertDialogAction>
                   </AlertDialogFooter>

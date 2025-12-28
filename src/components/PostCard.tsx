@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronUp, ChevronDown, MessageSquare, Share2, Flag, Eye } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  MessageSquare,
+  Share2,
+  Flag,
+  Eye,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
@@ -84,20 +91,20 @@ export default function PostCard({
       textColor: "text-blue-600",
       borderColor: "border-blue-200",
     },
-    "Complaint": {
+    Complaint: {
       icon: "⚠️",
       bgColor: "bg-yellow-50",
       textColor: "text-yellow-600",
       borderColor: "border-yellow-200",
     },
   };
-  
-  const config = (typeConfig as Record<string, any>)[type] ?? typeConfig["Feature Request"];
 
+  const config =
+    (typeConfig as Record<string, any>)[type] ?? typeConfig["Feature Request"];
 
   const handleVote = async (voteType: "up" | "down", e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     const userId = getCurrentUserId();
     if (!userId) {
       router.push("/auth/signin");
@@ -111,7 +118,7 @@ export default function PostCard({
       // Remove vote
       newUserVote = null;
       newVotes = votes + (voteType === "up" ? -1 : 1);
-      
+
       await supabase
         .from("votes")
         .delete()
@@ -125,21 +132,16 @@ export default function PostCard({
         newVotes = votes + (voteType === "up" ? 1 : -1);
       }
 
-      await supabase
-        .from("votes")
-        .upsert({
-          post_id: postId,
-          user_id: userId,
-          vote_type: voteType,
-        } as any);
+      await supabase.from("votes").upsert({
+        post_id: postId,
+        user_id: userId,
+        vote_type: voteType,
+      } as any);
     }
 
     // Update post votes count
     // @ts-ignore - Supabase type issue
-    await supabase
-      .from("posts")
-      .update({ votes: newVotes })
-      .eq("id", postId);
+    await supabase.from("posts").update({ votes: newVotes }).eq("id", postId);
 
     setVotes(newVotes);
     setUserVote(newUserVote);
@@ -166,42 +168,46 @@ export default function PostCard({
 
   const handleReport = (e: React.MouseEvent) => {
     e.stopPropagation();
-    alert("This post has been reported for review. Thank you for helping keep our community safe!");
+    alert(
+      "This post has been reported for review. Thank you for helping keep our community safe!",
+    );
   };
 
   return (
-    <div 
+    <div
       onClick={handlePostClick}
       className="rounded-xl sm:rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 sm:p-4 md:p-5 shadow-sm hover:shadow-md dark:hover:shadow-gray-800/50 transition-all cursor-pointer group"
     >
       <div className="flex items-start gap-2 sm:gap-3 md:gap-4">
         {/* Vote Section */}
         <div className="flex flex-col items-center gap-0.5 pt-0.5 sm:pt-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={(e) => handleVote("up", e)}
             className={cn(
               "h-6 w-6 sm:h-7 sm:w-7 rounded-md hover:bg-gray-100",
-              userVote === "up" && "text-green-600"
+              userVote === "up" && "text-green-600",
             )}
           >
             <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
-          <span className={cn(
-            "text-sm sm:text-base font-semibold tabular-nums py-0.5",
-            userVote === "up" && "text-green-600",
-            userVote === "down" && "text-red-600"
-          )}>
+          <span
+            className={cn(
+              "text-sm sm:text-base font-semibold tabular-nums py-0.5",
+              userVote === "up" && "text-green-600",
+              userVote === "down" && "text-red-600",
+            )}
+          >
             {votes}
           </span>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={(e) => handleVote("down", e)}
             className={cn(
               "h-6 w-6 sm:h-7 sm:w-7 rounded-md hover:bg-gray-100",
-              userVote === "down" && "text-red-600"
+              userVote === "down" && "text-red-600",
             )}
           >
             <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -212,13 +218,13 @@ export default function PostCard({
         <div className="flex-1 min-w-0">
           {/* Tags */}
           <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-2.5 flex-wrap">
-            <Badge 
+            <Badge
               variant="secondary"
               className={cn(
                 "rounded-md px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-medium border",
-                config.bgColor, 
-                config.textColor, 
-                config.borderColor
+                config.bgColor,
+                config.textColor,
+                config.borderColor,
               )}
             >
               {config.icon} {type}
@@ -229,7 +235,9 @@ export default function PostCard({
                 ✓ Official Response
               </Badge>
             )}
-            <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">•</span>
+            <span className="text-gray-300 dark:text-gray-700 hidden sm:inline">
+              •
+            </span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -257,7 +265,9 @@ export default function PostCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                router.push(`/profile/${author.toLowerCase().replace(/\s+/g, '')}`);
+                router.push(
+                  `/profile/${author.toLowerCase().replace(/\s+/g, "")}`,
+                );
               }}
               className="flex items-center gap-1.5 sm:gap-2 hover:opacity-70 transition-opacity min-w-0 flex-1 mr-2"
             >
@@ -266,20 +276,26 @@ export default function PostCard({
                   {authorInitial}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">{author}</span>
-              <span className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 hidden sm:inline">• {timestamp}</span>
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                {author}
+              </span>
+              <span className="text-xs sm:text-sm text-gray-400 dark:text-gray-500 hidden sm:inline">
+                • {timestamp}
+              </span>
             </button>
 
             <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
               {viewCount > 0 && (
                 <span className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 mr-1">
                   <Eye className="h-3 w-3" />
-                  {viewCount > 999 ? `${(viewCount / 1000).toFixed(1)}k` : viewCount}
+                  {viewCount > 999
+                    ? `${(viewCount / 1000).toFixed(1)}k`
+                    : viewCount}
                 </span>
               )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="gap-1 sm:gap-1.5 h-7 sm:h-8 px-1.5 sm:px-2.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -290,9 +306,9 @@ export default function PostCard({
                 <span className="text-xs sm:text-sm">{comments}</span>
               </Button>
               <BookmarkButton postId={postId} />
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-7 w-7 sm:h-8 sm:w-8 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                 onClick={handleShare}
               >
@@ -303,9 +319,9 @@ export default function PostCard({
         </div>
 
         {/* Flag Icon */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="h-7 w-7 sm:h-8 sm:w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 flex-shrink-0"
           onClick={handleReport}
           title="Report post"

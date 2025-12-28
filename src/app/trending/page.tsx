@@ -11,59 +11,59 @@ export default function TrendingPage() {
   const router = useRouter();
 
   const trendingCompanies = [
-    { 
-      name: "Instagram", 
-      followers: "15.4K", 
-      growth: "+12%", 
+    {
+      name: "Instagram",
+      followers: "15.4K",
+      growth: "+12%",
       posts: 347,
-      initial: "I", 
+      initial: "I",
       color: "bg-gradient-to-br from-purple-500 to-pink-500",
-      id: "instagram"
+      id: "instagram",
     },
-    { 
-      name: "WhatsApp", 
-      followers: "12.3K", 
-      growth: "+8%", 
+    {
+      name: "WhatsApp",
+      followers: "12.3K",
+      growth: "+8%",
       posts: 289,
-      initial: "W", 
+      initial: "W",
       color: "bg-green-500",
-      id: "whatsapp"
+      id: "whatsapp",
     },
-    { 
-      name: "Spotify", 
-      followers: "9.8K", 
-      growth: "+15%", 
+    {
+      name: "Spotify",
+      followers: "9.8K",
+      growth: "+15%",
       posts: 234,
-      initial: "S", 
+      initial: "S",
       color: "bg-green-600",
-      id: "spotify"
+      id: "spotify",
     },
-    { 
-      name: "Discord", 
-      followers: "8.7K", 
-      growth: "+5%", 
+    {
+      name: "Discord",
+      followers: "8.7K",
+      growth: "+5%",
       posts: 198,
-      initial: "D", 
+      initial: "D",
       color: "bg-indigo-500",
-      id: "discord"
+      id: "discord",
     },
-    { 
-      name: "Netflix", 
-      followers: "7.2K", 
-      growth: "+10%", 
+    {
+      name: "Netflix",
+      followers: "7.2K",
+      growth: "+10%",
       posts: 176,
-      initial: "N", 
+      initial: "N",
       color: "bg-red-600",
-      id: "netflix"
+      id: "netflix",
     },
-    { 
-      name: "Twitter", 
-      followers: "6.9K", 
-      growth: "+7%", 
+    {
+      name: "Twitter",
+      followers: "6.9K",
+      growth: "+7%",
       posts: 245,
-      initial: "T", 
+      initial: "T",
       color: "bg-blue-400",
-      id: "twitter"
+      id: "twitter",
     },
   ];
 
@@ -110,8 +110,12 @@ export default function TrendingPage() {
                 className="bg-white rounded-xl border shadow-sm p-6 hover:shadow-md transition-all cursor-pointer hover:scale-105"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <Avatar className={`h-16 w-16 ${company.color} ring-4 ring-gray-100`}>
-                    <AvatarFallback className={`${company.color} text-white text-xl font-bold`}>
+                  <Avatar
+                    className={`h-16 w-16 ${company.color} ring-4 ring-gray-100`}
+                  >
+                    <AvatarFallback
+                      className={`${company.color} text-white text-xl font-bold`}
+                    >
                       {company.initial}
                     </AvatarFallback>
                   </Avatar>
@@ -125,9 +129,7 @@ export default function TrendingPage() {
                     <Users className="h-4 w-4" />
                     <span>{company.followers}</span>
                   </div>
-                  <div className="text-gray-600">
-                    {company.posts} posts
-                  </div>
+                  <div className="text-gray-600">{company.posts} posts</div>
                 </div>
               </div>
             ))}

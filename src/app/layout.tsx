@@ -6,7 +6,8 @@ import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "CrowdUp - Voice Your Feedback",
-  description: "Share feedback, report bugs, and request features for your favorite apps and companies",
+  description:
+    "Share feedback, report bugs, and request features for your favorite apps and companies",
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
 };
 
@@ -21,7 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=5"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -38,19 +42,19 @@ export default function RootLayout({
       <body className="antialiased bg-gray-50 dark:bg-gray-950 transition-colors">
         <ThemeProvider>
           <AuthProvider>
-          <ErrorReporter />
-          <Script
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"
-            strategy="afterInteractive"
-            data-target-origin="*"
-            data-message-type="ROUTE_CHANGE"
-            data-include-search-params="true"
-            data-only-in-iframe="true"
-            data-debug="true"
-            data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
-          />
-          {children}
-          <VisualEditsMessenger />
+            <ErrorReporter />
+            <Script
+              src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"
+              strategy="afterInteractive"
+              data-target-origin="*"
+              data-message-type="ROUTE_CHANGE"
+              data-include-search-params="true"
+              data-only-in-iframe="true"
+              data-debug="true"
+              data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
+            />
+            {children}
+            <VisualEditsMessenger />
           </AuthProvider>
         </ThemeProvider>
       </body>

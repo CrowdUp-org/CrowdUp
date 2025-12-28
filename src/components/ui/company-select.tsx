@@ -23,16 +23,31 @@ interface CompanySelectProps {
 
 // Fallback colors for companies without a color
 const FALLBACK_COLORS = [
-  "#3B82F6", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6",
-  "#EC4899", "#06B6D4", "#84CC16", "#F97316", "#6366F1"
+  "#3B82F6",
+  "#EF4444",
+  "#10B981",
+  "#F59E0B",
+  "#8B5CF6",
+  "#EC4899",
+  "#06B6D4",
+  "#84CC16",
+  "#F97316",
+  "#6366F1",
 ];
 
 function getColorForName(name: string): string {
-  const hash = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = name
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return FALLBACK_COLORS[hash % FALLBACK_COLORS.length];
 }
 
-export function CompanySelect({ value, onChange, placeholder = "Select company...", className }: CompanySelectProps) {
+export function CompanySelect({
+  value,
+  onChange,
+  placeholder = "Select company...",
+  className,
+}: CompanySelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -65,18 +80,23 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
   }, []);
 
   // Filter companies based on search
-  const filteredCompanies = companies.filter(company =>
-    company.name.toLowerCase().includes(search.toLowerCase())
+  const filteredCompanies = companies.filter((company) =>
+    company.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   // Check if search matches any existing company
-  const exactMatch = companies.find(c => c.name.toLowerCase() === search.toLowerCase());
+  const exactMatch = companies.find(
+    (c) => c.name.toLowerCase() === search.toLowerCase(),
+  );
   const showCreateOption = search.length > 0 && !exactMatch;
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -110,7 +130,7 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
           "flex h-12 w-full items-center justify-between rounded-xl border bg-white dark:bg-gray-900 px-4 py-3 text-left shadow-sm transition-all",
           "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600",
           "focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500",
-          open && "ring-2 ring-orange-500/20 border-orange-500"
+          open && "ring-2 ring-orange-500/20 border-orange-500",
         )}
       >
         {value ? (
@@ -119,10 +139,14 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: getColorForName(value) }}
             />
-            <span className="font-medium text-gray-900 dark:text-gray-100">{value}</span>
+            <span className="font-medium text-gray-900 dark:text-gray-100">
+              {value}
+            </span>
           </div>
         ) : (
-          <span className="text-gray-500 dark:text-gray-400">{placeholder}</span>
+          <span className="text-gray-500 dark:text-gray-400">
+            {placeholder}
+          </span>
         )}
         <ChevronsUpDown className="h-4 w-4 text-gray-400" />
       </button>
@@ -157,9 +181,12 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    Create &quot;{search.charAt(0).toUpperCase() + search.slice(1)}&quot;
+                    Create &quot;
+                    {search.charAt(0).toUpperCase() + search.slice(1)}&quot;
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Add as new company</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Add as new company
+                  </p>
                 </div>
               </button>
             )}
@@ -179,7 +206,7 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
                   "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
                   value === company.name
                     ? "bg-orange-50 dark:bg-orange-950"
-                    : "hover:bg-gray-50 dark:hover:bg-gray-800"
+                    : "hover:bg-gray-50 dark:hover:bg-gray-800",
                 )}
               >
                 {company.logo_url ? (
@@ -188,13 +215,16 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
                     alt={company.name}
                     className="h-8 w-8 rounded-lg object-contain bg-white dark:bg-gray-800 p-1"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
                 ) : (
                   <div
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-white font-semibold text-sm"
-                    style={{ backgroundColor: company.color || getColorForName(company.name) }}
+                    style={{
+                      backgroundColor:
+                        company.color || getColorForName(company.name),
+                    }}
                   >
                     {company.name.charAt(0).toUpperCase()}
                   </div>
@@ -211,7 +241,9 @@ export function CompanySelect({ value, onChange, placeholder = "Select company..
                     )}
                   </div>
                   {company.category && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{company.category}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {company.category}
+                    </p>
                   )}
                 </div>
                 {value === company.name && (

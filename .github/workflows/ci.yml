@@ -2,24 +2,24 @@ name: 🚦 CI
 
 on:
   pull_request:
-    branches: [ main, develop ]
-    types: [ opened, synchronize, reopened, ready_for_review ]
+    branches: [main, develop]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'prototype-from-figma/**'
-      - 'UI design screenshots/**'
+      - "docs/**"
+      - "**/*.md"
+      - "prototype-from-figma/**"
+      - "UI design screenshots/**"
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths-ignore:
-      - 'docs/**'
-      - '**/*.md'
-      - 'prototype-from-figma/**'
-      - 'UI design screenshots/**'
+      - "docs/**"
+      - "**/*.md"
+      - "prototype-from-figma/**"
+      - "UI design screenshots/**"
   merge_group:
-    types: [ checks_requested ]
+    types: [checks_requested]
   schedule:
-    - cron: '0 8 * * 1' # Weekly CodeQL scan (Mon 08:00 UTC)
+    - cron: "0 8 * * 1" # Weekly CodeQL scan (Mon 08:00 UTC)
 
 permissions:
   contents: read
@@ -39,8 +39,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -69,8 +69,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci

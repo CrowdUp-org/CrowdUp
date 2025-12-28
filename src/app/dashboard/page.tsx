@@ -2,10 +2,23 @@
 
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Smartphone, Settings, ExternalLink, Users, Star } from "lucide-react";
+import {
+  Building2,
+  Smartphone,
+  Settings,
+  ExternalLink,
+  Users,
+  Star,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getCurrentUserId } from "@/lib/auth";
@@ -20,7 +33,7 @@ interface Company {
   logo_url: string | null;
   category: string | null;
   created_at: string;
-  role: 'owner' | 'admin' | 'member';
+  role: "owner" | "admin" | "member";
 }
 
 interface App {
@@ -60,7 +73,8 @@ export default function DashboardPage() {
     // Fetch companies where user is owner or member
     const { data: companyMemberships } = await supabase
       .from("company_members")
-      .select(`
+      .select(
+        `
         role,
         companies (
           id,
@@ -71,7 +85,8 @@ export default function DashboardPage() {
           category,
           created_at
         )
-      `)
+      `,
+      )
       .eq("user_id", userId);
 
     if (companyMemberships) {
@@ -79,7 +94,7 @@ export default function DashboardPage() {
         .filter((m: any) => m.companies)
         .map((m: any) => ({
           ...(m.companies as any),
-          role: m.role
+          role: m.role,
         }));
       setCompanies(companiesData);
     }
@@ -87,7 +102,8 @@ export default function DashboardPage() {
     // Fetch apps created by user
     const { data: appsData } = await supabase
       .from("apps")
-      .select(`
+      .select(
+        `
         id,
         name,
         description,
@@ -100,7 +116,8 @@ export default function DashboardPage() {
           name,
           display_name
         )
-      `)
+      `,
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
@@ -165,8 +182,13 @@ export default function DashboardPage() {
             <Card>
               <CardContent className="py-12 text-center">
                 <Building2 className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600 mb-4">You don't have any companies yet</p>
-                <Button onClick={() => router.push("/company/create")} variant="outline">
+                <p className="text-gray-600 mb-4">
+                  You don't have any companies yet
+                </p>
+                <Button
+                  onClick={() => router.push("/company/create")}
+                  variant="outline"
+                >
                   Create Your First Company
                 </Button>
               </CardContent>
@@ -174,23 +196,36 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {companies.map((company) => (
-                <Card key={company.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card
+                  key={company.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between mb-2">
                       <Avatar className="h-12 w-12 bg-gradient-to-br from-yellow-400 to-orange-500">
                         {company.logo_url ? (
-                          <img src={company.logo_url} alt={company.display_name} className="h-full w-full object-cover" />
+                          <img
+                            src={company.logo_url}
+                            alt={company.display_name}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-bold">
                             {company.display_name.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         )}
                       </Avatar>
-                      <Badge variant={company.role === 'owner' ? 'default' : 'secondary'}>
+                      <Badge
+                        variant={
+                          company.role === "owner" ? "default" : "secondary"
+                        }
+                      >
                         {company.role}
                       </Badge>
                     </div>
-                    <CardTitle className="text-lg">{company.display_name}</CardTitle>
+                    <CardTitle className="text-lg">
+                      {company.display_name}
+                    </CardTitle>
                     <CardDescription className="line-clamp-2">
                       {company.description || "No description"}
                     </CardDescription>
@@ -198,22 +233,30 @@ export default function DashboardPage() {
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">
-                        Created {formatDistanceToNow(new Date(company.created_at), { addSuffix: true })}
+                        Created{" "}
+                        {formatDistanceToNow(new Date(company.created_at), {
+                          addSuffix: true,
+                        })}
                       </span>
                       <div className="flex gap-2">
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => router.push(`/company/${company.name}`)}
+                          onClick={() =>
+                            router.push(`/company/${company.name}`)
+                          }
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
                           View
                         </Button>
-                        {(company.role === 'owner' || company.role === 'admin') && (
+                        {(company.role === "owner" ||
+                          company.role === "admin") && (
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => router.push(`/company/${company.name}/manage`)}
+                            onClick={() =>
+                              router.push(`/company/${company.name}/manage`)
+                            }
                           >
                             <Settings className="h-3 w-3" />
                           </Button>
@@ -240,8 +283,13 @@ export default function DashboardPage() {
             <Card>
               <CardContent className="py-12 text-center">
                 <Smartphone className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600 mb-4">You haven't created any apps yet</p>
-                <Button onClick={() => router.push("/apps/create")} variant="outline">
+                <p className="text-gray-600 mb-4">
+                  You haven't created any apps yet
+                </p>
+                <Button
+                  onClick={() => router.push("/apps/create")}
+                  variant="outline"
+                >
                   Create Your First App
                 </Button>
               </CardContent>
@@ -249,12 +297,19 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {apps.map((app) => (
-                <Card key={app.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card
+                  key={app.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer"
+                >
                   <CardHeader>
                     <div className="flex items-start gap-3 mb-2">
                       <Avatar className="h-12 w-12 bg-gradient-to-br from-blue-500 to-purple-600">
                         {app.logo_url ? (
-                          <img src={app.logo_url} alt={app.name} className="h-full w-full object-cover" />
+                          <img
+                            src={app.logo_url}
+                            alt={app.name}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
                             {app.name.charAt(0).toUpperCase()}
@@ -262,9 +317,13 @@ export default function DashboardPage() {
                         )}
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg truncate">{app.name}</CardTitle>
+                        <CardTitle className="text-lg truncate">
+                          {app.name}
+                        </CardTitle>
                         {app.company && (
-                          <p className="text-xs text-gray-500 truncate">{app.company.display_name}</p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {app.company.display_name}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -276,7 +335,9 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-4 mb-3 text-sm">
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                        <span className="font-semibold">{app.average_rating.toFixed(1)}</span>
+                        <span className="font-semibold">
+                          {app.average_rating.toFixed(1)}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-500">
                         <Users className="h-4 w-4" />
@@ -285,7 +346,10 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">
-                        Created {formatDistanceToNow(new Date(app.created_at), { addSuffix: true })}
+                        Created{" "}
+                        {formatDistanceToNow(new Date(app.created_at), {
+                          addSuffix: true,
+                        })}
                       </span>
                       <div className="flex gap-2">
                         <Button

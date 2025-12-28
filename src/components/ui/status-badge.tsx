@@ -12,35 +12,43 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-const statusConfig: Record<Status, {
-  label: string;
-  icon: typeof Circle;
-  className: string;
-}> = {
+const statusConfig: Record<
+  Status,
+  {
+    label: string;
+    icon: typeof Circle;
+    className: string;
+  }
+> = {
   open: {
     label: "Open",
     icon: Circle,
-    className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
+    className:
+      "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
   },
   in_progress: {
     label: "In Progress",
     icon: Clock,
-    className: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800",
+    className:
+      "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800",
   },
   resolved: {
     label: "Resolved",
     icon: CheckCircle2,
-    className: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800",
+    className:
+      "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800",
   },
   closed: {
     label: "Closed",
     icon: XCircle,
-    className: "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
+    className:
+      "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700",
   },
   wont_fix: {
     label: "Won't Fix",
     icon: Ban,
-    className: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800",
+    className:
+      "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800",
   },
 };
 
@@ -56,22 +64,22 @@ const iconSizes = {
   lg: "h-4 w-4",
 };
 
-export function StatusBadge({ 
-  status, 
-  size = "md", 
+export function StatusBadge({
+  status,
+  size = "md",
   showIcon = true,
-  className 
+  className,
 }: StatusBadgeProps) {
   const config = statusConfig[status];
   const Icon = config.icon;
-  
+
   return (
     <span
       className={cn(
         "inline-flex items-center font-medium rounded-full border transition-colors",
         sizeClasses[size],
         config.className,
-        className
+        className,
       )}
     >
       {showIcon && <Icon className={iconSizes[size]} />}

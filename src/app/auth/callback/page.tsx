@@ -18,10 +18,10 @@ function AuthCallbackContent() {
         // Store user session in localStorage
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("userId", user.id);
-        
+
         // Refresh the auth context
         refreshUser();
-        
+
         // Redirect to home page
         router.push("/");
       } catch (error) {
@@ -46,14 +46,16 @@ function AuthCallbackContent() {
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <AuthCallbackContent />
     </Suspense>
   );

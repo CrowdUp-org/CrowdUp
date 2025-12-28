@@ -12,7 +12,7 @@ body:
         Thanks for suggesting a new feature for CrowdUp!
 
         NOTE: If you're proposing an improvement to an existing feature (performance, UX polish, refactor, optimization, incremental enhancement), please use the "Enhancement" template instead. Use this "Feature Request" template for new capabilities or functionality that doesn't exist yet.
-        
+
   - type: textarea
     id: problem
     attributes:
@@ -21,7 +21,7 @@ body:
       placeholder: "I'm always frustrated when [...]"
     validations:
       required: true
-      
+
   - type: textarea
     id: solution
     attributes:
@@ -30,7 +30,7 @@ body:
       placeholder: "I would like to see..."
     validations:
       required: true
-      
+
   - type: textarea
     id: alternatives
     attributes:
@@ -39,7 +39,7 @@ body:
       placeholder: "Other approaches that might work could be..."
     validations:
       required: false
-      
+
   - type: textarea
     id: context
     attributes:
@@ -48,7 +48,7 @@ body:
       placeholder: "More details that might help understand the request better."
     validations:
       required: false
-      
+
   - type: checkboxes
     id: terms
     attributes:

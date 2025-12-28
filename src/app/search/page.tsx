@@ -23,7 +23,9 @@ function SearchPageContent() {
   const searchParams = useSearchParams();
   const currentUserId = getCurrentUserId();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || "posts");
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") || "posts",
+  );
   const [posts, setPosts] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [companies, setCompanies] = useState<any[]>([]);
@@ -34,8 +36,16 @@ function SearchPageContent() {
   const categories = [
     { name: "Productivity", icon: "📦", gradient: "from-blue-400 to-cyan-500" },
     { name: "Social", icon: "👥", gradient: "from-pink-400 to-rose-500" },
-    { name: "Entertainment", icon: "🎮", gradient: "from-purple-400 to-violet-500" },
-    { name: "Communication", icon: "💬", gradient: "from-yellow-400 to-orange-500" },
+    {
+      name: "Entertainment",
+      icon: "🎮",
+      gradient: "from-purple-400 to-violet-500",
+    },
+    {
+      name: "Communication",
+      icon: "💬",
+      gradient: "from-yellow-400 to-orange-500",
+    },
     { name: "Music", icon: "🎵", gradient: "from-green-400 to-emerald-500" },
     { name: "Photo & Video", icon: "📸", gradient: "from-red-400 to-pink-500" },
     { name: "Shopping", icon: "🛍️", gradient: "from-indigo-400 to-purple-500" },
@@ -61,14 +71,14 @@ function SearchPageContent() {
 
   const fetchFollowingStatus = async () => {
     if (!currentUserId) return;
-    
+
     const { data } = await supabase
-      .from('connections')
-      .select('following_id')
-      .eq('follower_id', currentUserId);
-    
+      .from("connections")
+      .select("following_id")
+      .eq("follower_id", currentUserId);
+
     if (data) {
-      setFollowingIds(new Set(data.map(c => c.following_id)));
+      setFollowingIds(new Set(data.map((c) => c.following_id)));
     }
   };
 
@@ -77,9 +87,9 @@ function SearchPageContent() {
 
     // Get users who are not followed by current user
     const { data } = await supabase
-      .from('users')
-      .select('*')
-      .neq('id', currentUserId)
+      .from("users")
+      .select("*")
+      .neq("id", currentUserId)
       .limit(10);
 
     if (data) {
@@ -95,26 +105,24 @@ function SearchPageContent() {
     if (isFollowing) {
       // Unfollow
       await supabase
-        .from('connections')
+        .from("connections")
         .delete()
-        .eq('follower_id', currentUserId)
-        .eq('following_id', userId);
-      
-      setFollowingIds(prev => {
+        .eq("follower_id", currentUserId)
+        .eq("following_id", userId);
+
+      setFollowingIds((prev) => {
         const newSet = new Set(prev);
         newSet.delete(userId);
         return newSet;
       });
     } else {
       // Follow
-      await supabase
-        .from('connections')
-        .insert({
-          follower_id: currentUserId,
-          following_id: userId,
-        });
-      
-      setFollowingIds(prev => new Set(prev).add(userId));
+      await supabase.from("connections").insert({
+        follower_id: currentUserId,
+        following_id: userId,
+      });
+
+      setFollowingIds((prev) => new Set(prev).add(userId));
     }
   };
 
@@ -125,12 +133,16 @@ function SearchPageContent() {
     // Search posts
     const { data: postsData } = await supabase
       .from("posts")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%,company.ilike.%${query}%`)
-      .order('created_at', { ascending: false })
+      `,
+      )
+      .or(
+        `title.ilike.%${query}%,description.ilike.%${query}%,company.ilike.%${query}%`,
+      )
+      .order("created_at", { ascending: false })
       .limit(20);
 
     setPosts(postsData || []);
@@ -139,8 +151,10 @@ function SearchPageContent() {
     const { data: usersData } = await supabase
       .from("users")
       .select("*")
-      .or(`username.ilike.%${query}%,display_name.ilike.%${query}%,bio.ilike.%${query}%`)
-      .neq('id', currentUserId || '')
+      .or(
+        `username.ilike.%${query}%,display_name.ilike.%${query}%,bio.ilike.%${query}%`,
+      )
+      .neq("id", currentUserId || "")
       .limit(20);
 
     setUsers(usersData || []);
@@ -154,7 +168,7 @@ function SearchPageContent() {
 
     if (companiesData) {
       const uniqueCompanies = Array.from(
-        new Map(companiesData.map((c: any) => [c.company, c])).values()
+        new Map(companiesData.map((c: any) => [c.company, c])).values(),
       );
       setCompanies(uniqueCompanies);
     }
@@ -200,7 +214,9 @@ function SearchPageContent() {
               </div>
             ) : searchQuery && posts.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-2xl border">
-                <p className="text-gray-600">No posts found for "{searchQuery}"</p>
+                <p className="text-gray-600">
+                  No posts found for "{searchQuery}"
+                </p>
               </div>
             ) : posts.length > 0 ? (
               <div className="space-y-4">
@@ -215,7 +231,9 @@ function SearchPageContent() {
                     description={post.description}
                     votes={post.votes}
                     author={post.users.display_name}
-                    authorInitial={post.users.display_name.charAt(0).toUpperCase()}
+                    authorInitial={post.users.display_name
+                      .charAt(0)
+                      .toUpperCase()}
                     timestamp={formatDistanceToNow(new Date(post.created_at), {
                       addSuffix: true,
                     })}
@@ -234,7 +252,9 @@ function SearchPageContent() {
               </div>
             ) : searchQuery && users.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-2xl border">
-                <p className="text-gray-600">No users found for "{searchQuery}"</p>
+                <p className="text-gray-600">
+                  No users found for "{searchQuery}"
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -246,10 +266,18 @@ function SearchPageContent() {
                       className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all"
                     >
                       <div className="flex items-center gap-4">
-                        <button onClick={() => router.push(`/profile/${user.username}`)}>
+                        <button
+                          onClick={() =>
+                            router.push(`/profile/${user.username}`)
+                          }
+                        >
                           <Avatar className="h-16 w-16 bg-gradient-to-br from-yellow-400 to-orange-500">
                             {user.avatar_url ? (
-                              <img src={user.avatar_url} alt={user.display_name} className="h-full w-full object-cover" />
+                              <img
+                                src={user.avatar_url}
+                                alt={user.display_name}
+                                className="h-full w-full object-cover"
+                              />
                             ) : (
                               <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-xl font-bold">
                                 {user.display_name.charAt(0).toUpperCase()}
@@ -258,11 +286,22 @@ function SearchPageContent() {
                           </Avatar>
                         </button>
                         <div className="flex-1">
-                          <button onClick={() => router.push(`/profile/${user.username}`)} className="text-left">
-                            <h3 className="text-lg font-bold hover:underline">{user.display_name}</h3>
-                            <p className="text-sm text-gray-600">@{user.username}</p>
+                          <button
+                            onClick={() =>
+                              router.push(`/profile/${user.username}`)
+                            }
+                            className="text-left"
+                          >
+                            <h3 className="text-lg font-bold hover:underline">
+                              {user.display_name}
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              @{user.username}
+                            </p>
                             {user.bio && (
-                              <p className="text-sm text-gray-500 mt-1 line-clamp-2">{user.bio}</p>
+                              <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                {user.bio}
+                              </p>
                             )}
                           </button>
                         </div>
@@ -270,7 +309,11 @@ function SearchPageContent() {
                           <Button
                             onClick={() => handleFollow(user.id)}
                             variant={isFollowing ? "outline" : "default"}
-                            className={isFollowing ? "" : "bg-gradient-to-br from-yellow-400 to-orange-500"}
+                            className={
+                              isFollowing
+                                ? ""
+                                : "bg-gradient-to-br from-yellow-400 to-orange-500"
+                            }
                           >
                             {isFollowing ? (
                               <>
@@ -307,14 +350,18 @@ function SearchPageContent() {
               </div>
             ) : searchQuery && companies.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-2xl border">
-                <p className="text-gray-600">No companies found for "{searchQuery}"</p>
+                <p className="text-gray-600">
+                  No companies found for "{searchQuery}"
+                </p>
               </div>
             ) : companies.length > 0 ? (
               <div className="space-y-4">
                 {companies.map((company: any, index: number) => (
                   <button
                     key={index}
-                    onClick={() => router.push(`/company/${company.company.toLowerCase()}`)}
+                    onClick={() =>
+                      router.push(`/company/${company.company.toLowerCase()}`)
+                    }
                     className="w-full rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition-all text-left"
                   >
                     <div className="flex items-center gap-4">
@@ -359,7 +406,9 @@ function SearchPageContent() {
 
             <div className="text-center py-12 bg-white rounded-2xl border">
               <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">Start typing to search or click a category above</p>
+              <p className="text-gray-600">
+                Start typing to search or click a category above
+              </p>
             </div>
           </>
         )}
@@ -370,16 +419,18 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main className="mx-auto max-w-4xl px-6 pt-24 pb-8">
-          <div className="text-center py-12">
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        </main>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50">
+          <Header />
+          <main className="mx-auto max-w-4xl px-6 pt-24 pb-8">
+            <div className="text-center py-12">
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </main>
+        </div>
+      }
+    >
       <SearchPageContent />
     </Suspense>
   );

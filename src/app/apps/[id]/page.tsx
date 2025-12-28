@@ -22,7 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Star, ExternalLink, Send, Edit2, BarChart3, Upload } from "lucide-react";
+import {
+  Star,
+  ExternalLink,
+  Send,
+  Edit2,
+  BarChart3,
+  Upload,
+} from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -61,7 +68,11 @@ interface Review {
   };
 }
 
-export default function AppDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AppDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const router = useRouter();
   const currentUser = getCurrentUser();
@@ -109,11 +120,13 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
   const fetchApp = async () => {
     const { data, error } = await supabase
       .from("apps")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name),
         companies (name, display_name)
-      `)
+      `,
+      )
       .eq("id", id)
       .single();
 
@@ -126,10 +139,12 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
   const fetchReviews = async () => {
     const { data } = await supabase
       .from("app_reviews")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .eq("app_id", id)
       .order("created_at", { ascending: false });
 
@@ -144,10 +159,12 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
 
     const { data } = await supabase
       .from("app_reviews")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .eq("app_id", id)
       .eq("user_id", userId)
       .single();
@@ -189,7 +206,9 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
         .eq("app_id", id);
 
       if (allReviews) {
-        const avg = allReviews.reduce((sum, r: any) => sum + r.rating, 0) / allReviews.length;
+        const avg =
+          allReviews.reduce((sum, r: any) => sum + r.rating, 0) /
+          allReviews.length;
         // @ts-ignore - Supabase type issue
         await supabase
           .from("apps")
@@ -218,7 +237,11 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
     setEditError("");
     setEditLoading(true);
 
-    if (!editFormData.name || !editFormData.description || !editFormData.category) {
+    if (
+      !editFormData.name ||
+      !editFormData.description ||
+      !editFormData.category
+    ) {
       setEditError("Name, description, and category are required");
       setEditLoading(false);
       return;
@@ -305,7 +328,9 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                     </Badge>
                     {app.companies && (
                       <button
-                        onClick={() => router.push(`/company/${app.companies!.name}`)}
+                        onClick={() =>
+                          router.push(`/company/${app.companies!.name}`)
+                        }
                         className="text-sm text-gray-600 hover:underline"
                       >
                         by {app.companies.display_name}
@@ -326,7 +351,8 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                       ))}
                     </div>
                     <span className="text-sm text-gray-600">
-                      {app.average_rating.toFixed(1)} ({app.total_reviews} reviews)
+                      {app.average_rating.toFixed(1)} ({app.total_reviews}{" "}
+                      reviews)
                     </span>
                   </div>
                 </div>
@@ -342,7 +368,10 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                         <BarChart3 className="h-4 w-4" />
                         Analytics
                       </Button>
-                      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                      <Dialog
+                        open={editDialogOpen}
+                        onOpenChange={setEditDialogOpen}
+                      >
                         <DialogTrigger asChild>
                           <Button variant="outline" className="gap-2">
                             <Edit2 className="h-4 w-4" />
@@ -368,18 +397,26 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                                 id="edit_name"
                                 value={editFormData.name}
                                 onChange={(e) =>
-                                  setEditFormData({ ...editFormData, name: e.target.value })
+                                  setEditFormData({
+                                    ...editFormData,
+                                    name: e.target.value,
+                                  })
                                 }
                                 className="mt-2"
                               />
                             </div>
                             <div>
-                              <Label htmlFor="edit_description">Description *</Label>
+                              <Label htmlFor="edit_description">
+                                Description *
+                              </Label>
                               <Textarea
                                 id="edit_description"
                                 value={editFormData.description}
                                 onChange={(e) =>
-                                  setEditFormData({ ...editFormData, description: e.target.value })
+                                  setEditFormData({
+                                    ...editFormData,
+                                    description: e.target.value,
+                                  })
                                 }
                                 className="mt-2 resize-none"
                                 rows={4}
@@ -390,23 +427,46 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                               <Select
                                 value={editFormData.category}
                                 onValueChange={(value) =>
-                                  setEditFormData({ ...editFormData, category: value })
+                                  setEditFormData({
+                                    ...editFormData,
+                                    category: value,
+                                  })
                                 }
                               >
                                 <SelectTrigger className="mt-2">
                                   <SelectValue placeholder="Select category..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="Productivity">📦 Productivity</SelectItem>
-                                  <SelectItem value="Social">👥 Social</SelectItem>
-                                  <SelectItem value="Entertainment">🎮 Entertainment</SelectItem>
-                                  <SelectItem value="Communication">💬 Communication</SelectItem>
-                                  <SelectItem value="Music">🎵 Music</SelectItem>
-                                  <SelectItem value="Photo & Video">📸 Photo & Video</SelectItem>
-                                  <SelectItem value="Shopping">🛍️ Shopping</SelectItem>
-                                  <SelectItem value="Business">📊 Business</SelectItem>
-                                  <SelectItem value="Education">📚 Education</SelectItem>
-                                  <SelectItem value="Health & Fitness">❤️ Health & Fitness</SelectItem>
+                                  <SelectItem value="Productivity">
+                                    📦 Productivity
+                                  </SelectItem>
+                                  <SelectItem value="Social">
+                                    👥 Social
+                                  </SelectItem>
+                                  <SelectItem value="Entertainment">
+                                    🎮 Entertainment
+                                  </SelectItem>
+                                  <SelectItem value="Communication">
+                                    💬 Communication
+                                  </SelectItem>
+                                  <SelectItem value="Music">
+                                    🎵 Music
+                                  </SelectItem>
+                                  <SelectItem value="Photo & Video">
+                                    📸 Photo & Video
+                                  </SelectItem>
+                                  <SelectItem value="Shopping">
+                                    🛍️ Shopping
+                                  </SelectItem>
+                                  <SelectItem value="Business">
+                                    📊 Business
+                                  </SelectItem>
+                                  <SelectItem value="Education">
+                                    📚 Education
+                                  </SelectItem>
+                                  <SelectItem value="Health & Fitness">
+                                    ❤️ Health & Fitness
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -417,7 +477,10 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                                 type="url"
                                 value={editFormData.app_url}
                                 onChange={(e) =>
-                                  setEditFormData({ ...editFormData, app_url: e.target.value })
+                                  setEditFormData({
+                                    ...editFormData,
+                                    app_url: e.target.value,
+                                  })
                                 }
                                 className="mt-2"
                                 placeholder="https://myapp.com"
@@ -444,12 +507,24 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                                       if (!file) return;
 
                                       setUploadingLogo(true);
-                                      const result = await compressAndUploadImage(file, 300, 300, 0.85);
-                                      
+                                      const result =
+                                        await compressAndUploadImage(
+                                          file,
+                                          300,
+                                          300,
+                                          0.85,
+                                        );
+
                                       if (result.success && result.dataUrl) {
-                                        setEditFormData({ ...editFormData, logo_url: result.dataUrl });
+                                        setEditFormData({
+                                          ...editFormData,
+                                          logo_url: result.dataUrl,
+                                        });
                                       } else {
-                                        setEditError(result.error || "Failed to upload logo");
+                                        setEditError(
+                                          result.error ||
+                                            "Failed to upload logo",
+                                        );
                                       }
                                       setUploadingLogo(false);
                                     }}
@@ -457,19 +532,30 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                                   <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => document.getElementById("edit-app-logo-upload")?.click()}
+                                    onClick={() =>
+                                      document
+                                        .getElementById("edit-app-logo-upload")
+                                        ?.click()
+                                    }
                                     disabled={uploadingLogo}
                                     className="w-full gap-2"
                                   >
                                     <Upload className="h-4 w-4" />
-                                    {uploadingLogo ? "Uploading..." : "Upload Logo"}
+                                    {uploadingLogo
+                                      ? "Uploading..."
+                                      : "Upload Logo"}
                                   </Button>
                                   {editFormData.logo_url && (
                                     <Button
                                       type="button"
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => setEditFormData({ ...editFormData, logo_url: "" })}
+                                      onClick={() =>
+                                        setEditFormData({
+                                          ...editFormData,
+                                          logo_url: "",
+                                        })
+                                      }
                                       className="text-xs mt-2"
                                     >
                                       Remove Logo
@@ -511,14 +597,22 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                 </div>
               </div>
 
-              <p className="text-gray-700 leading-relaxed mb-4">{app.description}</p>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                {app.description}
+              </p>
 
               <button
                 onClick={() => router.push(`/profile/${app.users.username}`)}
                 className="flex items-center gap-2 text-sm text-gray-600 hover:opacity-70"
               >
-                Created by <span className="font-semibold">{app.users.display_name}</span>
-                <span>• {formatDistanceToNow(new Date(app.created_at), { addSuffix: true })}</span>
+                Created by{" "}
+                <span className="font-semibold">{app.users.display_name}</span>
+                <span>
+                  •{" "}
+                  {formatDistanceToNow(new Date(app.created_at), {
+                    addSuffix: true,
+                  })}
+                </span>
               </button>
             </div>
           </div>
@@ -565,7 +659,11 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                 className="bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 gap-2"
               >
                 <Send className="h-4 w-4" />
-                {submitting ? "Submitting..." : userReview ? "Update Review" : "Submit Review"}
+                {submitting
+                  ? "Submitting..."
+                  : userReview
+                    ? "Update Review"
+                    : "Submit Review"}
               </Button>
             </div>
           ) : (
@@ -597,13 +695,18 @@ export default function AppDetailPage({ params }: { params: Promise<{ id: string
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <button
-                        onClick={() => router.push(`/profile/${review.users.username}`)}
+                        onClick={() =>
+                          router.push(`/profile/${review.users.username}`)
+                        }
                         className="font-semibold hover:underline"
                       >
                         {review.users.display_name}
                       </button>
                       <span className="text-sm text-gray-500">
-                        • {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
+                        •{" "}
+                        {formatDistanceToNow(new Date(review.created_at), {
+                          addSuffix: true,
+                        })}
                       </span>
                     </div>
                     <div className="flex items-center mb-2">

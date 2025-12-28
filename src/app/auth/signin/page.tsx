@@ -67,12 +67,13 @@ export default function SignInPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">Or continue with</span>
+              <span className="px-4 bg-white text-gray-500">
+                Or continue with
+              </span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
             <div className="space-y-2">
               <Label htmlFor="usernameOrEmail">Username or Email</Label>
               <Input

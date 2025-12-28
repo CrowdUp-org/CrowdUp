@@ -3,7 +3,13 @@
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import PostCard from "@/components/PostCard";
-import { ExternalLink, BarChart3, UserPlus, UserCheck, Settings } from "lucide-react";
+import {
+  ExternalLink,
+  BarChart3,
+  UserPlus,
+  UserCheck,
+  Settings,
+} from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -23,14 +29,20 @@ interface Company {
   follower_count: number;
 }
 
-export default function CompanyPage({ params }: { params: Promise<{ name: string }> }) {
+export default function CompanyPage({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}) {
   const { name } = use(params);
   const router = useRouter();
   const [company, setCompany] = useState<Company | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [apps, setApps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
+    {},
+  );
   const [isOwnerOrAdmin, setIsOwnerOrAdmin] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
@@ -66,10 +78,12 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
   const fetchPosts = async () => {
     const { data } = await supabase
       .from("posts")
-      .select(`
+      .select(
+        `
         *,
         users (username, display_name)
-      `)
+      `,
+      )
       .ilike("company", name)
       .order("created_at", { ascending: false });
 
@@ -112,12 +126,12 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
     const userId = getCurrentUserId();
     if (!userId || !company) return;
 
-    const { data } = await supabase
+    const { data } = (await supabase
       .from("company_members")
       .select("role")
       .eq("company_id", company.id)
       .eq("user_id", userId)
-      .single() as any;
+      .single()) as any;
 
     if (data && (data.role === "owner" || data.role === "admin")) {
       setIsOwnerOrAdmin(true);
@@ -206,7 +220,8 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
     );
   }
 
-  const displayName = company?.display_name || name.charAt(0).toUpperCase() + name.slice(1);
+  const displayName =
+    company?.display_name || name.charAt(0).toUpperCase() + name.slice(1);
   const logoUrl = company?.logo_url;
 
   return (
@@ -262,7 +277,9 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
                         Manage
                       </Button>
                       <Button
-                        onClick={() => router.push(`/company/${name}/analytics`)}
+                        onClick={() =>
+                          router.push(`/company/${name}/analytics`)
+                        }
                         variant="outline"
                         className="gap-2"
                       >
@@ -320,12 +337,17 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
                     )}
                     <div className="flex-1">
                       <h3 className="font-bold mb-1">{app.name}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">{app.description}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {app.description}
+                      </p>
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs text-gray-500">{app.category}</span>
+                        <span className="text-xs text-gray-500">
+                          {app.category}
+                        </span>
                         <span className="text-xs text-gray-400">•</span>
                         <span className="text-xs text-gray-500">
-                          ⭐ {app.average_rating.toFixed(1)} ({app.total_reviews})
+                          ⭐ {app.average_rating.toFixed(1)} (
+                          {app.total_reviews})
                         </span>
                       </div>
                     </div>
@@ -338,7 +360,9 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
         {/* Verified Team Section */}
         {verifiedMembers.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-4">Verified Representatives</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              Verified Representatives
+            </h2>
             <div className="flex flex-wrap gap-4">
               {verifiedMembers.map((member) => (
                 <button
@@ -358,7 +382,9 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
                     </div>
                   )}
                   <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-gray-900">{member.display_name}</span>
+                    <span className="font-semibold text-gray-900">
+                      {member.display_name}
+                    </span>
                     <VerifiedBadge size="md" />
                   </div>
                 </button>
@@ -372,7 +398,9 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
           </h2>
           {posts.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-2xl border">
-              <p className="text-gray-600 mb-4">No posts yet about {displayName}</p>
+              <p className="text-gray-600 mb-4">
+                No posts yet about {displayName}
+              </p>
               <Button
                 onClick={() => router.push("/create")}
                 className="bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600"
@@ -393,7 +421,9 @@ export default function CompanyPage({ params }: { params: Promise<{ name: string
                   description={post.description}
                   votes={post.votes}
                   author={post.users.display_name}
-                  authorInitial={post.users.display_name.charAt(0).toUpperCase()}
+                  authorInitial={post.users.display_name
+                    .charAt(0)
+                    .toUpperCase()}
                   timestamp={formatDistanceToNow(new Date(post.created_at), {
                     addSuffix: true,
                   })}

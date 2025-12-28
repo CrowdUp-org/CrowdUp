@@ -46,13 +46,19 @@ interface Post {
   created_at: string;
 }
 
-export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
+export default function ProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
   const { username } = use(params);
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
+    {},
+  );
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({
     display_name: "",
@@ -82,7 +88,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     // Fetch user profile
     const { data: userData, error: userError } = await supabase
       .from("users")
-      .select("id, username, display_name, bio, avatar_url, reputation_score, reputation_level, created_at")
+      .select(
+        "id, username, display_name, bio, avatar_url, reputation_score, reputation_level, created_at",
+      )
       .eq("username", username)
       .single();
 
@@ -103,7 +111,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     if (!postsError && postsData) {
       setPosts(postsData);
       // Fetch comment counts
-      const postIds = postsData.map(p => p.id);
+      const postIds = postsData.map((p) => p.id);
       if (postIds.length > 0) {
         const { data: commentsData } = await supabase
           .from("comments")
@@ -194,7 +202,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     votes: post.votes,
     author: profile.display_name,
     authorInitial: profile.display_name.charAt(0).toUpperCase(),
-    timestamp: formatDistanceToNow(new Date(post.created_at), { addSuffix: true }),
+    timestamp: formatDistanceToNow(new Date(post.created_at), {
+      addSuffix: true,
+    }),
     comments: commentCounts[post.id] || 0,
   }));
 
@@ -208,7 +218,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <div className="flex items-start gap-6">
               <Avatar className="h-24 w-24 bg-gradient-to-br from-yellow-400 to-orange-500 ring-4 ring-orange-200">
                 {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.display_name} className="h-full w-full object-cover rounded-full" />
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.display_name}
+                    className="h-full w-full object-cover rounded-full"
+                  />
                 ) : (
                   <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-3xl font-bold">
                     {profile.display_name.charAt(0).toUpperCase()}
@@ -216,7 +230,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 )}
               </Avatar>
               <div>
-                <h1 className="text-3xl font-bold mb-1">{profile.display_name}</h1>
+                <h1 className="text-3xl font-bold mb-1">
+                  {profile.display_name}
+                </h1>
                 <p className="text-gray-500 mb-3">@{profile.username}</p>
                 {profile.bio && (
                   <p className="text-gray-700 max-w-2xl mb-4">{profile.bio}</p>
@@ -224,7 +240,9 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Joined {format(new Date(profile.created_at), "MMMM yyyy")}</span>
+                    <span>
+                      Joined {format(new Date(profile.created_at), "MMMM yyyy")}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -250,7 +268,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                     <DialogHeader>
                       <DialogTitle>Edit Profile</DialogTitle>
                       <DialogDescription>
-                        Update your profile information. Changes to username will redirect you to the new profile URL.
+                        Update your profile information. Changes to username
+                        will redirect you to the new profile URL.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -265,7 +284,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                           id="edit_display_name"
                           value={editFormData.display_name}
                           onChange={(e) =>
-                            setEditFormData({ ...editFormData, display_name: e.target.value })
+                            setEditFormData({
+                              ...editFormData,
+                              display_name: e.target.value,
+                            })
                           }
                           className="mt-2"
                           placeholder="Your display name"
@@ -277,13 +299,19 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                           id="edit_username"
                           value={editFormData.username}
                           onChange={(e) =>
-                            setEditFormData({ ...editFormData, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '') })
+                            setEditFormData({
+                              ...editFormData,
+                              username: e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9_]/g, ""),
+                            })
                           }
                           className="mt-2"
                           placeholder="username"
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Only lowercase letters, numbers, and underscores allowed
+                          Only lowercase letters, numbers, and underscores
+                          allowed
                         </p>
                       </div>
                       <div>
@@ -292,7 +320,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                           id="edit_bio"
                           value={editFormData.bio}
                           onChange={(e) =>
-                            setEditFormData({ ...editFormData, bio: e.target.value })
+                            setEditFormData({
+                              ...editFormData,
+                              bio: e.target.value,
+                            })
                           }
                           className="mt-2 resize-none"
                           rows={3}
@@ -365,7 +396,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
         {/* Tabs */}
         <div className="bg-white rounded-2xl border shadow-sm mb-6">
           <div className="flex items-center gap-4 px-6 py-3 border-b">
-            <Button variant="ghost" className="text-orange-500 border-b-2 border-orange-500 rounded-none">
+            <Button
+              variant="ghost"
+              className="text-orange-500 border-b-2 border-orange-500 rounded-none"
+            >
               Posts ({posts.length})
             </Button>
           </div>

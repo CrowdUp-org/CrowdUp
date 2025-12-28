@@ -9,7 +9,7 @@ body:
     attributes:
       value: |
         Thanks for your interest in CrowdUp! Use this template to ask questions about the platform.
-        
+
   - type: textarea
     id: question
     attributes:
@@ -18,7 +18,7 @@ body:
       placeholder: "I'd like to understand how..."
     validations:
       required: true
-      
+
   - type: dropdown
     id: category
     attributes:
@@ -34,7 +34,7 @@ body:
         - Other
     validations:
       required: true
-      
+
   - type: textarea
     id: context
     attributes:
@@ -43,7 +43,7 @@ body:
       placeholder: "More details about my situation..."
     validations:
       required: false
-      
+
   - type: checkboxes
     id: searched
     attributes:

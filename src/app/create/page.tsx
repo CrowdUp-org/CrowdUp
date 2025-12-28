@@ -14,9 +14,30 @@ import { getCurrentUserId } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const postTypes = [
-  { value: "bug", label: "Bug Report", icon: Bug, color: "bg-red-50 border-red-200 text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-300", description: "Report something that's broken" },
-  { value: "feature", label: "Feature Request", icon: Lightbulb, color: "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300", description: "Suggest a new feature" },
-  { value: "complaint", label: "Complaint", icon: AlertCircle, color: "bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300", description: "Voice your concerns" },
+  {
+    value: "bug",
+    label: "Bug Report",
+    icon: Bug,
+    color:
+      "bg-red-50 border-red-200 text-red-700 dark:bg-red-950 dark:border-red-800 dark:text-red-300",
+    description: "Report something that's broken",
+  },
+  {
+    value: "feature",
+    label: "Feature Request",
+    icon: Lightbulb,
+    color:
+      "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300",
+    description: "Suggest a new feature",
+  },
+  {
+    value: "complaint",
+    label: "Complaint",
+    icon: AlertCircle,
+    color:
+      "bg-yellow-50 border-yellow-200 text-yellow-700 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300",
+    description: "Voice your concerns",
+  },
 ];
 
 export default function CreatePostPage() {
@@ -50,7 +71,12 @@ export default function CreatePostPage() {
       return;
     }
 
-    if (!formData.type || !formData.company || !formData.title || !formData.description) {
+    if (
+      !formData.type ||
+      !formData.company ||
+      !formData.title ||
+      !formData.description
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -65,7 +91,10 @@ export default function CreatePostPage() {
 
     const { error: insertError } = await supabase.from("posts").insert({
       user_id: userId,
-      type: typeMap[formData.type] as "Bug Report" | "Feature Request" | "Complaint",
+      type: typeMap[formData.type] as
+        | "Bug Report"
+        | "Feature Request"
+        | "Complaint",
       company: formData.company,
       company_color: formData.companyColor || "#6B7280",
       title: formData.title,
@@ -89,8 +118,12 @@ export default function CreatePostPage() {
       <Header />
       <main className="mx-auto max-w-3xl px-4 sm:px-6 pt-24 pb-8">
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">Create a Post</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">Share your feedback with the community</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+            Create a Post
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Share your feedback with the community
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
@@ -112,22 +145,30 @@ export default function CreatePostPage() {
                     <button
                       key={type.value}
                       type="button"
-                      onClick={() => setFormData({ ...formData, type: type.value })}
+                      onClick={() =>
+                        setFormData({ ...formData, type: type.value })
+                      }
                       className={cn(
                         "relative flex flex-col items-center p-4 rounded-xl border-2 transition-all text-center",
                         isSelected
                           ? "border-orange-500 bg-orange-50 dark:bg-orange-950 ring-2 ring-orange-500/20"
-                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-900"
+                          : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-900",
                       )}
                     >
-                      <div className={cn(
-                        "h-10 w-10 rounded-lg flex items-center justify-center mb-2",
-                        type.color
-                      )}>
+                      <div
+                        className={cn(
+                          "h-10 w-10 rounded-lg flex items-center justify-center mb-2",
+                          type.color,
+                        )}
+                      >
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{type.label}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{type.description}</span>
+                      <span className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                        {type.label}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {type.description}
+                      </span>
                       {isSelected && (
                         <div className="absolute top-2 right-2 h-5 w-5 bg-orange-500 rounded-full flex items-center justify-center">
                           <span className="text-white text-xs">✓</span>
@@ -146,7 +187,9 @@ export default function CreatePostPage() {
               </Label>
               <CompanySelect
                 value={formData.company}
-                onChange={(company, color) => setFormData({ ...formData, company, companyColor: color })}
+                onChange={(company, color) =>
+                  setFormData({ ...formData, company, companyColor: color })
+                }
                 placeholder="Search or type company name..."
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -156,23 +199,34 @@ export default function CreatePostPage() {
 
             {/* Title */}
             <div>
-              <Label htmlFor="title" className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100">
+              <Label
+                htmlFor="title"
+                className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100"
+              >
                 Title
               </Label>
               <Input
                 id="title"
                 placeholder="Brief summary of your feedback..."
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 className="h-12 dark:bg-gray-900 dark:border-gray-700"
                 maxLength={150}
               />
               <div className="flex justify-between mt-1">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Make it clear and specific</p>
-                <span className={cn(
-                  "text-xs",
-                  formData.title.length > 120 ? "text-orange-500" : "text-gray-400"
-                )}>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Make it clear and specific
+                </p>
+                <span
+                  className={cn(
+                    "text-xs",
+                    formData.title.length > 120
+                      ? "text-orange-500"
+                      : "text-gray-400",
+                  )}
+                >
                   {formData.title.length}/150
                 </span>
               </div>
@@ -180,7 +234,10 @@ export default function CreatePostPage() {
 
             {/* Description */}
             <div>
-              <Label htmlFor="description" className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100">
+              <Label
+                htmlFor="description"
+                className="text-base font-semibold mb-2 block text-gray-900 dark:text-gray-100"
+              >
                 Description
               </Label>
               <Textarea
@@ -200,11 +257,15 @@ export default function CreatePostPage() {
                 maxLength={2000}
               />
               <div className="flex justify-between mt-1">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Be as detailed as possible</p>
-                <span className={cn(
-                  "text-xs",
-                  charCount > 1800 ? "text-orange-500" : "text-gray-400"
-                )}>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Be as detailed as possible
+                </p>
+                <span
+                  className={cn(
+                    "text-xs",
+                    charCount > 1800 ? "text-orange-500" : "text-gray-400",
+                  )}
+                >
                   {charCount}/2000
                 </span>
               </div>
@@ -227,11 +288,11 @@ export default function CreatePostPage() {
                         ? priority === "critical"
                           ? "bg-red-500 text-white border-red-500"
                           : priority === "high"
-                          ? "bg-orange-500 text-white border-orange-500"
-                          : priority === "medium"
-                          ? "bg-yellow-500 text-white border-yellow-500"
-                          : "bg-green-500 text-white border-green-500"
-                        : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300"
+                            ? "bg-orange-500 text-white border-orange-500"
+                            : priority === "medium"
+                              ? "bg-yellow-500 text-white border-yellow-500"
+                              : "bg-green-500 text-white border-green-500"
+                        : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300",
                     )}
                   >
                     {priority}

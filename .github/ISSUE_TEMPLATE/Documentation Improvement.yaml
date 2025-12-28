@@ -9,7 +9,7 @@ body:
     attributes:
       value: |
         Thanks for helping us improve the CrowdUp documentation!
-        
+
   - type: input
     id: doc-link
     attributes:
@@ -18,7 +18,7 @@ body:
       placeholder: "https://docs.crowdup.com/page"
     validations:
       required: false
-      
+
   - type: dropdown
     id: improvement-type
     attributes:
@@ -34,7 +34,7 @@ body:
         - Other
     validations:
       required: true
-      
+
   - type: textarea
     id: current-state
     attributes:
@@ -43,7 +43,7 @@ body:
       placeholder: "The current documentation says..."
     validations:
       required: true
-      
+
   - type: textarea
     id: suggested-change
     attributes:
@@ -52,7 +52,7 @@ body:
       placeholder: "The documentation should be updated to..."
     validations:
       required: true
-      
+
   - type: textarea
     id: additional-context
     attributes:
@@ -61,7 +61,7 @@ body:
       placeholder: "More details that might help understand the suggestion better."
     validations:
       required: false
-      
+
   - type: checkboxes
     id: contribution
     attributes:

@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, CheckCheck, ThumbsUp, MessageSquare, Reply, UserPlus, AlertCircle, Building2 } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  ThumbsUp,
+  MessageSquare,
+  Reply,
+  UserPlus,
+  AlertCircle,
+  Building2,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -15,7 +24,14 @@ import { useRouter } from "next/navigation";
 
 interface Notification {
   id: string;
-  type: "vote" | "comment" | "reply" | "follow" | "mention" | "status_change" | "official_response";
+  type:
+    | "vote"
+    | "comment"
+    | "reply"
+    | "follow"
+    | "mention"
+    | "status_change"
+    | "official_response";
   title: string;
   message?: string;
   link?: string;
@@ -62,9 +78,10 @@ export function NotificationDropdown() {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = (await supabase
         .from("notifications")
-        .select(`
+        .select(
+          `
           id,
           type,
           title,
@@ -73,24 +90,31 @@ export function NotificationDropdown() {
           is_read,
           created_at,
           actor_id
-        `)
+        `,
+        )
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
-        .limit(20) as { data: any[] | null; error: any };
+        .limit(20)) as { data: any[] | null; error: any };
 
       if (!error && data) {
         // Fetch actor info for each notification
-        const actorIds = [...new Set(data.filter((n: any) => n.actor_id).map((n: any) => n.actor_id))];
+        const actorIds = [
+          ...new Set(
+            data.filter((n: any) => n.actor_id).map((n: any) => n.actor_id),
+          ),
+        ];
         let actorsMap: Record<string, any> = {};
-        
+
         if (actorIds.length > 0) {
           const { data: actors } = await supabase
             .from("users")
             .select("id, username, display_name, avatar_url")
             .in("id", actorIds);
-          
+
           if (actors) {
-            actorsMap = Object.fromEntries((actors as any[]).map((a: any) => [a.id, a]));
+            actorsMap = Object.fromEntries(
+              (actors as any[]).map((a: any) => [a.id, a]),
+            );
           }
         }
 
@@ -100,7 +124,9 @@ export function NotificationDropdown() {
         })) as Notification[];
 
         setNotifications(notificationsWithActors);
-        setUnreadCount(notificationsWithActors.filter(n => !n.is_read).length);
+        setUnreadCount(
+          notificationsWithActors.filter((n) => !n.is_read).length,
+        );
       }
     } catch (e) {
       console.error("Failed to fetch notifications:", e);
@@ -127,7 +153,7 @@ export function NotificationDropdown() {
           },
           () => {
             fetchNotifications();
-          }
+          },
         )
         .subscribe();
 
@@ -138,28 +164,26 @@ export function NotificationDropdown() {
   }, []);
 
   const markAsRead = async (notificationId: string) => {
-    await (supabase
-      .from("notifications") as any)
+    await (supabase.from("notifications") as any)
       .update({ is_read: true })
       .eq("id", notificationId);
 
-    setNotifications(prev =>
-      prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n)),
     );
-    setUnreadCount(prev => Math.max(0, prev - 1));
+    setUnreadCount((prev) => Math.max(0, prev - 1));
   };
 
   const markAllAsRead = async () => {
     const userId = getCurrentUserId();
     if (!userId) return;
 
-    await (supabase
-      .from("notifications") as any)
+    await (supabase.from("notifications") as any)
       .update({ is_read: true })
       .eq("user_id", userId)
       .eq("is_read", false);
 
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     setUnreadCount(0);
   };
 
@@ -188,10 +212,15 @@ export function NotificationDropdown() {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0 overflow-hidden">
+      <DropdownMenuContent
+        align="end"
+        className="w-80 sm:w-96 p-0 overflow-hidden"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+            Notifications
+          </h3>
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
@@ -214,7 +243,9 @@ export function NotificationDropdown() {
               <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
                 <Bell className="h-6 w-6 text-gray-400" />
               </div>
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No notifications yet</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                No notifications yet
+              </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 We&apos;ll notify you when something happens
               </p>
@@ -222,7 +253,9 @@ export function NotificationDropdown() {
           ) : (
             notifications.map((notification) => {
               const Icon = notificationIcons[notification.type] || Bell;
-              const colorClass = notificationColors[notification.type] || "text-gray-500 bg-gray-50";
+              const colorClass =
+                notificationColors[notification.type] ||
+                "text-gray-500 bg-gray-50";
 
               return (
                 <button
@@ -234,11 +267,15 @@ export function NotificationDropdown() {
                       : "bg-orange-50/50 dark:bg-orange-950/20"
                   } hover:bg-gray-50 dark:hover:bg-gray-900`}
                 >
-                  <div className={`flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center ${colorClass}`}>
+                  <div
+                    className={`flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center ${colorClass}`}
+                  >
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${notification.is_read ? "text-gray-700 dark:text-gray-300" : "text-gray-900 dark:text-gray-100 font-medium"}`}>
+                    <p
+                      className={`text-sm ${notification.is_read ? "text-gray-700 dark:text-gray-300" : "text-gray-900 dark:text-gray-100 font-medium"}`}
+                    >
                       {notification.title}
                     </p>
                     {notification.message && (
@@ -247,7 +284,9 @@ export function NotificationDropdown() {
                       </p>
                     )}
                     <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
-                      {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(notification.created_at), {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                   {!notification.is_read && (

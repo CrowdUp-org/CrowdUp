@@ -3,15 +3,15 @@
 import { ReactNode } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
-import { 
-  MessageSquare, 
-  Search, 
-  Bookmark, 
-  Bell, 
-  Users, 
+import {
+  MessageSquare,
+  Search,
+  Bookmark,
+  Bell,
+  Users,
   FileText,
   Plus,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 
 interface EmptyStateProps {
@@ -41,45 +41,54 @@ export function EmptyState({
     <div
       className={cn(
         "flex flex-col items-center justify-center text-center",
-        isCompact ? "py-8 px-4" : isCard ? "py-12 px-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800" : "py-16 px-6",
-        className
+        isCompact
+          ? "py-8 px-4"
+          : isCard
+            ? "py-12 px-6 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800"
+            : "py-16 px-6",
+        className,
       )}
     >
       {/* Animated Icon Container */}
-      <div className={cn(
-        "relative mb-4",
-        isCompact ? "mb-3" : "mb-6"
-      )}>
+      <div className={cn("relative mb-4", isCompact ? "mb-3" : "mb-6")}>
         {/* Background glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 rounded-full blur-xl scale-150" />
-        
+
         {/* Icon circle */}
-        <div className={cn(
-          "relative flex items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700",
-          isCompact ? "h-12 w-12" : "h-20 w-20"
-        )}>
+        <div
+          className={cn(
+            "relative flex items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700",
+            isCompact ? "h-12 w-12" : "h-20 w-20",
+          )}
+        >
           {icon || (
-            <Sparkles className={cn(
-              "text-gray-400 dark:text-gray-500",
-              isCompact ? "h-5 w-5" : "h-8 w-8"
-            )} />
+            <Sparkles
+              className={cn(
+                "text-gray-400 dark:text-gray-500",
+                isCompact ? "h-5 w-5" : "h-8 w-8",
+              )}
+            />
           )}
         </div>
       </div>
 
       {/* Title */}
-      <h3 className={cn(
-        "font-semibold text-gray-900 dark:text-gray-100",
-        isCompact ? "text-base mb-1" : "text-xl mb-2"
-      )}>
+      <h3
+        className={cn(
+          "font-semibold text-gray-900 dark:text-gray-100",
+          isCompact ? "text-base mb-1" : "text-xl mb-2",
+        )}
+      >
         {title}
       </h3>
 
       {/* Description */}
-      <p className={cn(
-        "text-gray-500 dark:text-gray-400 max-w-sm",
-        isCompact ? "text-sm" : "text-base mb-6"
-      )}>
+      <p
+        className={cn(
+          "text-gray-500 dark:text-gray-400 max-w-sm",
+          isCompact ? "text-sm" : "text-base mb-6",
+        )}
+      >
         {description}
       </p>
 
@@ -98,7 +107,11 @@ export function EmptyState({
 }
 
 // Preset empty states for common scenarios
-export function NoPostsEmptyState({ onCreatePost }: { onCreatePost: () => void }) {
+export function NoPostsEmptyState({
+  onCreatePost,
+}: {
+  onCreatePost: () => void;
+}) {
   return (
     <EmptyState
       icon={<FileText className="h-8 w-8 text-gray-400" />}
@@ -155,14 +168,19 @@ export function NoCommentsEmptyState() {
   );
 }
 
-export function NoFollowersEmptyState({ type }: { type: "followers" | "following" }) {
+export function NoFollowersEmptyState({
+  type,
+}: {
+  type: "followers" | "following";
+}) {
   return (
     <EmptyState
       icon={<Users className="h-8 w-8 text-gray-400" />}
       title={type === "followers" ? "No followers yet" : "Not following anyone"}
-      description={type === "followers" 
-        ? "When people follow this account, they'll show up here."
-        : "Follow people to see their posts in your feed."
+      description={
+        type === "followers"
+          ? "When people follow this account, they'll show up here."
+          : "Follow people to see their posts in your feed."
       }
       variant="card"
     />

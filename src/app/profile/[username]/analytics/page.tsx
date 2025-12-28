@@ -18,10 +18,18 @@ interface Analytics {
   totalFollowing: number;
   topPosts: any[];
   recentActivity: any[];
-  votesByType: { bugReports: number; featureRequests: number; complaints: number };
+  votesByType: {
+    bugReports: number;
+    featureRequests: number;
+    complaints: number;
+  };
 }
 
-export default function ProfileAnalyticsPage({ params }: { params: Promise<{ username: string }> }) {
+export default function ProfileAnalyticsPage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
   const { username } = use(params);
   const router = useRouter();
   const currentUser = getCurrentUser();
@@ -60,7 +68,6 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
       return;
     }
 
-
     await fetchAnalytics(userData.id);
   };
 
@@ -76,12 +83,14 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
     const totalVotes = posts?.reduce((sum, post) => sum + post.votes, 0) || 0;
 
     // Count by type
-    const bugReports = posts?.filter(p => p.type === "Bug Report").length || 0;
-    const featureRequests = posts?.filter(p => p.type === "Feature Request").length || 0;
-    const complaints = posts?.filter(p => p.type === "Complaint").length || 0;
+    const bugReports =
+      posts?.filter((p) => p.type === "Bug Report").length || 0;
+    const featureRequests =
+      posts?.filter((p) => p.type === "Feature Request").length || 0;
+    const complaints = posts?.filter((p) => p.type === "Complaint").length || 0;
 
     // Fetch comments on user's posts
-    const postIds = posts?.map(p => p.id) || [];
+    const postIds = posts?.map((p) => p.id) || [];
     let totalComments = 0;
     if (postIds.length > 0) {
       const { data: comments } = await supabase
@@ -167,7 +176,9 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
               {analytics.totalPosts}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {analytics.votesByType.bugReports} bugs, {analytics.votesByType.featureRequests} features, {analytics.votesByType.complaints} complaints
+              {analytics.votesByType.bugReports} bugs,{" "}
+              {analytics.votesByType.featureRequests} features,{" "}
+              {analytics.votesByType.complaints} complaints
             </p>
           </Card>
 
@@ -180,20 +191,28 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
               {analytics.totalVotes}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {analytics.totalPosts > 0 ? (analytics.totalVotes / analytics.totalPosts).toFixed(1) : 0} avg per post
+              {analytics.totalPosts > 0
+                ? (analytics.totalVotes / analytics.totalPosts).toFixed(1)
+                : 0}{" "}
+              avg per post
             </p>
           </Card>
 
           <Card className="p-6 bg-white border shadow-sm rounded-2xl">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-gray-600">Total Comments</p>
+              <p className="text-sm font-medium text-gray-600">
+                Total Comments
+              </p>
               <MessageCircle className="h-5 w-5 text-orange-500" />
             </div>
             <p className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
               {analytics.totalComments}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {analytics.totalPosts > 0 ? (analytics.totalComments / analytics.totalPosts).toFixed(1) : 0} avg per post
+              {analytics.totalPosts > 0
+                ? (analytics.totalComments / analytics.totalPosts).toFixed(1)
+                : 0}{" "}
+              avg per post
             </p>
           </Card>
 
@@ -227,18 +246,28 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-2xl font-bold text-gray-300">#{index + 1}</span>
-                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                          post.type === "Bug Report" ? "bg-red-100 text-red-700" :
-                          post.type === "Feature Request" ? "bg-blue-100 text-blue-700" :
-                          "bg-yellow-100 text-yellow-700"
-                        }`}>
+                        <span className="text-2xl font-bold text-gray-300">
+                          #{index + 1}
+                        </span>
+                        <span
+                          className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                            post.type === "Bug Report"
+                              ? "bg-red-100 text-red-700"
+                              : post.type === "Feature Request"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
                           {post.type}
                         </span>
-                        <span className="text-xs text-gray-500">{post.company}</span>
+                        <span className="text-xs text-gray-500">
+                          {post.company}
+                        </span>
                       </div>
                       <h3 className="font-semibold mb-1">{post.title}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">{post.description}</p>
+                      <p className="text-sm text-gray-600 line-clamp-2">
+                        {post.description}
+                      </p>
                     </div>
                     <div className="text-right ml-4">
                       <div className="flex items-center gap-1 text-orange-500">
@@ -246,7 +275,9 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
                         <p className="text-lg font-bold">{post.votes}</p>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(post.created_at), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
                   </div>
@@ -272,22 +303,34 @@ export default function ProfileAnalyticsPage({ params }: { params: Promise<{ use
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                          post.type === "Bug Report" ? "bg-red-100 text-red-700" :
-                          post.type === "Feature Request" ? "bg-blue-100 text-blue-700" :
-                          "bg-yellow-100 text-yellow-700"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                            post.type === "Bug Report"
+                              ? "bg-red-100 text-red-700"
+                              : post.type === "Feature Request"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
                           {post.type}
                         </span>
-                        <span className="text-xs text-gray-500">{post.company}</span>
+                        <span className="text-xs text-gray-500">
+                          {post.company}
+                        </span>
                       </div>
                       <h3 className="font-semibold mb-1">{post.title}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-1">{post.description}</p>
+                      <p className="text-sm text-gray-600 line-clamp-1">
+                        {post.description}
+                      </p>
                     </div>
                     <div className="text-right ml-4">
-                      <p className="text-sm font-medium text-gray-900">{post.votes} votes</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {post.votes} votes
+                      </p>
                       <p className="text-xs text-gray-500">
-                        {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(post.created_at), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
                   </div>

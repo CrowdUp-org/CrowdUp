@@ -34,7 +34,8 @@ export default function Sidebar() {
       .limit(100);
 
     if (data) {
-      const companyCounts: Record<string, { count: number; color: string }> = {};
+      const companyCounts: Record<string, { count: number; color: string }> =
+        {};
       data.forEach((post: any) => {
         if (!companyCounts[post.company]) {
           companyCounts[post.company] = { count: 0, color: post.company_color };
@@ -81,7 +82,9 @@ export default function Sidebar() {
       <div className="rounded-2xl bg-orange-50 p-5 border border-orange-100">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp className="h-5 w-5 text-orange-500" />
-          <h3 className="font-semibold text-base text-gray-900">Community Feed</h3>
+          <h3 className="font-semibold text-base text-gray-900">
+            Community Feed
+          </h3>
         </div>
         <p className="text-sm text-gray-600 leading-relaxed">
           Latest feedback and suggestions from the community
@@ -112,7 +115,9 @@ export default function Sidebar() {
             <Shield className="h-6 w-6" />
             <div className="text-left">
               <h3 className="font-semibold text-base">Admin Panel</h3>
-              <p className="text-sm text-white/80">Manage users & verification</p>
+              <p className="text-sm text-white/80">
+                Manage users & verification
+              </p>
             </div>
           </div>
         </button>
@@ -122,7 +127,9 @@ export default function Sidebar() {
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="h-5 w-5 text-orange-500" />
-          <h3 className="font-semibold text-base text-gray-900">Trending Group</h3>
+          <h3 className="font-semibold text-base text-gray-900">
+            Trending Group
+          </h3>
         </div>
 
         <div className="space-y-3">
@@ -141,14 +148,18 @@ export default function Sidebar() {
                     {company.initial}
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-sm text-gray-900">{company.name}</p>
+                    <p className="font-medium text-sm text-gray-900">
+                      {company.name}
+                    </p>
                     <p className="text-xs text-gray-500">{company.followers}</p>
                   </div>
                 </div>
               </button>
             ))
           ) : (
-            <p className="text-sm text-gray-500 text-center py-4">No trending companies yet</p>
+            <p className="text-sm text-gray-500 text-center py-4">
+              No trending companies yet
+            </p>
           )}
         </div>
       </div>
@@ -171,7 +182,9 @@ export default function Sidebar() {
           </div>
           <div className="flex items-center justify-between py-1.5">
             <span className="text-sm text-gray-600">Companies</span>
-            <span className="font-semibold text-gray-900">{stats.companies}</span>
+            <span className="font-semibold text-gray-900">
+              {stats.companies}
+            </span>
           </div>
         </div>
       </div>

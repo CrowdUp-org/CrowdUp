@@ -32,8 +32,12 @@ import {
 export default function MessagesPage() {
   const router = useRouter();
   const currentUser = getCurrentUser();
-  const [conversations, setConversations] = useState<ConversationWithUser[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ConversationWithUser[]>(
+    [],
+  );
+  const [selectedConversation, setSelectedConversation] = useState<
+    string | null
+  >(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,12 +62,15 @@ export default function MessagesPage() {
       markMessagesAsRead(selectedConversation);
 
       // Subscribe to new messages
-      const unsubscribe = subscribeToMessages(selectedConversation, (newMessage) => {
-        setMessages((prev) => [...prev, newMessage]);
-        if (newMessage.sender_id !== currentUser?.id) {
-          markMessagesAsRead(selectedConversation);
-        }
-      });
+      const unsubscribe = subscribeToMessages(
+        selectedConversation,
+        (newMessage) => {
+          setMessages((prev) => [...prev, newMessage]);
+          if (newMessage.sender_id !== currentUser?.id) {
+            markMessagesAsRead(selectedConversation);
+          }
+        },
+      );
 
       return () => unsubscribe();
     }
@@ -87,7 +94,8 @@ export default function MessagesPage() {
   };
 
   const loadMessages = async (conversationId: string) => {
-    const { messages: msgs, error } = await getConversationMessages(conversationId);
+    const { messages: msgs, error } =
+      await getConversationMessages(conversationId);
     if (!error && msgs) {
       setMessages(msgs);
     }
@@ -121,12 +129,17 @@ export default function MessagesPage() {
     }
   };
 
-  const filteredConversations = conversations.filter((conv) =>
-    conv.otherUser.display_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    conv.otherUser.username.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredConversations = conversations.filter(
+    (conv) =>
+      conv.otherUser.display_name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      conv.otherUser.username.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const selectedConvData = conversations.find((c) => c.id === selectedConversation);
+  const selectedConvData = conversations.find(
+    (c) => c.id === selectedConversation,
+  );
 
   if (!currentUser) {
     return null;
@@ -136,16 +149,25 @@ export default function MessagesPage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <main className="mx-auto max-w-7xl px-6 pt-24 pb-8">
-        <div className="bg-white rounded-2xl border shadow-sm overflow-hidden" style={{ height: "calc(100vh - 140px)" }}>
+        <div
+          className="bg-white rounded-2xl border shadow-sm overflow-hidden"
+          style={{ height: "calc(100vh - 140px)" }}
+        >
           <div className="grid grid-cols-12 h-full">
             {/* Conversations List */}
             <div className="col-span-4 border-r flex flex-col">
               <div className="p-4 border-b">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold">Messages</h2>
-                  <Dialog open={newChatDialogOpen} onOpenChange={setNewChatDialogOpen}>
+                  <Dialog
+                    open={newChatDialogOpen}
+                    onOpenChange={setNewChatDialogOpen}
+                  >
                     <DialogTrigger asChild>
-                      <Button size="sm" className="gap-2 bg-gradient-to-br from-yellow-400 to-orange-500">
+                      <Button
+                        size="sm"
+                        className="gap-2 bg-gradient-to-br from-yellow-400 to-orange-500"
+                      >
                         <UserPlus className="h-4 w-4" />
                         New
                       </Button>
@@ -161,8 +183,12 @@ export default function MessagesPage() {
                         {connections.length === 0 ? (
                           <div className="text-center text-gray-500 py-8">
                             <MessageCircle className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                            <p className="font-medium mb-2">No connections yet</p>
-                            <p className="text-sm mb-4">Connect with users to start chatting</p>
+                            <p className="font-medium mb-2">
+                              No connections yet
+                            </p>
+                            <p className="text-sm mb-4">
+                              Connect with users to start chatting
+                            </p>
                             <Button
                               onClick={() => {
                                 setNewChatDialogOpen(false);
@@ -182,7 +208,11 @@ export default function MessagesPage() {
                             >
                               <Avatar className="h-10 w-10 bg-gradient-to-br from-yellow-400 to-orange-500">
                                 {conn.avatar_url ? (
-                                  <img src={conn.avatar_url} alt={conn.display_name} className="h-full w-full object-cover" />
+                                  <img
+                                    src={conn.avatar_url}
+                                    alt={conn.display_name}
+                                    className="h-full w-full object-cover"
+                                  />
                                 ) : (
                                   <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
                                     {conn.display_name.charAt(0).toUpperCase()}
@@ -190,8 +220,12 @@ export default function MessagesPage() {
                                 )}
                               </Avatar>
                               <div className="text-left">
-                                <p className="font-semibold">{conn.display_name}</p>
-                                <p className="text-sm text-gray-500">@{conn.username}</p>
+                                <p className="font-semibold">
+                                  {conn.display_name}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  @{conn.username}
+                                </p>
                               </div>
                             </button>
                           ))
@@ -219,7 +253,9 @@ export default function MessagesPage() {
                   <div className="text-center py-12 text-gray-500">
                     <MessageCircle className="h-12 w-12 mx-auto mb-2 text-gray-300" />
                     <p>No conversations yet</p>
-                    <p className="text-sm mt-2">Click "New" to start chatting</p>
+                    <p className="text-sm mt-2">
+                      Click "New" to start chatting
+                    </p>
                   </div>
                 ) : (
                   filteredConversations.map((conv) => (
@@ -232,25 +268,40 @@ export default function MessagesPage() {
                     >
                       <Avatar className="h-12 w-12 bg-gradient-to-br from-yellow-400 to-orange-500">
                         {conv.otherUser.avatar_url ? (
-                          <img src={conv.otherUser.avatar_url} alt={conv.otherUser.display_name} className="h-full w-full object-cover" />
+                          <img
+                            src={conv.otherUser.avatar_url}
+                            alt={conv.otherUser.display_name}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
-                            {conv.otherUser.display_name.charAt(0).toUpperCase()}
+                            {conv.otherUser.display_name
+                              .charAt(0)
+                              .toUpperCase()}
                           </AvatarFallback>
                         )}
                       </Avatar>
                       <div className="flex-1 text-left">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold">{conv.otherUser.display_name}</p>
+                          <p className="font-semibold">
+                            {conv.otherUser.display_name}
+                          </p>
                           {conv.lastMessage && (
                             <span className="text-xs text-gray-500">
-                              {formatDistanceToNow(new Date(conv.lastMessage.created_at), { addSuffix: true })}
+                              {formatDistanceToNow(
+                                new Date(conv.lastMessage.created_at),
+                                { addSuffix: true },
+                              )}
                             </span>
                           )}
                         </div>
-                        <p className={`text-sm truncate ${
-                          conv.unreadCount > 0 ? "font-medium text-gray-900" : "text-gray-600"
-                        }`}>
+                        <p
+                          className={`text-sm truncate ${
+                            conv.unreadCount > 0
+                              ? "font-medium text-gray-900"
+                              : "text-gray-600"
+                          }`}
+                        >
                           {conv.lastMessage?.content || "No messages yet"}
                         </p>
                       </div>
@@ -273,10 +324,16 @@ export default function MessagesPage() {
                   <div className="p-4 border-b flex items-center gap-3">
                     <Avatar className="h-10 w-10 bg-gradient-to-br from-yellow-400 to-orange-500">
                       {selectedConvData?.otherUser.avatar_url ? (
-                        <img src={selectedConvData.otherUser.avatar_url} alt={selectedConvData.otherUser.display_name} className="h-full w-full object-cover" />
+                        <img
+                          src={selectedConvData.otherUser.avatar_url}
+                          alt={selectedConvData.otherUser.display_name}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white font-semibold">
-                          {selectedConvData?.otherUser.display_name.charAt(0).toUpperCase()}
+                          {selectedConvData?.otherUser.display_name
+                            .charAt(0)
+                            .toUpperCase()}
                         </AvatarFallback>
                       )}
                     </Avatar>
@@ -306,17 +363,29 @@ export default function MessagesPage() {
                         {messages.map((msg) => {
                           const isOwn = msg.sender_id === currentUser?.id;
                           return (
-                            <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                              <div className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                                isOwn
-                                  ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-tr-none"
-                                  : "bg-gray-100 text-gray-900 rounded-tl-none"
-                              }`}>
-                                <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
-                                <span className={`text-xs mt-1 block ${
-                                  isOwn ? "text-white/80" : "text-gray-500"
-                                }`}>
-                                  {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
+                            <div
+                              key={msg.id}
+                              className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                            >
+                              <div
+                                className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                                  isOwn
+                                    ? "bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-tr-none"
+                                    : "bg-gray-100 text-gray-900 rounded-tl-none"
+                                }`}
+                              >
+                                <p className="text-sm whitespace-pre-wrap break-words">
+                                  {msg.content}
+                                </p>
+                                <span
+                                  className={`text-xs mt-1 block ${
+                                    isOwn ? "text-white/80" : "text-gray-500"
+                                  }`}
+                                >
+                                  {formatDistanceToNow(
+                                    new Date(msg.created_at),
+                                    { addSuffix: true },
+                                  )}
                                 </span>
                               </div>
                             </div>
@@ -357,7 +426,9 @@ export default function MessagesPage() {
                   <div className="text-center">
                     <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-300" />
                     <p className="text-lg font-medium">Select a conversation</p>
-                    <p className="text-sm">Choose a conversation from the list to start messaging</p>
+                    <p className="text-sm">
+                      Choose a conversation from the list to start messaging
+                    </p>
                   </div>
                 </div>
               )}

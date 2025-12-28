@@ -51,118 +51,118 @@ export type ParentToChild =
   | { type: typeof CHANNEL; msg: "SCROLL"; dx: number; dy: number }
   | { type: typeof CHANNEL; msg: "CLEAR_INLINE_STYLES"; elementId: string }
   | {
-    type: typeof CHANNEL;
-    msg: "PREVIEW_FONT";
-    elementId: string;
-    fontFamily: string;
-  }
+      type: typeof CHANNEL;
+      msg: "PREVIEW_FONT";
+      elementId: string;
+      fontFamily: string;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "RESIZE_ELEMENT";
-    elementId: string;
-    width: number;
-    height: number;
-  }
+      type: typeof CHANNEL;
+      msg: "RESIZE_ELEMENT";
+      elementId: string;
+      width: number;
+      height: number;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "SHOW_ELEMENT_HOVER";
-    elementId: string | null;
-  };
+      type: typeof CHANNEL;
+      msg: "SHOW_ELEMENT_HOVER";
+      elementId: string | null;
+    };
 
 export type ChildToParent =
   | {
-    type: typeof CHANNEL;
-    msg: "HIT";
-    id: string | null;
-    tag: string | null;
-    rect: { top: number; left: number; width: number; height: number } | null;
-  }
+      type: typeof CHANNEL;
+      msg: "HIT";
+      id: string | null;
+      tag: string | null;
+      rect: { top: number; left: number; width: number; height: number } | null;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "ELEMENT_CLICKED";
-    id: string | null;
-    tag: string | null;
-    rect: { top: number; left: number; width: number; height: number };
-    clickPosition: { x: number; y: number };
-    isEditable?: boolean;
-    currentStyles?: {
-      fontSize?: string;
-      color?: string;
-      fontWeight?: string;
-      fontStyle?: string;
-      textDecoration?: string;
-      textAlign?: string;
-      lineHeight?: string;
-      letterSpacing?: string;
-      paddingLeft?: string;
-      paddingRight?: string;
-      paddingTop?: string;
-      paddingBottom?: string;
-      marginLeft?: string;
-      marginRight?: string;
-      marginTop?: string;
-      marginBottom?: string;
-      backgroundColor?: string;
-      backgroundImage?: string;
-      borderRadius?: string;
-      fontFamily?: string;
-      opacity?: string;
-      display?: string;
-      flexDirection?: string;
-      alignItems?: string;
-      justifyContent?: string;
-      gap?: string;
-    };
-    className?: string;
-    src?: string;
-  }
+      type: typeof CHANNEL;
+      msg: "ELEMENT_CLICKED";
+      id: string | null;
+      tag: string | null;
+      rect: { top: number; left: number; width: number; height: number };
+      clickPosition: { x: number; y: number };
+      isEditable?: boolean;
+      currentStyles?: {
+        fontSize?: string;
+        color?: string;
+        fontWeight?: string;
+        fontStyle?: string;
+        textDecoration?: string;
+        textAlign?: string;
+        lineHeight?: string;
+        letterSpacing?: string;
+        paddingLeft?: string;
+        paddingRight?: string;
+        paddingTop?: string;
+        paddingBottom?: string;
+        marginLeft?: string;
+        marginRight?: string;
+        marginTop?: string;
+        marginBottom?: string;
+        backgroundColor?: string;
+        backgroundImage?: string;
+        borderRadius?: string;
+        fontFamily?: string;
+        opacity?: string;
+        display?: string;
+        flexDirection?: string;
+        alignItems?: string;
+        justifyContent?: string;
+        gap?: string;
+      };
+      className?: string;
+      src?: string;
+    }
   | { type: typeof CHANNEL; msg: "SCROLL_STARTED" }
   | { type: typeof CHANNEL; msg: "SCROLL_STOPPED" }
   | {
-    type: typeof CHANNEL;
-    msg: "TEXT_CHANGED";
-    id: string;
-    oldText: string;
-    newText: string;
-    filePath: string;
-    line: number;
-    column: number;
-  }
+      type: typeof CHANNEL;
+      msg: "TEXT_CHANGED";
+      id: string;
+      oldText: string;
+      newText: string;
+      filePath: string;
+      line: number;
+      column: number;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "STYLE_CHANGED";
-    id: string;
-    styles: Record<string, string>;
-    filePath: string;
-    line: number;
-    column: number;
-  }
+      type: typeof CHANNEL;
+      msg: "STYLE_CHANGED";
+      id: string;
+      styles: Record<string, string>;
+      filePath: string;
+      line: number;
+      column: number;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "STYLE_BLUR";
-    id: string;
-    styles: Record<string, string>;
-    filePath: string;
-    line: number;
-    column: number;
-    className: string;
-  }
+      type: typeof CHANNEL;
+      msg: "STYLE_BLUR";
+      id: string;
+      styles: Record<string, string>;
+      filePath: string;
+      line: number;
+      column: number;
+      className: string;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "IMAGE_BLUR";
-    id: string;
-    oldSrc: string;
-    newSrc: string;
-    filePath: string;
-    line: number;
-    column: number;
-  }
+      type: typeof CHANNEL;
+      msg: "IMAGE_BLUR";
+      id: string;
+      oldSrc: string;
+      newSrc: string;
+      filePath: string;
+      line: number;
+      column: number;
+    }
   | {
-    type: typeof CHANNEL;
-    msg: "FOCUS_MOVED";
-    id: string;
-    rect: { top: number; left: number; width: number; height: number };
-  }
+      type: typeof CHANNEL;
+      msg: "FOCUS_MOVED";
+      id: string;
+      rect: { top: number; left: number; width: number; height: number };
+    }
   | { type: typeof CHANNEL; msg: "VISUAL_EDIT_MODE_ACK"; active: boolean }
   | { type: typeof CHANNEL; msg: "VISUAL_EDIT_MODE_RESTORED"; active: boolean };
 
@@ -206,7 +206,7 @@ const isTextEditable = (element: HTMLElement): boolean => {
   if (editableTags.includes(tagName) && element.textContent?.trim()) {
     // Check if element has direct text nodes (not just text from children)
     const hasDirectText = Array.from(element.childNodes).some(
-      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()
+      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
     );
 
     // Allow editing if:
@@ -236,7 +236,7 @@ const extractDirectTextContent = (element: HTMLElement): string => {
 
 // Helper to parse data-orchids-id to extract file path, line, and column
 const parseOrchidsId = (
-  orchidsId: string
+  orchidsId: string,
 ): { filePath: string; line: number; column: number } | null => {
   // Format: "filepath:line:column"
   const parts = orchidsId.split(":");
@@ -254,7 +254,7 @@ const parseOrchidsId = (
 
 // Helper to get current styles of an element (including inline styles)
 const getCurrentStyles = (
-  element: HTMLElement
+  element: HTMLElement,
 ): {
   fontSize?: string;
   color?: string;
@@ -379,11 +379,11 @@ const getCurrentStyles = (
     marginBottom: normalizeValue(computed.marginBottom, "marginBottom"),
     backgroundColor: normalizeValue(
       computed.backgroundColor,
-      "backgroundColor"
+      "backgroundColor",
     ),
     backgroundImage: normalizeValue(
       computed.backgroundImage,
-      "backgroundImage"
+      "backgroundImage",
     ),
     borderRadius: normalizeValue(computed.borderRadius, "borderRadius"),
     fontFamily: normalizeValue(computed.fontFamily, "fontFamily"),
@@ -462,7 +462,7 @@ export default function HoverReceiver() {
   const styleElementRef = useRef<HTMLStyleElement | null>(null);
   const originalStylesRef = useRef<Record<string, string>>({});
   const appliedStylesRef = useRef<Map<string, Record<string, string>>>(
-    new Map()
+    new Map(),
   );
   const hasStyleChangesRef = useRef<boolean>(false);
   const lastClickTimeRef = useRef<number>(0);
@@ -491,13 +491,13 @@ export default function HoverReceiver() {
       // This will sync the parent's state with our restored state
       window.parent.postMessage(
         { type: CHANNEL, msg: "VISUAL_EDIT_MODE_ACK", active: true },
-        "*"
+        "*",
       );
 
       // Also send a special message to indicate this was restored from localStorage
       window.parent.postMessage(
         { type: CHANNEL, msg: "VISUAL_EDIT_MODE_RESTORED", active: true },
-        "*"
+        "*",
       );
 
       // Restore focused element after a short delay to ensure DOM is ready
@@ -509,7 +509,7 @@ export default function HoverReceiver() {
             try {
               const { id } = JSON.parse(focusedData);
               const element = document.querySelector(
-                `[data-orchids-id="${id}"]`
+                `[data-orchids-id="${id}"]`,
               ) as HTMLElement;
 
               if (element) {
@@ -620,7 +620,7 @@ export default function HoverReceiver() {
   // Helper to restore child elements after editing
   const restoreChildElements = (element: HTMLElement) => {
     const protectedElements = element.querySelectorAll(
-      '[data-orchids-protected="true"]'
+      '[data-orchids-protected="true"]',
     );
     protectedElements.forEach((child) => {
       const childEl = child as HTMLElement;
@@ -686,7 +686,7 @@ export default function HoverReceiver() {
   // Handle style changes and send to parent
   const handleStyleChange = (
     element: HTMLElement,
-    styles: Record<string, string>
+    styles: Record<string, string>,
   ) => {
     const orchidsId = element.getAttribute("data-orchids-id");
     if (!orchidsId) return;
@@ -696,7 +696,7 @@ export default function HoverReceiver() {
 
     // Find ALL elements with the same orchids ID
     const allMatchingElements = document.querySelectorAll(
-      `[data-orchids-id="${orchidsId}"]`
+      `[data-orchids-id="${orchidsId}"]`,
     ) as NodeListOf<HTMLElement>;
 
     // Apply styles to ALL matching elements for visual feedback
@@ -829,7 +829,7 @@ export default function HoverReceiver() {
 
         // Find ALL elements with the same orchids ID
         const allMatchingElements = document.querySelectorAll(
-          `[data-orchids-id="${elementId}"]`
+          `[data-orchids-id="${elementId}"]`,
         ) as NodeListOf<HTMLElement>;
 
         if (allMatchingElements.length > 0) {
@@ -919,7 +919,7 @@ export default function HoverReceiver() {
         const { elementId, src, oldSrc } = e.data;
         let element: HTMLImageElement | null = null;
         const candidates = document.querySelectorAll(
-          `[data-orchids-id="${elementId}"]`
+          `[data-orchids-id="${elementId}"]`,
         );
         candidates.forEach((el) => {
           if (el.tagName.toLowerCase() === "img") {
@@ -973,7 +973,7 @@ export default function HoverReceiver() {
       } else if (e.data?.type === "RESIZE_ELEMENT") {
         const { elementId, width, height } = e.data;
         const element = document.querySelector(
-          `[data-orchids-id="${elementId}"]`
+          `[data-orchids-id="${elementId}"]`,
         ) as HTMLElement;
 
         if (element && focusedElementRef.current === element) {
@@ -1073,12 +1073,12 @@ export default function HoverReceiver() {
 
         newWidth = Math.max(
           20,
-          exceedsWidth ? newWidth : Math.min(newWidth, maxWidth)
+          exceedsWidth ? newWidth : Math.min(newWidth, maxWidth),
         );
 
         newHeight = Math.max(
           20,
-          exceedsHeight ? newHeight : Math.min(newHeight, maxHeight)
+          exceedsHeight ? newHeight : Math.min(newHeight, maxHeight),
         );
       } else {
         // Fallback to minimum dimensions if no parent
@@ -1101,7 +1101,7 @@ export default function HoverReceiver() {
             width: Math.round(newWidth),
             height: Math.round(newHeight),
           },
-          "*"
+          "*",
         );
       }
     };
@@ -1148,7 +1148,7 @@ export default function HoverReceiver() {
           if (
             Math.abs(widthPercent - Math.round(widthPercent)) < 0.1 ||
             [25, 33.333, 50, 66.667, 75, 100].some(
-              (v) => Math.abs(widthPercent - v) < 0.5
+              (v) => Math.abs(widthPercent - v) < 0.5,
             )
           ) {
             widthValue = `${Math.round(widthPercent * 10) / 10}%`;
@@ -1425,7 +1425,7 @@ export default function HoverReceiver() {
         // Update hover boxes immediately for instant feedback
         // Find ALL elements with the same orchids ID
         const allMatchingElements = document.querySelectorAll(
-          `[data-orchids-id="${hitId}"]`
+          `[data-orchids-id="${hitId}"]`,
         ) as NodeListOf<HTMLElement>;
 
         // Create hover boxes for all matching elements except the focused one
@@ -1502,7 +1502,7 @@ export default function HoverReceiver() {
       if (!isVisualEditModeRef.current) return;
 
       const hit = (e.target as HTMLElement)?.closest<HTMLElement>(
-        "[data-orchids-id]"
+        "[data-orchids-id]",
       );
 
       if (hit && isTextEditable(hit)) {
@@ -1515,7 +1515,7 @@ export default function HoverReceiver() {
           const currentStyle = hit.getAttribute("style") || "";
           hit.setAttribute(
             "style",
-            `${currentStyle}; outline: none !important; box-shadow: none !important;`
+            `${currentStyle}; outline: none !important; box-shadow: none !important;`,
           );
 
           hit.contentEditable = "true";
@@ -1579,13 +1579,13 @@ export default function HoverReceiver() {
           };
           localStorage.setItem(
             FOCUSED_ELEMENT_KEY,
-            JSON.stringify(focusedElementData)
+            JSON.stringify(focusedElementData),
           );
         }
 
         // Find ALL other elements with the same orchids ID and show hover boxes
         const allMatchingElements = document.querySelectorAll(
-          `[data-orchids-id="${hitId}"]`
+          `[data-orchids-id="${hitId}"]`,
         ) as NodeListOf<HTMLElement>;
 
         // Create hover boxes for all matching elements except the focused one
@@ -1735,17 +1735,17 @@ export default function HoverReceiver() {
           tag: tagName,
           rect: expandedBox
             ? {
-              top: expandedBox.top,
-              left: expandedBox.left,
-              width: expandedBox.width,
-              height: expandedBox.height,
-            }
+                top: expandedBox.top,
+                left: expandedBox.left,
+                width: expandedBox.width,
+                height: expandedBox.height,
+              }
             : {
-              top: 0,
-              left: 0,
-              width: 0,
-              height: 0,
-            },
+                top: 0,
+                left: 0,
+                width: 0,
+                height: 0,
+              },
           clickPosition: {
             x: e.clientX,
             y: e.clientY,
@@ -1836,7 +1836,7 @@ export default function HoverReceiver() {
         }
 
         const element = document.querySelector(
-          `[data-orchids-id="${elementId}"]`
+          `[data-orchids-id="${elementId}"]`,
         ) as HTMLElement | null;
         if (!element) return;
 
@@ -1874,7 +1874,7 @@ export default function HoverReceiver() {
         // Send acknowledgement back to parent so it knows we received the mode change
         window.parent.postMessage(
           { type: CHANNEL, msg: "VISUAL_EDIT_MODE_ACK", active: newMode },
-          "*"
+          "*",
         );
 
         if (!newMode) {
@@ -1916,7 +1916,7 @@ export default function HoverReceiver() {
       if (e.data.msg === "CLEAR_INLINE_STYLES" && "elementId" in e.data) {
         // Find ALL elements with the same orchids ID
         const allMatchingElements = document.querySelectorAll(
-          `[data-orchids-id="${e.data.elementId}"]`
+          `[data-orchids-id="${e.data.elementId}"]`,
         ) as NodeListOf<HTMLElement>;
 
         allMatchingElements.forEach((element) => {
@@ -1962,7 +1962,7 @@ export default function HoverReceiver() {
 
         // Find ALL elements with the same orchids ID
         const allMatchingElements = document.querySelectorAll(
-          `[data-orchids-id="${elementId}"]`
+          `[data-orchids-id="${elementId}"]`,
         ) as NodeListOf<HTMLElement>;
 
         if (allMatchingElements.length > 0) {

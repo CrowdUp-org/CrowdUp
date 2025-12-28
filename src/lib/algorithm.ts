@@ -1,6 +1,6 @@
 /**
  * CrowdUp Recommendation Algorithm
- * 
+ *
  * Inspired by social media platforms like Instagram, Facebook, and X (Twitter)
  * This algorithm ranks content based on multiple signals to maximize engagement
  */
@@ -63,11 +63,9 @@ function calculateEngagementScore(post: PostWithEngagement): number {
   const voteWeight = 1.0;
   const commentWeight = 2.0; // Comments are more valuable than votes
   const shareWeight = 3.0; // Shares are most valuable
-  
-  const totalEngagement = 
-    (votes * voteWeight) + 
-    (comments * commentWeight) + 
-    (shares * shareWeight);
+
+  const totalEngagement =
+    votes * voteWeight + comments * commentWeight + shares * shareWeight;
 
   // Engagement rate (similar to Instagram's algorithm)
   const engagementRate = totalEngagement / Math.max(views, 1);
@@ -81,16 +79,16 @@ function calculateEngagementScore(post: PostWithEngagement): number {
  */
 function calculateVelocityScore(
   currentEngagement: number,
-  ageInHours: number
+  ageInHours: number,
 ): number {
   if (ageInHours < 1) {
     // Very new posts get a boost
     return currentEngagement * 2;
   }
-  
+
   // Engagement per hour
   const velocity = currentEngagement / ageInHours;
-  
+
   // Boost posts with high velocity
   return velocity * Math.log10(currentEngagement + 10);
 }
@@ -101,7 +99,7 @@ function calculateVelocityScore(
  */
 function calculatePersonalizationScore(
   post: Post,
-  userInteraction?: UserInteraction
+  userInteraction?: UserInteraction,
 ): number {
   if (!userInteraction) return 1.0; // No personalization data
 
@@ -137,18 +135,20 @@ function calculatePersonalizationScore(
 function calculateDiversityScore(
   post: Post,
   recentlyShownCompanies: string[],
-  recentlyShownUsers: string[]
+  recentlyShownUsers: string[],
 ): number {
   let score = 1.0;
 
   // Count how many times this company appeared recently
-  const companyCount = recentlyShownCompanies.filter(c => c === post.company).length;
+  const companyCount = recentlyShownCompanies.filter(
+    (c) => c === post.company,
+  ).length;
   if (companyCount > 0) {
     score *= Math.pow(0.7, companyCount); // Exponential penalty
   }
 
   // Count how many times this user appeared recently
-  const userCount = recentlyShownUsers.filter(u => u === post.user_id).length;
+  const userCount = recentlyShownUsers.filter((u) => u === post.user_id).length;
   if (userCount > 0) {
     score *= Math.pow(0.8, userCount);
   }
@@ -198,26 +198,33 @@ export function calculatePostScore(
   post: PostWithEngagement,
   userInteraction?: UserInteraction,
   recentlyShownCompanies: string[] = [],
-  recentlyShownUsers: string[] = []
+  recentlyShownUsers: string[] = [],
 ): number {
   const ageInHours = getPostAgeInHours(post.created_at);
-  
+
   // Calculate individual scores
   const timeDecay = calculateTimeDecay(ageInHours);
   const engagementScore = calculateEngagementScore(post);
   const velocityScore = calculateVelocityScore(engagementScore, ageInHours);
-  const personalizationScore = calculatePersonalizationScore(post, userInteraction);
-  const diversityScore = calculateDiversityScore(post, recentlyShownCompanies, recentlyShownUsers);
+  const personalizationScore = calculatePersonalizationScore(
+    post,
+    userInteraction,
+  );
+  const diversityScore = calculateDiversityScore(
+    post,
+    recentlyShownCompanies,
+    recentlyShownUsers,
+  );
   const qualityScore = calculateQualityScore(post);
 
   // Weighted combination of all signals
-  const finalScore = 
-    engagementScore * 0.3 +        // 30% engagement
-    velocityScore * 0.25 +          // 25% velocity (trending)
-    timeDecay * 100 * 0.2 +         // 20% recency
+  const finalScore =
+    engagementScore * 0.3 + // 30% engagement
+    velocityScore * 0.25 + // 25% velocity (trending)
+    timeDecay * 100 * 0.2 + // 20% recency
     personalizationScore * 50 * 0.15 + // 15% personalization
-    diversityScore * 50 * 0.05 +    // 5% diversity
-    qualityScore * 50 * 0.05;       // 5% quality
+    diversityScore * 50 * 0.05 + // 5% diversity
+    qualityScore * 50 * 0.05; // 5% quality
 
   return finalScore;
 }
@@ -227,15 +234,20 @@ export function calculatePostScore(
  */
 export function rankPosts(
   posts: PostWithEngagement[],
-  userInteraction?: UserInteraction
+  userInteraction?: UserInteraction,
 ): PostWithEngagement[] {
   const recentlyShownCompanies: string[] = [];
   const recentlyShownUsers: string[] = [];
 
   // Calculate scores for all posts
-  const postsWithScores = posts.map(post => ({
+  const postsWithScores = posts.map((post) => ({
     post,
-    score: calculatePostScore(post, userInteraction, recentlyShownCompanies, recentlyShownUsers)
+    score: calculatePostScore(
+      post,
+      userInteraction,
+      recentlyShownCompanies,
+      recentlyShownUsers,
+    ),
   }));
 
   // Sort by score (highest first)
@@ -253,20 +265,18 @@ export function rankPosts(
  * Calculate trending score for sidebar/trending page
  * Similar to X (Twitter)'s trending topics
  */
-export function calculateTrendingScore(
-  post: PostWithEngagement
-): number {
+export function calculateTrendingScore(post: PostWithEngagement): number {
   const ageInHours = getPostAgeInHours(post.created_at);
-  
+
   // Only consider posts from last 48 hours for trending
   if (ageInHours > 48) return 0;
 
   const engagementScore = calculateEngagementScore(post);
   const velocity = engagementScore / Math.max(ageInHours, 0.5);
-  
+
   // Trending = high velocity + recency
   const recencyBoost = Math.max(0, 48 - ageInHours) / 48;
-  
+
   return velocity * (1 + recencyBoost);
 }
 
@@ -275,11 +285,11 @@ export function calculateTrendingScore(
  */
 export function getTrendingPosts(
   posts: PostWithEngagement[],
-  limit: number = 10
+  limit: number = 10,
 ): PostWithEngagement[] {
-  const postsWithTrendingScore = posts.map(post => ({
+  const postsWithTrendingScore = posts.map((post) => ({
     post,
-    trendingScore: calculateTrendingScore(post)
+    trendingScore: calculateTrendingScore(post),
   }));
 
   return postsWithTrendingScore
@@ -295,11 +305,11 @@ export function getTrendingPosts(
 export function getPersonalizedRecommendations(
   allPosts: PostWithEngagement[],
   userInteraction: UserInteraction,
-  limit: number = 20
+  limit: number = 20,
 ): PostWithEngagement[] {
   // Filter out posts user already interacted with
   const unseenPosts = allPosts.filter(
-    post => !userInteraction.votedPosts.includes(post.id)
+    (post) => !userInteraction.votedPosts.includes(post.id),
   );
 
   // Rank using personalization
@@ -312,17 +322,20 @@ export function getPersonalizedRecommendations(
  * Calculate company/topic popularity for trending sidebar
  */
 export function calculateCompanyTrending(
-  posts: PostWithEngagement[]
+  posts: PostWithEngagement[],
 ): Array<{ company: string; score: number; postCount: number }> {
   const companyStats = new Map<string, { totalScore: number; count: number }>();
 
-  posts.forEach(post => {
+  posts.forEach((post) => {
     const trendingScore = calculateTrendingScore(post);
     if (trendingScore > 0) {
-      const existing = companyStats.get(post.company) || { totalScore: 0, count: 0 };
+      const existing = companyStats.get(post.company) || {
+        totalScore: 0,
+        count: 0,
+      };
       companyStats.set(post.company, {
         totalScore: existing.totalScore + trendingScore,
-        count: existing.count + 1
+        count: existing.count + 1,
       });
     }
   });
@@ -331,7 +344,7 @@ export function calculateCompanyTrending(
     .map(([company, stats]) => ({
       company,
       score: stats.totalScore,
-      postCount: stats.count
+      postCount: stats.count,
     }))
     .sort((a, b) => b.score - a.score);
 }
@@ -339,12 +352,16 @@ export function calculateCompanyTrending(
 /**
  * A/B Testing variant - can be used to test different algorithm weights
  */
-export function getAlgorithmVariant(userId: string): 'default' | 'engagement' | 'recency' {
+export function getAlgorithmVariant(
+  userId: string,
+): "default" | "engagement" | "recency" {
   // Simple hash-based assignment for consistent A/B testing
-  const hash = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = userId
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const variant = hash % 3;
-  
-  if (variant === 0) return 'default';
-  if (variant === 1) return 'engagement';
-  return 'recency';
+
+  if (variant === 0) return "default";
+  if (variant === 1) return "engagement";
+  return "recency";
 }

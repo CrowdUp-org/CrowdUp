@@ -3,6 +3,7 @@
 This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a database and storage. It implements a client-side auth model and leans on direct Supabase queries from the client. Follow the patterns below to be productive and consistent.
 
 ## Architecture & Data Flow
+
 - UI: React components and pages under `src/app/**` (App Router). Example feed and sorting in `src/app/page.tsx`.
 - State: Lightweight client state; auth context in `src/contexts/AuthContext.tsx` reads from localStorage.
 - Data: Direct `@supabase/supabase-js` client (`src/lib/supabase.ts`) used in client components for CRUD.
@@ -12,6 +13,7 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 - Styling: Tailwind CSS + shadcn/ui; use `cn()` from `src/lib/utils.ts` to compose classes. UI atoms live in `src/components/ui/`.
 
 ## Environment & Build
+
 - Required env (runtime): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (modern key format), and `SUPABASE_SECRET_KEY` (server-side) in `.env.local`. See `SETUP.md`.
 - Build placeholders: `src/lib/supabase.ts` falls back to placeholder URL/key to allow `next build` without envs (see `BUILD_NOTES.md`). Ensure real values at runtime.
 - TypeScript/ESLint: Builds ignore TS/ESLint errors for speed (`next.config.ts`: `typescript.ignoreBuildErrors`, `eslint.ignoreDuringBuilds`). Don’t introduce new errors, even if builds pass.
@@ -22,11 +24,13 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 - Port: Docs reference 3000/3001; default Next.js dev is 3000 unless overridden.
 
 ## Database Model (public schema)
+
 - Core tables: `users`, `posts`, `comments`, `votes` (+ `connections`, `apps`, `companies`, `conversations`, `messages`). Types live in `src/lib/database.types.ts`.
 - RLS: Disabled in the provided schema. The app uses the modern Publishable key from the client. Treat this as a dev bootstrap; for sensitive changes, prefer server mediation with the Secret API key.
 - Migrations/schema: Primary DDL in `supabase-schema.sql`. Optional Google OAuth migration exists (`migration-google-oauth.sql`).
 
 ## Project-Specific Conventions
+
 - Client-first data access: Prefer `supabase.from(...).select/insert/update` directly in client components/hooks unless a server boundary is explicitly introduced.
 - Auth helpers: Use `getCurrentUser()`/`getCurrentUserId()` from `src/lib/auth.ts` for gating actions and `signIn/signUp/signOut` for flows.
 - Voting pattern: See `src/components/PostCard.tsx` for upsert/delete in `votes` and denormalized `posts.votes` update. Mirror this interaction model for similar counters.
@@ -36,6 +40,7 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 - Visual Edits: Turbopack loader (`next.config.ts`) injects tags used by `src/visual-edits/VisualEditsMessenger.tsx`. Keep this import in `src/app/layout.tsx`.
 
 ## Typical Workflows
+
 - Install + run:
   ```bash
   npm install
@@ -49,6 +54,7 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 - Initialize DB: open Supabase → run `supabase-schema.sql` (see `QUICK_START.md`, `RUN_THIS_NOW.md`).
 
 ## When Adding Features
+
 - Data writes: Use the existing client Supabase pattern; return `{ success/error }` shaped results like in `auth.ts` and `messaging.ts`.
 - Access control: Gate UI actions with `getCurrentUserId()`; redirect to `/auth/signin` when unauthenticated (see `PostCard.tsx`).
 - Types: Extend `Database` in `src/lib/database.types.ts` if you add tables/columns; keep enums and union types in sync with SQL.
@@ -56,6 +62,7 @@ This repo is a Next.js 15 (App Router) + TypeScript app using Supabase as a data
 - Performance: Batch reads and use `.in(...)` queries as seen on the home feed for comment counts; avoid N+1 fetches.
 
 ## Key Files (jump-starters)
+
 - `src/app/page.tsx` — feed, sorting, data shaping
 - `src/lib/algorithm.ts` — ranking utilities
 - `src/lib/auth.ts` — client auth/session helpers

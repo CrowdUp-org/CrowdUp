@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, Send, MessageCircle, UserPlus } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/services/auth.service";
 import {
   getUserConversations,
   getConversationMessages,
@@ -18,7 +18,7 @@ import {
   getOrCreateConversation,
   type ConversationWithUser,
   type Message,
-} from "@/lib/messaging";
+} from "@/lib/services/messaging.service";
 import { formatDistanceToNow } from "date-fns";
 import {
   Dialog,

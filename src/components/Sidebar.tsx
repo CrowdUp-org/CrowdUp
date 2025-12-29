@@ -4,8 +4,8 @@ import { TrendingUp, Users, Trophy, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
-import { isCurrentUserAdmin } from "@/lib/verification";
+import { getCurrentUserId } from "@/lib/services/auth.service";
+import { isCurrentUserAdmin } from "@/lib/services/verification.service";
 
 export default function Sidebar() {
   const router = useRouter();

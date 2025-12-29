@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { Bookmark } from "lucide-react";
 import { Button } from "./button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { useRouter } from "next/navigation";
 
 interface BookmarkButtonProps {

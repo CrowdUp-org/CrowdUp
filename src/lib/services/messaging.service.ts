@@ -1,5 +1,5 @@
-import { supabase } from "../supabase";
-import { getCurrentUserId } from "./auth";
+import { supabase } from "@/lib/supabase";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 
 export interface ConversationWithUser {
   id: string;

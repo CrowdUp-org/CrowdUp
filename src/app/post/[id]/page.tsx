@@ -15,9 +15,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { use, useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUser, getCurrentUserId } from "@/lib/auth";
+import { getCurrentUser, getCurrentUserId } from "@/lib/services/auth.service";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 

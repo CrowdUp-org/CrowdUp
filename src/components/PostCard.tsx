@@ -11,11 +11,11 @@ import {
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { StatusBadge } from "./ui/status-badge";
 import { BookmarkButton } from "./ui/bookmark-button";
 

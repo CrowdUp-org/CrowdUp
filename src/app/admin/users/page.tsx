@@ -14,12 +14,12 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import {
   getAllUsers,
   updateUserAdminStatus,
   isCurrentUserAdmin,
-} from "@/lib/verification";
+} from "@/lib/services/verification.service";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { ReputationBadge } from "@/components/ui/reputation-badge";

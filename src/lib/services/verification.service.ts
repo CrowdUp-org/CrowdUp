@@ -1,8 +1,8 @@
 "use client";
 
-import { supabase } from "../supabase";
-import { createNotification } from "./notifications.service";
-import type { Json } from "./database.types";
+import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/services/notifications.service";
+import type { Json } from "@/lib/database.types";
 
 /**
  * Verification document structure

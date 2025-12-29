@@ -1,4 +1,4 @@
-import { supabase } from "../supabase";
+import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 
 const SALT_ROUNDS = 10;

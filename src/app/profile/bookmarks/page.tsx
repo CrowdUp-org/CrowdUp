@@ -6,7 +6,7 @@ import { NoBookmarksEmptyState } from "@/components/EmptyState";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { formatDistanceToNow } from "date-fns";
 import { Bookmark, Loader2 } from "lucide-react";
 

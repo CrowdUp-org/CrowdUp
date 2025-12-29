@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Check, ChevronsUpDown, Plus, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { supabase } from "@/lib/supabase";
 
 interface Company {

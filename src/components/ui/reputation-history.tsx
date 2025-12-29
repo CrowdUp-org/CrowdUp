@@ -5,7 +5,7 @@ import {
   getReputationHistory,
   getActionDescription,
   ReputationHistoryItem,
-} from "@/lib/reputation";
+} from "@/lib/services/reputation.service";
 import { formatDistanceToNow } from "date-fns";
 
 interface ReputationHistoryProps {

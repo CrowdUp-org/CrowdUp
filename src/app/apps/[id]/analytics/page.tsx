@@ -7,7 +7,7 @@ import { ArrowLeft, Star, MessageCircle, TrendingUp } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { formatDistanceToNow } from "date-fns";
 
 interface Analytics {

@@ -1,5 +1,5 @@
-import { supabase } from "../supabase";
-import { createNotification } from "./notifications.service";
+import { supabase } from "@/lib/supabase";
+import { createNotification } from "@/lib/services/notifications.service";
 
 // =====================================================
 // Reputation Level Definitions

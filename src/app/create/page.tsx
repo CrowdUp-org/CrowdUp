@@ -10,8 +10,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Send, AlertCircle, Lightbulb, Bug } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
-import { cn } from "@/lib/utils";
+import { getCurrentUserId } from "@/lib/services/auth.service";
+import { cn } from "@/lib/utils/cn";
 
 const postTypes = [
   {

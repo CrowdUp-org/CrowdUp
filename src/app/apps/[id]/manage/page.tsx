@@ -35,8 +35,8 @@ import { Settings, Upload, Trash2, ExternalLink } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
-import { compressAndUploadImage } from "@/lib/imageUpload";
+import { getCurrentUserId } from "@/lib/services/auth.service";
+import { compressAndUploadImage } from "@/lib/utils/image";
 
 interface AppData {
   id: string;

@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { CHANNEL, type ParentToChild, type ChildToParent } from "../types/messages";
+import {
+  CHANNEL,
+  type ParentToChild,
+  type ChildToParent,
+} from "../types/messages";
 import { BOX_PADDING } from "../types/constants";
 import { validateAndNormalizeImageSrc } from "../utils/validation";
 import { normalizeImageSrc } from "../utils/normalization";
@@ -19,7 +23,10 @@ interface UseMessageHandlerProps {
   appliedStylesRef: React.MutableRefObject<Map<string, Record<string, string>>>;
   setHoverBoxes: (boxes: Box[]) => void;
   setHoverTag: (tag: string | null) => void;
-  handleStyleChange: (element: HTMLElement, styles: Record<string, string>) => void;
+  handleStyleChange: (
+    element: HTMLElement,
+    styles: Record<string, string>,
+  ) => void;
   postMessageDedup: (data: ChildToParent) => void;
 }
 

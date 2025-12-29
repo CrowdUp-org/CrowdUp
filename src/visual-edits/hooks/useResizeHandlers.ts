@@ -112,8 +112,7 @@ export function useResizeHandlers({
         const parentPaddingLeft = parseFloat(parentStyles.paddingLeft) || 0;
         const parentPaddingRight = parseFloat(parentStyles.paddingRight) || 0;
         const parentPaddingTop = parseFloat(parentStyles.paddingTop) || 0;
-        const parentPaddingBottom =
-          parseFloat(parentStyles.paddingBottom) || 0;
+        const parentPaddingBottom = parseFloat(parentStyles.paddingBottom) || 0;
 
         const maxWidth =
           parentRect.width - parentPaddingLeft - parentPaddingRight;
@@ -160,8 +159,7 @@ export function useResizeHandlers({
         const element = focusedElementRef.current;
         const computedStyle = window.getComputedStyle(element);
         const width = parseFloat(computedStyle.width) || element.offsetWidth;
-        const height =
-          parseFloat(computedStyle.height) || element.offsetHeight;
+        const height = parseFloat(computedStyle.height) || element.offsetHeight;
 
         const maxWidth = computedStyle.maxWidth;
         const maxHeight = computedStyle.maxHeight;
@@ -178,8 +176,7 @@ export function useResizeHandlers({
           const parentRect = parent.getBoundingClientRect();
           const parentStyles = window.getComputedStyle(parent);
           const parentPaddingLeft = parseFloat(parentStyles.paddingLeft) || 0;
-          const parentPaddingRight =
-            parseFloat(parentStyles.paddingRight) || 0;
+          const parentPaddingRight = parseFloat(parentStyles.paddingRight) || 0;
           const parentPaddingTop = parseFloat(parentStyles.paddingTop) || 0;
           const parentPaddingBottom =
             parseFloat(parentStyles.paddingBottom) || 0;

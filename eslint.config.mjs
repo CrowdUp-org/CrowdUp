@@ -26,6 +26,17 @@ const eslintConfig = [
       "import/no-self-import": "error",
       "import/no-cycle": "error",
       "import/no-useless-path-segments": "error",
+      // Security: Prevent template literals in Supabase .or() queries
+      // Use buildSafeIlikeOr() or buildSafeEqOr() from @/lib/utils/safe-query instead
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector:
+            "CallExpression[callee.property.name='or'] TemplateLiteral",
+          message:
+            "Avoid template literals in .or() - use buildSafeIlikeOr() or buildSafeEqOr() from @/lib/utils/safe-query to prevent PostgREST injection",
+        },
+      ],
     },
   },
 ];

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
+import { buildSafeEqOr } from "@/lib/utils/safe-query";
 
 const SALT_ROUNDS = 10;
 
@@ -86,13 +87,15 @@ export async function signIn(
   data: SignInData,
 ): Promise<{ user: User | null; error: string | null }> {
   try {
-    // Find user by username or email
+    // Find user by username or email - use safe query builder
+    const safeFilter = buildSafeEqOr(
+      ["username", "email"],
+      data.usernameOrEmail,
+    );
     const { data: users, error: fetchError } = await supabase
       .from("users")
       .select("*")
-      .or(
-        `username.eq.${data.usernameOrEmail},email.eq.${data.usernameOrEmail}`,
-      )
+      .or(safeFilter)
       .limit(1);
 
     if (fetchError || !users || users.length === 0) {

@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 

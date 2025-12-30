@@ -15,8 +15,8 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
-import { compressAndUploadImage } from "@/lib/imageUpload";
+import { getCurrentUserId } from "@/lib/services/auth.service";
+import { compressAndUploadImage } from "@/lib/utils/image";
 import { Send, Upload } from "lucide-react";
 
 export default function CreateAppPage() {

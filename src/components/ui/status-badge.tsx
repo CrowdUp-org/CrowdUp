@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { CheckCircle2, Circle, Clock, XCircle, Ban } from "lucide-react";
 
 type Status = "open" | "in_progress" | "resolved" | "closed" | "wont_fix";

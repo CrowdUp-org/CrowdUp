@@ -2,7 +2,7 @@
 
 import { Trophy, TrendingUp } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 import { useRouter } from "next/navigation";
 
 interface PodiumPost {

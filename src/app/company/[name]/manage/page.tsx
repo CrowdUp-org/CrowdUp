@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { VerificationForm } from "@/components/ui/verification-form";
-import { getVerificationStatus } from "@/lib/verification";
+import { getVerificationStatus } from "@/lib/services/verification.service";
 import {
   Settings,
   Upload,
@@ -50,8 +50,8 @@ import {
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
-import { compressAndUploadImage } from "@/lib/imageUpload";
+import { getCurrentUserId } from "@/lib/services/auth.service";
+import { compressAndUploadImage } from "@/lib/utils/image";
 
 interface Company {
   id: string;

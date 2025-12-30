@@ -11,8 +11,8 @@ import { ChevronDown, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
-import { rankPosts } from "@/lib/algorithm";
-import { getCurrentUserId } from "@/lib/auth";
+import { rankPosts } from "@/lib/algorithms/feed";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 
 interface Post {
   id: string;

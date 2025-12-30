@@ -12,8 +12,8 @@ import {
   rejectVerification,
   isCurrentUserAdmin,
   type VerificationRequest,
-} from "@/lib/verification";
-import { getCurrentUserId } from "@/lib/auth";
+} from "@/lib/services/verification.service";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import {
   CheckCircle,
   XCircle,

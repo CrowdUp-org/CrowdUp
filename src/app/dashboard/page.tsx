@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 

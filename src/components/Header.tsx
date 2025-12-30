@@ -28,7 +28,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuPortal,
 } from "./ui/dropdown-menu";
-import { signOut } from "@/lib/auth";
+import { signOut } from "@/lib/services/auth.service";
 import svgPaths from "./navbar/svg-paths";
 import { NotificationBell } from "./ui/notification-bell";
 

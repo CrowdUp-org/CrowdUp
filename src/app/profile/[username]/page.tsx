@@ -19,7 +19,7 @@ import { Calendar, Settings, Edit2, BarChart3 } from "lucide-react";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUser, updateProfile } from "@/lib/auth";
+import { getCurrentUser, updateProfile } from "@/lib/services/auth.service";
 import { formatDistanceToNow, format } from "date-fns";
 import { ReputationCard } from "@/components/ui/reputation-card";
 import { ReputationBadge } from "@/components/ui/reputation-badge";

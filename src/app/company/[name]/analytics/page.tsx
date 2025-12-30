@@ -7,7 +7,7 @@ import { ArrowLeft, TrendingUp, MessageCircle, Users, Eye } from "lucide-react";
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 
 interface Analytics {
   totalPosts: number;

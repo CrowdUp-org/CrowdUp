@@ -18,11 +18,11 @@ import {
   getUnreadCount,
   subscribeToNotifications,
   Notification,
-} from "@/lib/notifications";
-import { getCurrentUserId } from "@/lib/auth";
+} from "@/lib/services/notifications.service";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/cn";
 
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

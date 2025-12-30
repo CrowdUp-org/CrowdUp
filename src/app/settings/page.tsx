@@ -29,9 +29,13 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUser, getCurrentUserId, changePassword } from "@/lib/auth";
+import {
+  getCurrentUser,
+  getCurrentUserId,
+  changePassword,
+} from "@/lib/services/auth.service";
 import { supabase } from "@/lib/supabase";
-import { compressAndUploadImage } from "@/lib/imageUpload";
+import { compressAndUploadImage } from "@/lib/utils/image";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function SettingsPage() {

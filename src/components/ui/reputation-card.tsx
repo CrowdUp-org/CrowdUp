@@ -4,7 +4,7 @@ import {
   REPUTATION_LEVELS,
   ReputationLevel,
   getReputationData,
-} from "@/lib/reputation";
+} from "@/lib/services/reputation.service";
 
 interface ReputationCardProps {
   score: number;

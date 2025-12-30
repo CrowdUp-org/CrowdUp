@@ -8,7 +8,7 @@ import {
   REPUTATION_LEVELS,
   getLeaderboard,
   LeaderboardEntry,
-} from "@/lib/reputation";
+} from "@/lib/services/reputation.service";
 import { Trophy, Medal, Award } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";

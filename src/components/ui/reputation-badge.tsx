@@ -1,6 +1,9 @@
 "use client";
 
-import { REPUTATION_LEVELS, ReputationLevel } from "@/lib/reputation";
+import {
+  REPUTATION_LEVELS,
+  ReputationLevel,
+} from "@/lib/services/reputation.service";
 
 interface ReputationBadgeProps {
   level: string;

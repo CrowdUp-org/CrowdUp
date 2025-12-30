@@ -33,8 +33,8 @@ import {
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUser, getCurrentUserId } from "@/lib/auth";
-import { compressAndUploadImage } from "@/lib/imageUpload";
+import { getCurrentUser, getCurrentUserId } from "@/lib/services/auth.service";
+import { compressAndUploadImage } from "@/lib/utils/image";
 import { formatDistanceToNow } from "date-fns";
 
 interface AppData {

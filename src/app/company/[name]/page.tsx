@@ -13,10 +13,10 @@ import {
 import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUserId } from "@/lib/auth";
+import { getCurrentUserId } from "@/lib/services/auth.service";
 import { formatDistanceToNow } from "date-fns";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
-import { getVerifiedMembers } from "@/lib/verification";
+import { getVerifiedMembers } from "@/lib/services/verification.service";
 
 interface Company {
   id: string;

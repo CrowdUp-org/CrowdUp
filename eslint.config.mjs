@@ -31,8 +31,7 @@ const eslintConfig = [
       "no-restricted-syntax": [
         "warn",
         {
-          selector:
-            "CallExpression[callee.property.name='or'] TemplateLiteral",
+          selector: "CallExpression[callee.property.name='or'] TemplateLiteral",
           message:
             "Avoid template literals in .or() - use buildSafeIlikeOr() or buildSafeEqOr() from @/lib/utils/safe-query to prevent PostgREST injection",
         },

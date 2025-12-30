@@ -42,7 +42,7 @@ export function getCsrfToken(): string | null {
  */
 export async function secureFetch(
   url: string | URL,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<Response> {
   const method = (options.method || "GET").toUpperCase();
 
@@ -72,7 +72,7 @@ export async function secureFetch(
  */
 export async function secureJsonFetch(
   url: string | URL,
-  options: RequestInit & { body?: unknown } = {}
+  options: RequestInit & { body?: unknown } = {},
 ): Promise<Response> {
   const headers = new Headers(options.headers);
 

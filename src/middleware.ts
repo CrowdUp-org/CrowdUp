@@ -8,7 +8,13 @@ import type { NextRequest } from "next/server";
 /**
  * Routes that require authentication
  */
-const PROTECTED_ROUTES = ["/create", "/messages", "/settings", "/dashboard", "/admin"];
+const PROTECTED_ROUTES = [
+  "/create",
+  "/messages",
+  "/settings",
+  "/dashboard",
+  "/admin",
+];
 
 /**
  * Auth routes that redirect to home if already authenticated
@@ -58,7 +64,7 @@ function getAllowedOrigins(): string[] {
  */
 function validateCsrfToken(
   cookieToken: string | undefined,
-  headerToken: string | null
+  headerToken: string | null,
 ): boolean {
   if (!cookieToken || !headerToken) return false;
   if (cookieToken.length !== headerToken.length) return false;
@@ -83,7 +89,8 @@ function validateCsrfToken(
 function requiresCsrfProtection(pathname: string, method: string): boolean {
   if (!pathname.startsWith("/api/")) return false;
   if (!CSRF_PROTECTED_METHODS.includes(method)) return false;
-  if (CSRF_EXEMPT_ROUTES.some((route) => pathname.startsWith(route))) return false;
+  if (CSRF_EXEMPT_ROUTES.some((route) => pathname.startsWith(route)))
+    return false;
   return true;
 }
 
@@ -117,11 +124,11 @@ export function middleware(request: NextRequest) {
     response.headers.set("Access-Control-Allow-Credentials", "true");
     response.headers.set(
       "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+      "GET, POST, PUT, DELETE, PATCH, OPTIONS",
     );
     response.headers.set(
       "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, x-csrf-token"
+      "Content-Type, Authorization, x-csrf-token",
     );
     // Prevent cache poisoning with CORS responses
     response.headers.set("Vary", "Origin");
@@ -135,12 +142,15 @@ export function middleware(request: NextRequest) {
   // ---------------------------------------------------------------------------
   // Origin/Referer Validation for API Routes
   // ---------------------------------------------------------------------------
-  if (pathname.startsWith("/api/") && CSRF_PROTECTED_METHODS.includes(request.method)) {
+  if (
+    pathname.startsWith("/api/") &&
+    CSRF_PROTECTED_METHODS.includes(request.method)
+  ) {
     // Validate Origin header if present
     if (origin && !allowedOrigins.includes(origin)) {
       return NextResponse.json(
         { error: "Origin not allowed" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -152,14 +162,11 @@ export function middleware(request: NextRequest) {
         if (!allowedOrigins.includes(refererOrigin)) {
           return NextResponse.json(
             { error: "Referer not allowed" },
-            { status: 403 }
+            { status: 403 },
           );
         }
       } catch {
-        return NextResponse.json(
-          { error: "Invalid referer" },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Invalid referer" }, { status: 403 });
       }
     }
 
@@ -177,7 +184,7 @@ export function middleware(request: NextRequest) {
     if (!validateCsrfToken(cookieToken, headerToken)) {
       return NextResponse.json(
         { error: "Invalid or missing CSRF token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -207,7 +214,7 @@ export function middleware(request: NextRequest) {
   // Route Protection (check auth for protected routes)
   // ---------------------------------------------------------------------------
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
+    pathname.startsWith(route),
   );
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 

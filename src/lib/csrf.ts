@@ -60,7 +60,7 @@ export async function setCsrfCookie(): Promise<string> {
  */
 export function validateCsrfToken(
   cookieToken: string | undefined,
-  headerToken: string | null
+  headerToken: string | null,
 ): boolean {
   if (!cookieToken || !headerToken) {
     return false;
@@ -74,7 +74,7 @@ export function validateCsrfToken(
   try {
     return crypto.timingSafeEqual(
       Buffer.from(cookieToken),
-      Buffer.from(headerToken)
+      Buffer.from(headerToken),
     );
   } catch {
     return false;

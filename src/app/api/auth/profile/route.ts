@@ -7,18 +7,12 @@ export async function PATCH(request: NextRequest) {
     const accessToken = request.cookies.get("access_token")?.value;
 
     if (!accessToken) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const payload = await verifyAccessToken(accessToken);
     if (!payload?.sub) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const data = await request.json();
@@ -56,8 +50,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update user
-    const { data: updatedUser, error: updateError } = await (supabaseAdmin
-      .from("users") as any)
+    const { data: updatedUser, error: updateError } = await (
+      supabaseAdmin.from("users") as any
+    )
       .update(updateData)
       .eq("id", payload.sub)
       .select("id, username, display_name, email, avatar_url, bio, created_at")

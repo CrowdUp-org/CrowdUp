@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         // First try to get user with current token
         const currentUser = await fetchCurrentUser();
-        
+
         if (currentUser) {
           setUser(currentUser);
         } else {

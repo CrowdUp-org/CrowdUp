@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { verifyRefreshToken, signAccessToken, signRefreshToken } from "@/lib/jwt";
+import {
+  verifyRefreshToken,
+  signAccessToken,
+  signRefreshToken,
+} from "@/lib/jwt";
 import {
   getAccessTokenCookie,
   getRefreshTokenCookie,
@@ -50,7 +54,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check expiration
-    if (new Date((storedToken as { expires_at: string }).expires_at) < new Date()) {
+    if (
+      new Date((storedToken as { expires_at: string }).expires_at) < new Date()
+    ) {
       // Delete expired token
       await supabaseAdmin
         .from("refresh_tokens")
@@ -67,10 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Rotate refresh token (delete old, create new)
-    await supabaseAdmin
-      .from("refresh_tokens")
-      .delete()
-      .eq("jti", payload.jti);
+    await supabaseAdmin.from("refresh_tokens").delete().eq("jti", payload.jti);
 
     const newJti = crypto.randomUUID();
     const newAccessToken = await signAccessToken(payload.sub);

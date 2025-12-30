@@ -10,18 +10,12 @@ export async function POST(request: NextRequest) {
     const accessToken = request.cookies.get("access_token")?.value;
 
     if (!accessToken) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const payload = await verifyAccessToken(accessToken);
     if (!payload?.sub) {
-      return NextResponse.json(
-        { error: "Invalid token" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const { currentPassword, newPassword } = await request.json();
@@ -41,10 +35,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (fetchError || !user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Verify current password
@@ -63,8 +54,7 @@ export async function POST(request: NextRequest) {
     const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
     // Update password
-    const { error: updateError } = await (supabaseAdmin
-      .from("users") as any)
+    const { error: updateError } = await (supabaseAdmin.from("users") as any)
       .update({ password_hash: newPasswordHash })
       .eq("id", payload.sub);
 

@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken } from "@/lib/jwt";
-import {
-  getAccessTokenCookie,
-  getRefreshTokenCookie,
-} from "@/lib/cookies";
+import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,15 +23,25 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (fetchError || !users || users.length === 0) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 },
+      );
     }
 
-    const user = users[0] as { id: string; password_hash: string; [key: string]: unknown };
+    const user = users[0] as {
+      id: string;
+      password_hash: string;
+      [key: string]: unknown;
+    };
 
     // Verify password server-side
     const isValid = await bcrypt.compare(password, user.password_hash);
     if (!isValid) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 },
+      );
     }
 
     // Generate tokens

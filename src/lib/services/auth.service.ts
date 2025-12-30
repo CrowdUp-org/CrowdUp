@@ -46,7 +46,7 @@ export async function signUp(
 
     // Update cache
     cachedUser = result.user;
-    
+
     // Clean up any legacy localStorage data
     cleanupLegacyStorage();
 
@@ -79,7 +79,7 @@ export async function signIn(
 
     // Update cache
     cachedUser = result.user;
-    
+
     // Clean up any legacy localStorage data
     cleanupLegacyStorage();
 
@@ -170,7 +170,7 @@ export function getCurrentUserId(): string | null {
  */
 function cleanupLegacyStorage(): void {
   if (typeof window === "undefined") return;
-  
+
   try {
     localStorage.removeItem("user");
     localStorage.removeItem("userId");
@@ -198,7 +198,10 @@ export async function changePassword(
     const result = await response.json();
 
     if (!response.ok) {
-      return { success: false, error: result.error || "Failed to change password" };
+      return {
+        success: false,
+        error: result.error || "Failed to change password",
+      };
     }
 
     return { success: true, error: null };
@@ -230,7 +233,10 @@ export async function updateProfile(data: {
     const result = await response.json();
 
     if (!response.ok) {
-      return { success: false, error: result.error || "Failed to update profile" };
+      return {
+        success: false,
+        error: result.error || "Failed to update profile",
+      };
     }
 
     // Update cache with new user data

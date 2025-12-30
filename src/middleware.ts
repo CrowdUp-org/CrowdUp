@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
       // Allow access but token refresh will happen client-side
       return NextResponse.next();
     }
-    
+
     // No tokens at all, redirect to signin
     const url = new URL("/auth/signin", request.url);
     url.searchParams.set("callbackUrl", pathname);

@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken } from "@/lib/jwt";
-import {
-  getAccessTokenCookie,
-  getRefreshTokenCookie,
-} from "@/lib/cookies";
+import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
 
 const SALT_ROUNDS = 10;
 
@@ -52,8 +49,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
     // Create user
-    const { data: newUser, error } = await (supabaseAdmin
-      .from("users") as any)
+    const { data: newUser, error } = await (supabaseAdmin.from("users") as any)
       .insert({
         username,
         display_name,

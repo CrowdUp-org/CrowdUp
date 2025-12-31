@@ -4,12 +4,12 @@
 
 ## Type of Change
 
-- [ ] Bug fix
-- [ ] Feature
-- [ ] UI/UX improvement
-- [ ] Documentation
-- [ ] Refactor
-- [ ] Dependencies update
+- Bug fix
+- Feature
+- UI/UX improvement
+- Documentation
+- Refactor
+- Dependencies update
 
 ## Related Issue
 
@@ -37,8 +37,8 @@
 
 <!-- Any breaking changes? -->
 
-- [ ] No breaking changes
-- [ ] Breaking changes documented below
+- No breaking changes
+- Breaking changes documented below
 
 ## Screenshots/Video (if applicable)
 

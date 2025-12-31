@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { getCurrentUserId } from "@/lib/services/auth.service";
+import { isValidUUID } from "@/lib/utils/safe-query";
 
 export interface ConversationWithUser {
   id: string;
@@ -34,8 +35,13 @@ export async function getOrCreateConversation(
 ): Promise<{ conversationId: string | null; error: string | null }> {
   try {
     const currentUserId = getCurrentUserId();
-    if (!currentUserId) {
+    if (!currentUserId || !isValidUUID(currentUserId)) {
       return { conversationId: null, error: "Not authenticated" };
+    }
+
+    // Validate otherUserId to prevent injection
+    if (!isValidUUID(otherUserId)) {
+      return { conversationId: null, error: "Invalid user ID" };
     }
 
     // Order user IDs consistently
@@ -82,11 +88,12 @@ export async function getUserConversations(): Promise<{
 }> {
   try {
     const currentUserId = getCurrentUserId();
-    if (!currentUserId) {
+    if (!currentUserId || !isValidUUID(currentUserId)) {
       return { conversations: [], error: "Not authenticated" };
     }
 
     // Get all conversations where user is a participant
+    // currentUserId is validated as UUID, safe to use in query
     const { data: conversations, error: convError } = await supabase
       .from("conversations")
       .select("*")
@@ -158,6 +165,11 @@ export async function getConversationMessages(
   conversationId: string,
 ): Promise<{ messages: Message[]; error: string | null }> {
   try {
+    // Validate conversationId to prevent injection
+    if (!isValidUUID(conversationId)) {
+      return { messages: [], error: "Invalid conversation ID" };
+    }
+
     const { data, error } = await supabase
       .from("messages")
       .select("*")
@@ -183,8 +195,13 @@ export async function sendMessage(
 ): Promise<{ success: boolean; error: string | null }> {
   try {
     const currentUserId = getCurrentUserId();
-    if (!currentUserId) {
+    if (!currentUserId || !isValidUUID(currentUserId)) {
       return { success: false, error: "Not authenticated" };
+    }
+
+    // Validate conversationId to prevent injection
+    if (!isValidUUID(conversationId)) {
+      return { success: false, error: "Invalid conversation ID" };
     }
 
     const { error } = (await supabase.from("messages").insert({
@@ -211,13 +228,16 @@ export async function markMessagesAsRead(
 ): Promise<void> {
   try {
     const currentUserId = getCurrentUserId();
-    if (!currentUserId) return;
+    if (!currentUserId || !isValidUUID(currentUserId)) return;
 
-    const { error } = (await (supabase.from("messages") as any)
+    // Validate conversationId to prevent injection
+    if (!isValidUUID(conversationId)) return;
+
+    await (supabase.from("messages") as any)
       .update({ read: true })
       .eq("conversation_id", conversationId)
       .neq("sender_id", currentUserId)
-      .eq("read", false)) as any;
+      .eq("read", false);
   } catch (error) {
     console.error("Failed to mark messages as read:", error);
   }
@@ -292,6 +312,12 @@ export function subscribeToMessages(
   conversationId: string,
   callback: (message: Message) => void,
 ) {
+  // Validate conversationId to prevent injection in realtime filter
+  if (!isValidUUID(conversationId)) {
+    console.error("Invalid conversation ID for subscription");
+    return () => {}; // Return no-op unsubscribe
+  }
+
   const subscription = supabase
     .channel(`messages:${conversationId}`)
     .on(

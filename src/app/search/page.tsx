@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabase";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCurrentUserId } from "@/lib/services/auth.service";
+import { buildSafeIlikeOr, sanitizeForPostgREST } from "@/lib/utils/safe-query";
 
 interface SearchResult {
   type: "post" | "user" | "company";
@@ -128,7 +129,18 @@ function SearchPageContent() {
 
   const performSearch = async () => {
     setLoading(true);
-    const query = searchQuery.toLowerCase().trim();
+    const query = searchQuery.trim();
+
+    // Use safe query builder to prevent PostgREST injection
+    const postsFilter = buildSafeIlikeOr(
+      ["title", "description", "company"],
+      query,
+    );
+    const usersFilter = buildSafeIlikeOr(
+      ["username", "display_name", "bio"],
+      query,
+    );
+    const sanitizedQuery = sanitizeForPostgREST(query.toLowerCase());
 
     // Search posts
     const { data: postsData } = (await supabase
@@ -139,9 +151,7 @@ function SearchPageContent() {
         users (username, display_name)
       `,
       )
-      .or(
-        `title.ilike.%${query}%,description.ilike.%${query}%,company.ilike.%${query}%`,
-      )
+      .or(postsFilter)
       .order("created_at", { ascending: false })
       .limit(20)) as any;
 
@@ -151,19 +161,17 @@ function SearchPageContent() {
     const { data: usersData } = (await supabase
       .from("users")
       .select("*")
-      .or(
-        `username.ilike.%${query}%,display_name.ilike.%${query}%,bio.ilike.%${query}%`,
-      )
+      .or(usersFilter)
       .neq("id", currentUserId || "")
       .limit(20)) as any;
 
     setUsers(usersData || []);
 
-    // Get unique companies from posts
+    // Get unique companies from posts - use sanitized ilike
     const { data: companiesData } = await supabase
       .from("posts")
       .select("company, company_color")
-      .ilike("company", `%${query}%`)
+      .ilike("company", `%${sanitizedQuery}%`)
       .limit(20);
 
     if (companiesData) {

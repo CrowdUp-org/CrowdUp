@@ -101,6 +101,15 @@ export async function signIn(
 
     const user = users[0];
 
+    // Check if user is banned
+    if ((user as any).is_banned) {
+      return {
+        user: null,
+        error: `Your account is banned. Reason: ${(user as any).banned_reason || "No reason provided"
+          }`,
+      };
+    }
+
     // Verify password
     const isValid = await bcrypt.compare(
       data.password,
@@ -122,6 +131,20 @@ export async function signIn(
   } catch (error) {
     return { user: null, error: "An error occurred during sign in" };
   }
+}
+
+/**
+ * Check if a specific account is banned
+ */
+export async function isAccountBanned(userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("is_banned")
+    .eq("id", userId)
+    .single();
+
+  if (error || !data) return false;
+  return (data as any).is_banned === true;
 }
 
 export function signOut() {

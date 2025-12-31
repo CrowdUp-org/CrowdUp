@@ -6,6 +6,15 @@ const supabaseUrl =
 const supabasePublishableKey =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "placeholder-key";
 
+if (
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+) {
+  console.error(
+    "CRITICAL: Missing Supabase environment variables. Using placeholders for build/development.",
+  );
+}
+
 // Client-side Supabase client (publishable key)
 export const supabase = createClient<Database>(
   supabaseUrl,

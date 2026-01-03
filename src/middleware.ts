@@ -1,33 +1,97 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-// Middleware to protect certain routes
-// Note: Since auth is client-side (localStorage), we check for the presence of session cookies or just rely on path matching for basic redirects. For persistent auth, a cookie-based session would be better.
-export function middleware(request: NextRequest) {
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "crowdup-jwt-secret-change-in-production",
+);
+
+// Routes that require authentication
+const PROTECTED_ROUTES = [
+  "/create",
+  "/messages",
+  "/settings",
+  "/dashboard",
+  "/admin",
+];
+
+// Routes that should redirect to home if already authenticated
+const AUTH_ROUTES = ["/auth/signin", "/auth/signup"];
+
+// API routes that don't need token validation (they handle it internally)
+const PUBLIC_API_ROUTES = [
+  "/api/auth/login",
+  "/api/auth/signup",
+  "/api/auth/refresh",
+  "/api/auth/callback",
+  "/api/auth/google",
+];
+
+async function verifyToken(token: string): Promise<boolean> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    // Check if token is expired
+    if (payload.exp && payload.exp < Date.now() / 1000) {
+      return false;
+    }
+    return payload.type === "access";
+  } catch {
+    return false;
+  }
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const accessToken = request.cookies.get("access_token")?.value;
+  const refreshToken = request.cookies.get("refresh_token")?.value;
 
-  // Protected routes
-  const protectedRoutes = ["/admin", "/messages", "/settings", "/create"];
-  const isProtected = protectedRoutes.some((route) =>
+  // Skip public API routes
+  if (PUBLIC_API_ROUTES.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  // Check if current route is protected
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
 
-  // For client-side auth, middleware can't easily read localStorage.
-  // In a real production app, we would use HttpOnly cookies for sessions.
-  // For now, we perform basic existence check if cookie 'userId' exists (if we implemented it)
-  // or we rely on client-side protection in the layouts/pages themselves.
+  // Check if current route is an auth route
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
-  // If we wanted to add a basic redirect for now:
-  /*
-  const userId = request.cookies.get("userId");
-  if (isProtected && !userId) {
-    return NextResponse.redirect(new URL("/auth/signin", request.url));
+  // Verify access token if present
+  const isValidToken = accessToken ? await verifyToken(accessToken) : false;
+
+  // Protected route without valid token
+  if (isProtectedRoute && !isValidToken) {
+    // If we have a refresh token, let the client-side handle refresh
+    if (refreshToken) {
+      // Allow access but token refresh will happen client-side
+      return NextResponse.next();
+    }
+
+    // No tokens at all, redirect to signin
+    const url = new URL("/auth/signin", request.url);
+    url.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(url);
   }
-  */
+
+  // Auth route with valid token - redirect to home
+  if (isAuthRoute && isValidToken) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/messages/:path*", "/settings/:path*", "/create"],
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (public folder)
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

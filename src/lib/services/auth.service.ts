@@ -1,7 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import bcrypt from "bcryptjs";
-
-const SALT_ROUNDS = 10;
 
 export interface User {
   id: string;
@@ -25,109 +22,70 @@ export interface SignInData {
   password: string;
 }
 
+// In-memory cache for current user (populated by fetchCurrentUser)
+let cachedUser: User | null = null;
+
+/**
+ * Sign up a new user via secure API route
+ * Credentials are hashed server-side, session stored in httpOnly cookies
+ */
 export async function signUp(
   data: SignUpData,
 ): Promise<{ user: User | null; error: string | null }> {
   try {
-    // Check if username exists
-    const { data: existingUsername } = (await supabase
-      .from("users")
-      .select("id")
-      .eq("username", data.username)
-      .single()) as any;
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
 
-    if (existingUsername) {
-      return { user: null, error: "Username already taken" };
+    const result = await response.json();
+
+    if (!response.ok) {
+      return { user: null, error: result.error || "Sign up failed" };
     }
 
-    // Check if email exists
-    const { data: existingEmail } = (await supabase
-      .from("users")
-      .select("id")
-      .eq("email", data.email)
-      .single()) as any;
+    // Update cache
+    cachedUser = result.user;
 
-    if (existingEmail) {
-      return { user: null, error: "Email already registered" };
-    }
+    // Clean up any legacy localStorage data
+    cleanupLegacyStorage();
 
-    // Hash password
-    const password_hash = await bcrypt.hash(data.password, SALT_ROUNDS);
-
-    // Create user
-    const { data: newUser, error } = (await supabase
-      .from("users")
-      .insert({
-        username: data.username,
-        display_name: data.display_name,
-        email: data.email,
-        password_hash,
-      } as any)
-      .select("id, username, display_name, email, avatar_url, bio, created_at")
-      .single()) as any;
-
-    if (error) {
-      return { user: null, error: error.message };
-    }
-
-    // Store session
-    if (newUser) {
-      localStorage.setItem("user", JSON.stringify(newUser));
-      localStorage.setItem("userId", (newUser as any).id);
-    }
-
-    return { user: newUser, error: null };
+    return { user: result.user, error: null };
   } catch (error) {
     return { user: null, error: "An error occurred during sign up" };
   }
 }
 
+/**
+ * Sign in via secure API route
+ * Password verified server-side, session stored in httpOnly cookies
+ */
 export async function signIn(
   data: SignInData,
 ): Promise<{ user: User | null; error: string | null }> {
   try {
-    // Find user by username or email
-    const { data: users, error: fetchError } = await supabase
-      .from("users")
-      .select("*")
-      .or(
-        `username.eq.${data.usernameOrEmail},email.eq.${data.usernameOrEmail}`,
-      )
-      .limit(1);
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
 
-    if (fetchError || !users || users.length === 0) {
-      return { user: null, error: "Invalid credentials" };
+    const result = await response.json();
+
+    if (!response.ok) {
+      return { user: null, error: result.error || "Sign in failed" };
     }
 
-    const user = users[0];
+    // Update cache
+    cachedUser = result.user;
 
-    // Check if user is banned
-    if ((user as any).is_banned) {
-      return {
-        user: null,
-        error: `Your account is banned. Reason: ${(user as any).banned_reason || "No reason provided"
-          }`,
-      };
-    }
+    // Clean up any legacy localStorage data
+    cleanupLegacyStorage();
 
-    // Verify password
-    const isValid = await bcrypt.compare(
-      data.password,
-      (user as any).password_hash,
-    );
-
-    if (!isValid) {
-      return { user: null, error: "Invalid credentials" };
-    }
-
-    // Remove password_hash from user object
-    const { password_hash, ...userWithoutPassword } = user as any;
-
-    // Store session
-    localStorage.setItem("user", JSON.stringify(userWithoutPassword));
-    localStorage.setItem("userId", (user as any).id);
-
-    return { user: userWithoutPassword, error: null };
+    return { user: result.user, error: null };
   } catch (error) {
     return { user: null, error: "An error occurred during sign in" };
   }
@@ -147,69 +105,119 @@ export async function isAccountBanned(userId: string): Promise<boolean> {
   return (data as any).is_banned === true;
 }
 
-export function signOut() {
-  localStorage.removeItem("user");
-  localStorage.removeItem("userId");
+/**
+ * Sign out via secure API route
+ * Clears httpOnly cookies and revokes refresh token
+ */
+export async function signOut(): Promise<void> {
+  try {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+  } finally {
+    cachedUser = null;
+    cleanupLegacyStorage();
+  }
 }
 
-export function getCurrentUser(): User | null {
-  if (typeof window === "undefined") return null;
-
-  const userStr = localStorage.getItem("user");
-  if (!userStr) return null;
-
+/**
+ * Fetch current user from secure API route
+ * Used by AuthContext for async user loading
+ */
+export async function fetchCurrentUser(): Promise<User | null> {
   try {
-    return JSON.parse(userStr);
-  } catch {
+    const response = await fetch("/api/auth/me", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      cachedUser = null;
+      return null;
+    }
+
+    const result = await response.json();
+    cachedUser = result.user;
+    return result.user;
+  } catch (error) {
+    cachedUser = null;
     return null;
   }
 }
 
-export function getCurrentUserId(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("userId");
+/**
+ * Refresh the access token using refresh token cookie
+ * Called automatically when access token expires
+ */
+export async function refreshToken(): Promise<boolean> {
+  try {
+    const response = await fetch("/api/auth/refresh", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
 }
 
+/**
+ * Get cached current user (synchronous, for backward compatibility)
+ * Note: Use fetchCurrentUser() for authoritative data
+ */
+export function getCurrentUser(): User | null {
+  return cachedUser;
+}
+
+/**
+ * Get cached current user ID (synchronous, for backward compatibility)
+ * Note: Use fetchCurrentUser() for authoritative data
+ */
+export function getCurrentUserId(): string | null {
+  return cachedUser?.id ?? null;
+}
+
+/**
+ * Clean up legacy localStorage data from previous auth implementation
+ */
+function cleanupLegacyStorage(): void {
+  if (typeof window === "undefined") return;
+
+  try {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userId");
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Change password via secure API route
+ * Password verification and hashing done server-side
+ */
 export async function changePassword(
   currentPassword: string,
   newPassword: string,
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
-    }
+    const response = await fetch("/api/auth/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
 
-    // Get user with password hash
-    const { data: user, error: fetchError } = await supabase
-      .from("users")
-      .select("password_hash")
-      .eq("id", userId)
-      .single();
+    const result = await response.json();
 
-    if (fetchError || !user) {
-      return { success: false, error: "User not found" };
-    }
-
-    // Verify current password
-    const isValid = await bcrypt.compare(
-      currentPassword,
-      (user as any).password_hash,
-    );
-    if (!isValid) {
-      return { success: false, error: "Current password is incorrect" };
-    }
-
-    // Hash new password
-    const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
-
-    // Update password
-    const { error: updateError } = (await (supabase.from("users") as any)
-      .update({ password_hash: newPasswordHash })
-      .eq("id", userId)) as any;
-
-    if (updateError) {
-      return { success: false, error: "Failed to update password" };
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error || "Failed to change password",
+      };
     }
 
     return { success: true, error: null };
@@ -221,52 +229,49 @@ export async function changePassword(
   }
 }
 
+/**
+ * Update profile via secure API route
+ */
 export async function updateProfile(data: {
   display_name?: string;
   username?: string;
   bio?: string;
-}): Promise<{ success: boolean; error: string | null }> {
+  avatar_url?: string;
+}): Promise<{ success: boolean; error: string | null; user?: User }> {
   try {
-    const userId = getCurrentUserId();
-    if (!userId) {
-      return { success: false, error: "Not authenticated" };
+    const response = await fetch("/api/auth/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: result.error || "Failed to update profile",
+      };
     }
 
-    // If username is being changed, check if it's available
-    if (data.username) {
-      const { data: existingUser } = (await supabase
-        .from("users")
-        .select("id")
-        .eq("username", data.username)
-        .neq("id", userId)
-        .single()) as any;
-
-      if (existingUser) {
-        return { success: false, error: "Username already taken" };
-      }
+    // Update cache with new user data
+    if (result.user) {
+      cachedUser = result.user;
     }
 
-    // Update user
-    const { error: updateError } = (await (supabase.from("users") as any)
-      .update(data)
-      .eq("id", userId)) as any;
-
-    if (updateError) {
-      return { success: false, error: "Failed to update profile" };
-    }
-
-    // Update local storage
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      const updatedUser = { ...currentUser, ...data };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-    }
-
-    return { success: true, error: null };
+    return { success: true, error: null, user: result.user };
   } catch (error) {
     return {
       success: false,
       error: "An error occurred while updating profile",
     };
   }
+}
+
+/**
+ * Update the cached user (for use after profile updates from other sources)
+ */
+export function updateCachedUser(user: User): void {
+  cachedUser = user;
 }

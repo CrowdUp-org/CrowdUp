@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 // ============================================================================
 // Configuration
 // ============================================================================
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "crowdup-jwt-secret-change-in-production",
+);
 
 /**
  * Routes that require authentication
@@ -20,6 +25,17 @@ const PROTECTED_ROUTES = [
  * Auth routes that redirect to home if already authenticated
  */
 const AUTH_ROUTES = ["/auth/signin", "/auth/signup"];
+
+/**
+ * API routes that don't need token validation (they handle it internally)
+ */
+const PUBLIC_API_ROUTES = [
+  "/api/auth/login",
+  "/api/auth/signup",
+  "/api/auth/refresh",
+  "/api/auth/callback",
+  "/api/auth/google",
+];
 
 /**
  * HTTP methods that require CSRF protection
@@ -40,6 +56,22 @@ const CSRF_HEADER_NAME = "x-csrf-token";
 // ============================================================================
 // Helper Functions
 // ============================================================================
+
+/**
+ * Verify JWT token
+ */
+async function verifyToken(token: string): Promise<boolean> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    // Check if token is expired
+    if (payload.exp && payload.exp < Date.now() / 1000) {
+      return false;
+    }
+    return payload.type === "access";
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Get allowed origins from environment or defaults
@@ -107,11 +139,13 @@ function hasAuthCookie(request: NextRequest): boolean {
 // Middleware
 // ============================================================================
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
   const allowedOrigins = getAllowedOrigins();
+  const accessToken = request.cookies.get("access_token")?.value;
+  const refreshToken = request.cookies.get("refresh_token")?.value;
 
   // Create response with potential modifications
   let response = NextResponse.next();
@@ -137,6 +171,13 @@ export function middleware(request: NextRequest) {
   // Handle CORS preflight requests
   if (request.method === "OPTIONS") {
     return new NextResponse(null, { status: 204, headers: response.headers });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Skip public API routes from auth checks
+  // ---------------------------------------------------------------------------
+  if (PUBLIC_API_ROUTES.some((route) => pathname.startsWith(route))) {
+    return response;
   }
 
   // ---------------------------------------------------------------------------
@@ -211,20 +252,32 @@ export function middleware(request: NextRequest) {
   }
 
   // ---------------------------------------------------------------------------
-  // Route Protection (check auth for protected routes)
+  // Route Protection & JWT Validation
   // ---------------------------------------------------------------------------
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (isProtectedRoute && !hasAuthCookie(request)) {
-    const signInUrl = new URL("/auth/signin", request.url);
-    signInUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(signInUrl);
+  // Verify access token if present
+  const isValidToken = accessToken ? await verifyToken(accessToken) : false;
+
+  // Protected route without valid token
+  if (isProtectedRoute && !isValidToken) {
+    // If we have a refresh token, let the client-side handle refresh
+    if (refreshToken) {
+      // Allow access but token refresh will happen client-side
+      return response;
+    }
+
+    // No tokens at all, redirect to signin
+    const url = new URL("/auth/signin", request.url);
+    url.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(url);
   }
 
-  if (isAuthRoute && hasAuthCookie(request)) {
+  // Auth route with valid token - redirect to home
+  if (isAuthRoute && isValidToken) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -233,7 +286,13 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all routes except static files and Next.js internals
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (public folder)
+     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

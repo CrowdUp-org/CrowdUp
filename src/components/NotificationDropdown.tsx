@@ -10,6 +10,8 @@ import {
   UserPlus,
   AlertCircle,
   Building2,
+  TrendingUp,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -24,14 +26,20 @@ import { useRouter } from "next/navigation";
 
 interface Notification {
   id: string;
-  type:
+  notification_type:
     | "vote"
     | "comment"
     | "reply"
     | "follow"
     | "mention"
     | "status_change"
-    | "official_response";
+    | "official_response"
+    | "post_mention"
+    | "company_post"
+    | "vote_milestone"
+    | "priority_alert"
+    | "trending"
+    | "sentiment_alert";
   title: string;
   message?: string;
   link?: string;
@@ -52,6 +60,12 @@ const notificationIcons: Record<string, typeof Bell> = {
   mention: Bell,
   status_change: AlertCircle,
   official_response: Building2,
+  post_mention: Bell,
+  company_post: Building2,
+  vote_milestone: ThumbsUp,
+  priority_alert: AlertTriangle,
+  trending: TrendingUp,
+  sentiment_alert: AlertTriangle,
 };
 
 const notificationColors: Record<string, string> = {
@@ -62,6 +76,12 @@ const notificationColors: Record<string, string> = {
   mention: "text-orange-500 bg-orange-50 dark:bg-orange-950",
   status_change: "text-yellow-500 bg-yellow-50 dark:bg-yellow-950",
   official_response: "text-indigo-500 bg-indigo-50 dark:bg-indigo-950",
+  post_mention: "text-orange-500 bg-orange-50 dark:bg-orange-950",
+  company_post: "text-blue-500 bg-blue-50 dark:bg-blue-950",
+  vote_milestone: "text-green-500 bg-green-50 dark:bg-green-950",
+  priority_alert: "text-red-500 bg-red-50 dark:bg-red-950",
+  trending: "text-purple-500 bg-purple-50 dark:bg-purple-950",
+  sentiment_alert: "text-red-500 bg-red-50 dark:bg-red-950",
 };
 
 export function NotificationDropdown() {
@@ -83,7 +103,7 @@ export function NotificationDropdown() {
         .select(
           `
           id,
-          type,
+          notification_type,
           title,
           message,
           link,
@@ -92,7 +112,7 @@ export function NotificationDropdown() {
           actor_id
         `,
         )
-        .eq("user_id", userId)
+        .eq("recipient_id", userId)
         .order("created_at", { ascending: false })
         .limit(20)) as { data: any[] | null; error: any };
 
@@ -149,7 +169,7 @@ export function NotificationDropdown() {
             event: "INSERT",
             schema: "public",
             table: "notifications",
-            filter: `user_id=eq.${userId}`,
+            filter: `recipient_id=eq.${userId}`,
           },
           () => {
             fetchNotifications();
@@ -180,7 +200,7 @@ export function NotificationDropdown() {
 
     await (supabase.from("notifications") as any)
       .update({ is_read: true })
-      .eq("user_id", userId)
+      .eq("recipient_id", userId)
       .eq("is_read", false);
 
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
@@ -252,9 +272,9 @@ export function NotificationDropdown() {
             </div>
           ) : (
             notifications.map((notification) => {
-              const Icon = notificationIcons[notification.type] || Bell;
+              const Icon = notificationIcons[notification.notification_type] || Bell;
               const colorClass =
-                notificationColors[notification.type] ||
+                notificationColors[notification.notification_type] ||
                 "text-gray-500 bg-gray-50";
 
               return (

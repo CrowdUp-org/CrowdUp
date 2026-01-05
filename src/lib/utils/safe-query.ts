@@ -11,7 +11,7 @@
  * Characters that have special meaning in PostgREST filter syntax
  * These need to be escaped when used in user-provided values
  */
-const POSTGREST_SPECIAL_CHARS = /[(),.*%\\,]/g;
+const POSTGREST_SPECIAL_CHARS = /[().*%\\,]/g;
 
 /**
  * Sanitizes a string for safe use in PostgREST filter expressions

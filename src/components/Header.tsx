@@ -254,8 +254,8 @@ export default function Header() {
     }
   };
 
-  const handleSignOut = () => {
-    signOut();
+  const handleSignOut = async () => {
+    await signOut();
     refreshUser();
     router.push("/auth/signin");
   };

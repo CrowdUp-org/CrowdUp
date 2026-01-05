@@ -35,8 +35,8 @@
 - `src/lib/supabase.ts` includes placeholder defaults so `next build` can run without envs, but real runtime requires valid Supabase project.
 - No other required secrets observed; Stripe dependency present but not wired in CI configs.
 
-
 ## Development Conventions (VERY IMPORTANT)
+
 - Follow `PULL_REQUEST_TEMPLATE.md`
 - Follow https://github.com/CrowdUp-org/CrowdUp/wiki/Development-Conventions
 

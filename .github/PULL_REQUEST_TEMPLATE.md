@@ -29,9 +29,10 @@
 ## Checklist
 
 - [ ] Tested in dev mode (`npm run dev`)
-- [ ] Responsive design verified (if UI changes)
-- [ ] Supabase migrations included (if schema changes)
-- [ ] Component stories updated (if applicable)
+- [ ] Responsive design verified <!-- if UI changes -->
+- [ ] Supabase migrations included <!-- schema changes -->
+- [ ] Component stories updated <!-- if applicable -->
+- [ ] Prettier Syntax (`npx prettier --check .`)
 
 ## Breaking Changes
 

@@ -38,7 +38,10 @@ export async function POST(request: NextRequest) {
     // Check if user is an OAuth user (password_hash is null)
     if (!user.password_hash) {
       return NextResponse.json(
-        { error: "This account uses OAuth authentication. Please sign in with Google." },
+        {
+          error:
+            "This account uses OAuth authentication. Please sign in with Google.",
+        },
         { status: 401 },
       );
     }

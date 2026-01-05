@@ -1,38 +1,21 @@
 "use client";
 
 import { Suspense, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 function AuthCallbackContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { refreshUser } = useAuth();
 
   useEffect(() => {
-    const sessionData = searchParams.get("session");
+    // Refresh user context from /api/auth/me endpoint
+    // JWT tokens are already set in httpOnly cookies by OAuth callback
+    refreshUser();
 
-    if (sessionData) {
-      try {
-        const user = JSON.parse(decodeURIComponent(sessionData));
-        // Store user session in localStorage
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("userId", user.id);
-
-        // Refresh the auth context
-        refreshUser();
-
-        // Redirect to home page
-        router.push("/");
-      } catch (error) {
-        console.error("Failed to process session data:", error);
-        router.push("/auth/signin?error=session_failed");
-      }
-    } else {
-      // No session data, redirect to signin
-      router.push("/auth/signin");
-    }
-  }, [searchParams, router, refreshUser]);
+    // Redirect to home page
+    router.push("/");
+  }, [router, refreshUser]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

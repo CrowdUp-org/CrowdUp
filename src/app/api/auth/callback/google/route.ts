@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { signAccessToken, signRefreshToken } from "@/lib/jwt";
+import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
 
 interface GoogleTokenResponse {
   access_token: string;
@@ -177,14 +179,26 @@ export async function GET(request: NextRequest) {
       throw new Error("User not found after creation");
     }
 
-    // Create a session token (simple approach - in production, use proper JWT)
-    const sessionData = encodeURIComponent(JSON.stringify(user));
+    // Generate JWT tokens
+    const jti = crypto.randomUUID();
+    const accessToken = await signAccessToken(user.id);
+    const refreshToken = await signRefreshToken(user.id, jti);
 
-    // Redirect to home page with user data in URL
-    // The client will handle storing it in localStorage
-    return NextResponse.redirect(
-      `${request.nextUrl.origin}/auth/callback?session=${sessionData}`,
-    );
+    // Store refresh token jti in database for revocation support
+    await (supabaseAdmin.from("refresh_tokens") as any).upsert({
+      user_id: user.id,
+      jti,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+
+    // Create response with redirect
+    const response = NextResponse.redirect(`${request.nextUrl.origin}/`);
+
+    // Set httpOnly cookies
+    response.cookies.set(getAccessTokenCookie(accessToken));
+    response.cookies.set(getRefreshTokenCookie(refreshToken));
+
+    return response;
   } catch (error) {
     console.error("Error in Google OAuth callback:", error);
     return NextResponse.redirect(

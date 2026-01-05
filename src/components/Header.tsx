@@ -255,13 +255,17 @@ export default function Header() {
   };
 
   const handleSignOut = async () => {
+    console.log("[Header] handleSignOut called, current user:", user?.username);
     try {
-      await signOut(); // signOut() pulisce già cachedUser
-      // NON chiamare refreshUser() - il logout ha già pulito lo stato!
+      await signOut(); // Pulisce i cookie e cachedUser
+      console.log("[Header] signOut completed, calling refreshUser");
+      await refreshUser(); // Sincronizza AuthContext (fetchCurrentUser ritornerà null perché i cookie sono stati cancellati)
+      console.log("[Header] refreshUser completed, redirecting to signin");
       router.push("/auth/signin");
     } catch (error) {
-      console.error("Logout fallito:", error);
-      // Anche se fallisce, reindirizza comunque (il cleanup è stato fatto nel catch di signOut)
+      console.error("[Header] Logout fallito:", error);
+      // Anche se fallisce, prova a sincronizzare comunque e reindirizza
+      await refreshUser();
       router.push("/auth/signin");
     }
   };

@@ -94,10 +94,17 @@ export async function signIn(
  * Clears httpOnly cookies and revokes refresh token
  */
 export async function signOut(): Promise<void> {
+  console.log("[signOut] Starting logout process...");
   try {
     const response = await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
+    });
+
+    console.log("[signOut] Logout response:", {
+      ok: response.ok,
+      status: response.status,
+      statusText: response.statusText,
     });
 
     if (!response.ok) {
@@ -107,11 +114,13 @@ export async function signOut(): Promise<void> {
     // Cleanup SOLO dopo che il server ha confermato il logout
     cachedUser = null;
     cleanupLegacyStorage();
+    console.log("[signOut] Cleanup completed, cachedUser is now null");
   } catch (error) {
-    console.error("Logout error:", error);
+    console.error("[signOut] Logout error:", error);
     // Cleanup anche in caso di errore (fallback)
     cachedUser = null;
     cleanupLegacyStorage();
+    console.log("[signOut] Fallback cleanup completed");
     throw error; // Re-throw per che il caller sappia che è fallito
   }
 }

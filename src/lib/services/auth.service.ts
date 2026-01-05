@@ -95,15 +95,24 @@ export async function signIn(
  */
 export async function signOut(): Promise<void> {
   try {
-    await fetch("/api/auth/logout", {
+    const response = await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
-  } catch (error) {
-    console.error("Logout error:", error);
-  } finally {
+
+    if (!response.ok) {
+      throw new Error(`Logout failed: ${response.statusText}`);
+    }
+
+    // Cleanup SOLO dopo che il server ha confermato il logout
     cachedUser = null;
     cleanupLegacyStorage();
+  } catch (error) {
+    console.error("Logout error:", error);
+    // Cleanup anche in caso di errore (fallback)
+    cachedUser = null;
+    cleanupLegacyStorage();
+    throw error; // Re-throw per che il caller sappia che è fallito
   }
 }
 

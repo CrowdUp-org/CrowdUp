@@ -255,9 +255,15 @@ export default function Header() {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    refreshUser();
-    router.push("/auth/signin");
+    try {
+      await signOut(); // signOut() pulisce già cachedUser
+      // NON chiamare refreshUser() - il logout ha già pulito lo stato!
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("Logout fallito:", error);
+      // Anche se fallisce, reindirizza comunque (il cleanup è stato fatto nel catch di signOut)
+      router.push("/auth/signin");
+    }
   };
 
   return (

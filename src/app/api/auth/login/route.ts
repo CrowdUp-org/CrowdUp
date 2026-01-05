@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken } from "@/lib/jwt";
 import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
+import { buildSafeEqOr } from "@/lib/utils/safe-query";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,10 +17,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user by username or email using server-side admin client
+    const orFilter = buildSafeEqOr(["username", "email"], usernameOrEmail);
     const { data: users, error: fetchError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .or(`username.eq.${usernameOrEmail},email.eq.${usernameOrEmail}`)
+      .or(orFilter)
       .limit(1);
 
     if (fetchError || !users || users.length === 0) {

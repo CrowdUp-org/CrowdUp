@@ -19,32 +19,48 @@ export async function POST(request: NextRequest) {
 
   try {
     const refreshToken = request.cookies.get("refresh_token")?.value;
+    let revocationSuccess = true;
 
     // Revoke refresh token in database if present
     if (refreshToken) {
-      console.log("[Logout API] Revoking refresh token in database");
+      console.log("[Logout API] Verifying and revoking refresh token");
       const payload = await verifyRefreshToken(refreshToken);
       if (payload?.jti) {
-        await supabaseAdmin
+        const { error } = await supabaseAdmin
           .from("refresh_tokens")
           .delete()
           .eq("jti", payload.jti);
-        console.log("[Logout API] Refresh token revoked:", payload.jti);
+
+        if (error) {
+          console.error(
+            "[Logout API] Token revocation failed in database:",
+            error,
+          );
+          revocationSuccess = false;
+        } else {
+          console.log("[Logout API] Refresh token revoked:", payload.jti);
+        }
       }
     } else {
       console.log("[Logout API] No refresh token to revoke");
     }
 
+    // If revocation failed, return error BEFORE clearing cookies
+    if (!revocationSuccess) {
+      console.error("[Logout API] Aborting logout: token revocation failed");
+      return NextResponse.json(
+        { success: false, error: "Token revocation failed" },
+        { status: 500 },
+      );
+    }
+
     const response = NextResponse.json({ success: true }, { status: 200 });
 
-    // Clear cookies
+    // Clear cookies only after successful revocation
     const clearAccessCookie = getClearAccessTokenCookie();
     const clearRefreshCookie = getClearRefreshTokenCookie();
 
-    console.log("[Logout API] Clearing cookies:", {
-      access_token: clearAccessCookie,
-      refresh_token: clearRefreshCookie,
-    });
+    console.log("[Logout API] Clearing cookies");
 
     response.cookies.set(clearAccessCookie);
     response.cookies.set(clearRefreshCookie);
@@ -53,8 +69,11 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("[Logout API] Logout error:", error);
-    // Still clear cookies even on error
-    const response = NextResponse.json({ success: true }, { status: 200 });
+    // Still clear cookies even on error (fallback)
+    const response = NextResponse.json(
+      { success: false, error: "Logout encountered an error" },
+      { status: 500 },
+    );
     response.cookies.set(getClearAccessTokenCookie());
     response.cookies.set(getClearRefreshTokenCookie());
     console.log("[Logout API] Cookies cleared despite error");

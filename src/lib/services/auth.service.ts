@@ -120,38 +120,26 @@ export async function signIn(
  * Clears httpOnly cookies and revokes refresh token
  */
 export async function signOut(): Promise<void> {
-  console.log("[signOut] Starting logout process...");
   try {
-    const csrfToken = getCsrfToken();
-    console.log("[signOut] CSRF token:", csrfToken ? "present" : "missing");
-
     const response = await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
       headers: getAuthHeaders(),
     });
 
-    console.log("[signOut] Logout response:", {
-      ok: response.ok,
-      status: response.status,
-      statusText: response.statusText,
-    });
-
     if (!response.ok) {
       throw new Error(`Logout failed: ${response.statusText}`);
     }
 
-    // Cleanup SOLO dopo che il server ha confermato il logout
+    // Cleanup dopo che il server ha confermato il logout
     cachedUser = null;
     cleanupLegacyStorage();
-    console.log("[signOut] Cleanup completed, cachedUser is now null");
   } catch (error) {
-    console.error("[signOut] Logout error:", error);
+    console.error("[Auth] Logout error:", error);
     // Cleanup anche in caso di errore (fallback)
     cachedUser = null;
     cleanupLegacyStorage();
-    console.log("[signOut] Fallback cleanup completed");
-    throw error; // Re-throw per che il caller sappia che è fallito
+    throw error;
   }
 }
 

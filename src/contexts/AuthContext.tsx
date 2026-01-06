@@ -42,14 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const refreshUser = useCallback(async () => {
-    console.log("[AuthContext] refreshUser called");
     try {
       setError(null);
       const currentUser = await fetchCurrentUser();
-      console.log("[AuthContext] fetchCurrentUser returned:", currentUser);
       setUser(currentUser);
     } catch (err) {
-      console.error("[AuthContext] Error fetching user:", err);
+      console.error("[Auth] Error fetching user:", err);
       setError("Failed to fetch user data");
       setUser(null);
     }

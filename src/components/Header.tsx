@@ -254,10 +254,17 @@ export default function Header() {
     }
   };
 
-  const handleSignOut = () => {
-    signOut();
-    refreshUser();
-    router.push("/auth/signin");
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      await refreshUser();
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("[Auth] Logout error:", error);
+      // Prova a sincronizzare comunque e reindirizza
+      await refreshUser();
+      router.push("/auth/signin");
+    }
   };
 
   return (

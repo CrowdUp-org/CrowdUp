@@ -24,6 +24,32 @@ export interface SignInData {
 let cachedUser: User | null = null;
 
 /**
+ * Get CSRF token from cookie
+ * Required for all POST/PUT/PATCH/DELETE requests to API routes
+ */
+function getCsrfToken(): string {
+  if (typeof document === "undefined") return "";
+
+  const csrfCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrf_token="));
+
+  return csrfCookie ? csrfCookie.split("=")[1] : "";
+}
+
+/**
+ * Create headers with CSRF token for authenticated API requests
+ */
+function getAuthHeaders(
+  additionalHeaders: Record<string, string> = {},
+): Record<string, string> {
+  return {
+    "x-csrf-token": getCsrfToken(),
+    ...additionalHeaders,
+  };
+}
+
+/**
  * Sign up a new user via secure API route
  * Credentials are hashed server-side, session stored in httpOnly cookies
  */
@@ -95,15 +121,25 @@ export async function signIn(
  */
 export async function signOut(): Promise<void> {
   try {
-    await fetch("/api/auth/logout", {
+    const response = await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
+      headers: getAuthHeaders(),
     });
-  } catch (error) {
-    console.error("Logout error:", error);
-  } finally {
+
+    if (!response.ok) {
+      throw new Error(`Logout failed: ${response.statusText}`);
+    }
+
+    // Cleanup dopo che il server ha confermato il logout
     cachedUser = null;
     cleanupLegacyStorage();
+  } catch (error) {
+    console.error("[Auth] Logout error:", error);
+    // Cleanup anche in caso di errore (fallback)
+    cachedUser = null;
+    cleanupLegacyStorage();
+    throw error;
   }
 }
 
@@ -141,6 +177,7 @@ export async function refreshToken(): Promise<boolean> {
     const response = await fetch("/api/auth/refresh", {
       method: "POST",
       credentials: "include",
+      headers: getAuthHeaders(),
     });
 
     return response.ok;
@@ -190,7 +227,7 @@ export async function changePassword(
   try {
     const response = await fetch("/api/auth/change-password", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
       credentials: "include",
       body: JSON.stringify({ currentPassword, newPassword }),
     });
@@ -225,7 +262,7 @@ export async function updateProfile(data: {
   try {
     const response = await fetch("/api/auth/profile", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders({ "Content-Type": "application/json" }),
       credentials: "include",
       body: JSON.stringify(data),
     });

@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = await fetchCurrentUser();
       setUser(currentUser);
     } catch (err) {
+      console.error("[Auth] Error fetching user:", err);
       setError("Failed to fetch user data");
       setUser(null);
     }

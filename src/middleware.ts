@@ -33,6 +33,7 @@ const PUBLIC_API_ROUTES = [
   "/api/auth/login",
   "/api/auth/signup",
   "/api/auth/refresh",
+  "/api/auth/logout", // Logout handles cleanup with httpOnly cookies
   "/api/auth/callback",
   "/api/auth/google",
 ];
@@ -45,7 +46,11 @@ const CSRF_PROTECTED_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
 /**
  * Routes exempt from CSRF protection (OAuth, webhooks with signatures)
  */
-const CSRF_EXEMPT_ROUTES = ["/api/auth/callback", "/api/webhooks"];
+const CSRF_EXEMPT_ROUTES = [
+  "/api/auth/callback",
+  "/api/auth/logout", // Logout should always be allowed
+  "/api/webhooks",
+];
 
 /**
  * CSRF token cookie and header names

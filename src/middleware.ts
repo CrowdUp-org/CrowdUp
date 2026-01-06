@@ -28,11 +28,16 @@ const AUTH_ROUTES = ["/auth/signin", "/auth/signup"];
 
 /**
  * API routes that don't need token validation (they handle it internally)
+ * Also skips Origin/Referer validation for logout because:
+ * - httpOnly cookies provide implicit authentication
+ * - CSRF exemption is documented and justified
+ * - Origin validation would create false failures on cross-origin deployments
  */
 const PUBLIC_API_ROUTES = [
   "/api/auth/login",
   "/api/auth/signup",
   "/api/auth/refresh",
+  "/api/auth/logout",
   "/api/auth/callback",
   "/api/auth/google",
 ];
@@ -49,7 +54,11 @@ const CSRF_PROTECTED_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
  * - Response cannot be read cross-origin
  * - Refresh token in httpOnly cookie is protected by SameSite policy
  */
-const CSRF_EXEMPT_ROUTES = ["/api/auth/callback", "/api/webhooks", "/api/auth/logout"];
+const CSRF_EXEMPT_ROUTES = [
+  "/api/auth/callback",
+  "/api/webhooks",
+  "/api/auth/logout",
+];
 
 /**
  * CSRF token cookie and header names

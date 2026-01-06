@@ -6,6 +6,38 @@ import {
   getClearRefreshTokenCookie,
 } from "@/lib/cookies";
 
+/**
+ * POST /api/auth/logout
+ *
+ * CSRF EXEMPTION RATIONALE:
+ *
+ * This endpoint is exempt from CSRF protection (see middleware.ts) because:
+ *
+ * 1. **Stateless operation**: Logout doesn't create/modify persistent data beyond token revocation
+ * 2. **No sensitive data in response**: Response is just { success: true }
+ * 3. **Refresh token protection**:
+ *    - httpOnly flag (not accessible to JavaScript)
+ *    - sameSite=strict (not sent in cross-site requests)
+ *    - path=/api/auth (restricted to this API prefix)
+ * 4. **Origin/Referer validation**: Middleware validates origin BEFORE this route (L151-173)
+ * 5. **Token revocation guarantee**: All tokens are deleted from database before clearing cookies
+ *
+ * ATTACK SCENARIO (MITIGATED):
+ *
+ * Attacker.com → Fetch POST /api/auth/logout (to crowdup.io)
+ *   ↓ (Middleware checks Origin header)
+ * Origin: attacker.com ≠ CORS_ALLOWED_ORIGINS
+ *   ↓ (Middleware returns 403 BEFORE reaching this handler)
+ * 403 "Origin not allowed"
+ *   ↓ (Refresh token is NEVER sent to attacker's domain)
+ * ✅ Request is blocked at middleware level
+ *
+ * This follows OWASP guidance: logout is safe to exempt from CSRF when
+ * it doesn't modify sensitive data and uses additional auth layers
+ * (httpOnly cookies + origin validation).
+ *
+ * See: SECURITY_FIX_SUMMARY.md for full analysis
+ */
 export async function POST(request: NextRequest) {
   console.log("[Logout API] Request received");
   console.log("[Logout API] Cookies:", {

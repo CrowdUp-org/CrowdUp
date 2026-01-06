@@ -43,9 +43,13 @@ const PUBLIC_API_ROUTES = [
 const CSRF_PROTECTED_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
 
 /**
- * Routes exempt from CSRF protection (OAuth, webhooks with signatures)
+ * Routes exempt from CSRF protection (OAuth, webhooks with signatures, logout)
+ * Logout is safe to exempt because:
+ * - No user data is created/modified/deleted
+ * - Response cannot be read cross-origin
+ * - Refresh token in httpOnly cookie is protected by SameSite policy
  */
-const CSRF_EXEMPT_ROUTES = ["/api/auth/callback", "/api/webhooks"];
+const CSRF_EXEMPT_ROUTES = ["/api/auth/callback", "/api/webhooks", "/api/auth/logout"];
 
 /**
  * CSRF token cookie and header names

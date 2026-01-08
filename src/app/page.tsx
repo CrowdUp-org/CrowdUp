@@ -57,6 +57,7 @@ export default function Home() {
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
   );
+  const [officialResponseFlags, setOfficialResponseFlags] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<"featured" | "new" | "top">("featured");
   const [displayCount, setDisplayCount] = useState(10);
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -98,6 +99,20 @@ export default function Home() {
             ...post,
             comments_count: counts[post.id] || 0,
           }));
+        }
+
+        // Check for official responses
+        const { data: responsesData } = await supabase
+          .from("official_responses")
+          .select("post_id")
+          .in("post_id", postIds);
+
+        if (responsesData) {
+          const flags: Record<string, boolean> = {};
+          responsesData.forEach((response: any) => {
+            flags[response.post_id] = true;
+          });
+          setOfficialResponseFlags(flags);
         }
       }
 
@@ -203,6 +218,7 @@ export default function Home() {
       addSuffix: true,
     }),
     comments: commentCounts[post.id] || 0,
+    hasOfficialResponse: officialResponseFlags[post.id] || false,
   }));
 
   if (loading) {

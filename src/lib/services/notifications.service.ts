@@ -1,6 +1,17 @@
 import { supabase } from "@/lib/supabase";
 
-export type NotificationType = "badge" | "level" | "verification" | "milestone";
+export type NotificationType = 
+  | "badge" 
+  | "level" 
+  | "verification" 
+  | "milestone"
+  | "official_response"
+  | "vote"
+  | "comment"
+  | "reply"
+  | "follow"
+  | "mention"
+  | "status_change";
 
 export interface Notification {
   id: string;

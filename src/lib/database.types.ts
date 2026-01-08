@@ -326,6 +326,59 @@ export interface Database {
           created_at?: string;
         };
       };
+      official_responses: {
+        Row: {
+          id: string;
+          post_id: string;
+          company_id: string | null;
+          responder_id: string;
+          content: string;
+          response_type:
+            | "acknowledgment"
+            | "investigating"
+            | "planned"
+            | "fixed"
+            | "wont_fix"
+            | "duplicate";
+          is_pinned: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          company_id?: string | null;
+          responder_id: string;
+          content: string;
+          response_type?:
+            | "acknowledgment"
+            | "investigating"
+            | "planned"
+            | "fixed"
+            | "wont_fix"
+            | "duplicate";
+          is_pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          company_id?: string | null;
+          responder_id?: string;
+          content?: string;
+          response_type?:
+            | "acknowledgment"
+            | "investigating"
+            | "planned"
+            | "fixed"
+            | "wont_fix"
+            | "duplicate";
+          is_pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       conversations: {
         Row: {
           id: string;

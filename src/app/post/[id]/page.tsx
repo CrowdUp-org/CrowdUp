@@ -5,7 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronUp, ChevronDown, Share2, Flag, Send } from "lucide-react";
+import { ChevronUp, ChevronDown, Share2, Flag, Send, Building2 } from "lucide-react";
+import { OfficialResponseCard } from "@/components/OfficialResponseCard";
+import { OfficialResponseForm } from "@/components/OfficialResponseForm";
+import {
+  getResponsesForPost,
+  createOfficialResponse,
+  updateOfficialResponse,
+  deleteOfficialResponse,
+  canUserRespond,
+  OfficialResponseWithUser,
+  ResponseType,
+} from "@/lib/services/official-responses.service";
+import { OfficialResponseCard } from "@/components/OfficialResponseCard";
+import { OfficialResponseForm } from "@/components/OfficialResponseForm";
+import {
+  getResponsesForPost,
+  createOfficialResponse,
+  updateOfficialResponse,
+  deleteOfficialResponse,
+  canUserRespond,
+  OfficialResponseWithUser,
+  ResponseType,
+} from "@/lib/services/official-responses.service";
 import {
   Dialog,
   DialogContent,
@@ -66,12 +88,19 @@ export default function PostDetailPage({
   const [submitting, setSubmitting] = useState(false);
   const [upvoters, setUpvoters] = useState<any[]>([]);
   const [upvotersDialogOpen, setUpvotersDialogOpen] = useState(false);
+  const [officialResponses, setOfficialResponses] = useState<OfficialResponseWithUser[]>([]);
+  const [canRespond, setCanRespond] = useState(false);
+  const [showResponseForm, setShowResponseForm] = useState(false);
+  const [editingResponse, setEditingResponse] = useState<OfficialResponseWithUser | null>(null);
+  const [responseSubmitting, setResponseSubmitting] = useState(false);
 
   useEffect(() => {
     fetchPost();
     fetchComments();
     fetchUserVote();
     fetchUpvoters();
+    fetchOfficialResponses();
+    checkCanRespond();
   }, [id]);
 
   const fetchPost = async () => {
@@ -126,6 +155,105 @@ export default function PostDetailPage({
     if (data) {
       setUpvoters(data);
     }
+  };
+
+  const fetchOfficialResponses = async () => {
+    const { success, data } = await getResponsesForPost(id);
+    if (success && data) {
+      setOfficialResponses(data);
+    }
+  };
+
+  const checkCanRespond = async () => {
+    const userId = getCurrentUserId();
+    if (!userId) {
+      setCanRespond(false);
+      return;
+    }
+
+    const { canRespond: allowed } = await canUserRespond(userId, id);
+    setCanRespond(allowed);
+  };
+
+  const handleCreateResponse = async (data: {
+    content: string;
+    responseType: ResponseType;
+    isPinned: boolean;
+  }) => {
+    const userId = getCurrentUserId();
+    if (!userId) {
+      router.push("/auth/signin");
+      return;
+    }
+
+    setResponseSubmitting(true);
+
+    const { success, error } = await createOfficialResponse(
+      id,
+      userId,
+      data.content,
+      data.responseType,
+      data.isPinned
+    );
+
+    setResponseSubmitting(false);
+
+    if (success) {
+      setShowResponseForm(false);
+      fetchOfficialResponses();
+    } else {
+      alert(error || "Failed to create response");
+    }
+  };
+
+  const handleUpdateResponse = async (data: {
+    content: string;
+    responseType: ResponseType;
+    isPinned: boolean;
+  }) => {
+    const userId = getCurrentUserId();
+    if (!userId || !editingResponse) return;
+
+    setResponseSubmitting(true);
+
+    const { success, error } = await updateOfficialResponse(
+      editingResponse.id,
+      userId,
+      data
+    );
+
+    setResponseSubmitting(false);
+
+    if (success) {
+      setEditingResponse(null);
+      setShowResponseForm(false);
+      fetchOfficialResponses();
+    } else {
+      alert(error || "Failed to update response");
+    }
+  };
+
+  const handleDeleteResponse = async (responseId: string) => {
+    const userId = getCurrentUserId();
+    if (!userId) return;
+
+    const { success, error } = await deleteOfficialResponse(responseId, userId);
+
+    if (success) {
+      fetchOfficialResponses();
+    } else {
+      alert(error || "Failed to delete response");
+    }
+  };
+
+  const handleEditResponse = (response: OfficialResponseWithUser) => {
+    setEditingResponse(response);
+    setShowResponseForm(true);
+  };
+
+  const handleCancelResponse = () => {
+    setShowResponseForm(false);
+    setEditingResponse(null);
   };
 
   const fetchUserVote = async () => {
@@ -456,8 +584,58 @@ export default function PostDetailPage({
           </div>
         </div>
 
+        {/* Official Responses Section */}
+        {officialResponses.length > 0 && (
+          <div className="rounded-2xl border bg-white p-8 shadow-sm mb-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Building2 className="h-5 w-5 text-indigo-600" />
+              <h2 className="text-2xl font-bold">
+                Official Responses ({officialResponses.length})
+              </h2>
+            </div>
+            <div className="space-y-4">
+              {officialResponses.map((response) => (
+                <OfficialResponseCard
+                  key={response.id}
+                  response={response}
+                  currentUserId={getCurrentUserId() || undefined}
+                  onEdit={handleEditResponse}
+                  onDelete={handleDeleteResponse}
+                  canModify={canRespond}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Add Official Response Button */}
+        {canRespond && !showResponseForm && (
+          <div className="mb-6">
+            <Button
+              onClick={() => setShowResponseForm(true)}
+              className="bg-indigo-600 hover:bg-indigo-700 w-full sm:w-auto"
+            >
+              <Building2 className="mr-2 h-4 w-4" />
+              Post Official Response
+            </Button>
+          </div>
+        )}
+
+        {/* Official Response Form */}
+        {showResponseForm && (
+          <div className="mb-6">
+            <OfficialResponseForm
+              postId={id}
+              existingResponse={editingResponse || undefined}
+              onSubmit={editingResponse ? handleUpdateResponse : handleCreateResponse}
+              onCancel={handleCancelResponse}
+              isSubmitting={responseSubmitting}
+            />
+          </div>
+        )}
+
         {/* Comments Section */}
-        <div className="rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border bg-white p-8 shadow-sm">{
           <h2 className="text-2xl font-bold mb-6">
             {comments.length} Comments
           </h2>

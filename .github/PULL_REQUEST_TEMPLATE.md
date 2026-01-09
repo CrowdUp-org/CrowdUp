@@ -4,6 +4,8 @@
 
 ## Type of Change
 
+<!-- Choose one option -->
+
 - Bug fix
 - Feature
 - UI/UX improvement

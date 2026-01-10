@@ -497,10 +497,7 @@ export default function UserManagementPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setBanModalOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setBanModalOpen(false)}>
                 Cancel
               </Button>
               <Button
@@ -528,10 +525,7 @@ export default function UserManagementPage() {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setKickModalOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setKickModalOpen(false)}>
                 Cancel
               </Button>
               <Button

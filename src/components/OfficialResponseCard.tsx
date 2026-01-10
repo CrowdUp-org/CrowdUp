@@ -139,7 +139,10 @@ export function OfficialResponseCard({
             {config.label}
           </Badge>
           {response.is_pinned && (
-            <Badge variant="outline" className="border-indigo-200 bg-indigo-50 text-indigo-700">
+            <Badge
+              variant="outline"
+              className="border-indigo-200 bg-indigo-50 text-indigo-700"
+            >
               <Pin className="mr-1 h-3 w-3 fill-indigo-700" />
               Pinned
             </Badge>

@@ -272,7 +272,8 @@ export function NotificationDropdown() {
             </div>
           ) : (
             notifications.map((notification) => {
-              const Icon = notificationIcons[notification.notification_type] || Bell;
+              const Icon =
+                notificationIcons[notification.notification_type] || Bell;
               const colorClass =
                 notificationColors[notification.notification_type] ||
                 "text-gray-500 bg-gray-50";

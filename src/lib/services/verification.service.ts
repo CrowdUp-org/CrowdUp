@@ -524,9 +524,12 @@ export async function resetUserPassword(
  * Get trending companies (admin only)
  */
 export async function getTrendingCompanies(limit: number = 6): Promise<any[]> {
-  const { data, error } = await (supabase.rpc as any)("get_trending_companies", {
-    limit_count: limit,
-  });
+  const { data, error } = await (supabase.rpc as any)(
+    "get_trending_companies",
+    {
+      limit_count: limit,
+    },
+  );
 
   if (error) {
     console.error("Get trending companies error:", error);

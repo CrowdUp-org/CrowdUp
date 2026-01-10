@@ -41,7 +41,9 @@ export default function NotificationSettingsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [preferences, setPreferences] = useState<Record<string, NotificationPreferences>>({});
+  const [preferences, setPreferences] = useState<
+    Record<string, NotificationPreferences>
+  >({});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -123,7 +125,7 @@ export default function NotificationSettingsPage() {
   const handleUpdate = (
     companyId: string | "global",
     key: keyof NotificationPreferences,
-    value: any
+    value: any,
   ) => {
     setPreferences((prev) => ({
       ...prev,
@@ -149,9 +151,9 @@ export default function NotificationSettingsPage() {
         };
       });
 
-      const { error } = await (supabase
-        .from("notification_preferences") as any)
-        .upsert(updates, { onConflict: "user_id, company_id" });
+      const { error } = await (
+        supabase.from("notification_preferences") as any
+      ).upsert(updates, { onConflict: "user_id, company_id" });
 
       if (error) throw error;
 
@@ -224,7 +226,9 @@ export default function NotificationSettingsPage() {
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       {company.display_name}
                     </h2>
-                    <p className="text-xs text-gray-500">Company Notifications</p>
+                    <p className="text-xs text-gray-500">
+                      Company Notifications
+                    </p>
                   </div>
                 </div>
 
@@ -290,7 +294,11 @@ export default function NotificationSettingsPage() {
                     <Switch
                       checked={prefs.notify_negative_sentiment}
                       onCheckedChange={(checked) =>
-                        handleUpdate(company.id, "notify_negative_sentiment", checked)
+                        handleUpdate(
+                          company.id,
+                          "notify_negative_sentiment",
+                          checked,
+                        )
                       }
                     />
                   </div>
@@ -308,7 +316,11 @@ export default function NotificationSettingsPage() {
                       <Switch
                         checked={prefs.email_notifications}
                         onCheckedChange={(checked) =>
-                          handleUpdate(company.id, "email_notifications", checked)
+                          handleUpdate(
+                            company.id,
+                            "email_notifications",
+                            checked,
+                          )
                         }
                       />
                     </div>
@@ -327,9 +339,13 @@ export default function NotificationSettingsPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="realtime">Real-time</SelectItem>
-                            <SelectItem value="hourly">Hourly Digest</SelectItem>
+                            <SelectItem value="hourly">
+                              Hourly Digest
+                            </SelectItem>
                             <SelectItem value="daily">Daily Digest</SelectItem>
-                            <SelectItem value="weekly">Weekly Digest</SelectItem>
+                            <SelectItem value="weekly">
+                              Weekly Digest
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -347,7 +363,8 @@ export default function NotificationSettingsPage() {
                 No Companies Found
               </h3>
               <p className="text-sm text-gray-500 max-w-sm mx-auto mt-1">
-                You don't seem to manage any companies. Create a company page to access company notification settings.
+                You don't seem to manage any companies. Create a company page to
+                access company notification settings.
               </p>
             </div>
           )}

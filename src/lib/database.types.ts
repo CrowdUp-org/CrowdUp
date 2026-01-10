@@ -60,10 +60,10 @@ export interface Database {
           id: string;
           user_id: string;
           type:
-          | "Bug Report"
-          | "Feature Request"
-          | "Complaint"
-          | "App Review Request";
+            | "Bug Report"
+            | "Feature Request"
+            | "Complaint"
+            | "App Review Request";
           company: string;
           company_color: string;
           title: string;
@@ -77,10 +77,10 @@ export interface Database {
           id?: string;
           user_id: string;
           type:
-          | "Bug Report"
-          | "Feature Request"
-          | "Complaint"
-          | "App Review Request";
+            | "Bug Report"
+            | "Feature Request"
+            | "Complaint"
+            | "App Review Request";
           company: string;
           company_color: string;
           title: string;
@@ -94,10 +94,10 @@ export interface Database {
           id?: string;
           user_id?: string;
           type?:
-          | "Bug Report"
-          | "Feature Request"
-          | "Complaint"
-          | "App Review Request";
+            | "Bug Report"
+            | "Feature Request"
+            | "Complaint"
+            | "App Review Request";
           company?: string;
           company_color?: string;
           title?: string;
@@ -459,14 +459,14 @@ export interface Database {
           id: string;
           user_id: string;
           action_type:
-          | "post_created"
-          | "post_upvoted"
-          | "post_downvoted"
-          | "post_acknowledged"
-          | "post_implemented"
-          | "comment_upvoted"
-          | "reported_content"
-          | "manual_adjustment";
+            | "post_created"
+            | "post_upvoted"
+            | "post_downvoted"
+            | "post_acknowledged"
+            | "post_implemented"
+            | "comment_upvoted"
+            | "reported_content"
+            | "manual_adjustment";
           points_change: number;
           related_post_id: string | null;
           related_comment_id: string | null;
@@ -477,14 +477,14 @@ export interface Database {
           id?: string;
           user_id: string;
           action_type:
-          | "post_created"
-          | "post_upvoted"
-          | "post_downvoted"
-          | "post_acknowledged"
-          | "post_implemented"
-          | "comment_upvoted"
-          | "reported_content"
-          | "manual_adjustment";
+            | "post_created"
+            | "post_upvoted"
+            | "post_downvoted"
+            | "post_acknowledged"
+            | "post_implemented"
+            | "comment_upvoted"
+            | "reported_content"
+            | "manual_adjustment";
           points_change: number;
           related_post_id?: string | null;
           related_comment_id?: string | null;
@@ -495,14 +495,14 @@ export interface Database {
           id?: string;
           user_id?: string;
           action_type?:
-          | "post_created"
-          | "post_upvoted"
-          | "post_downvoted"
-          | "post_acknowledged"
-          | "post_implemented"
-          | "comment_upvoted"
-          | "reported_content"
-          | "manual_adjustment";
+            | "post_created"
+            | "post_upvoted"
+            | "post_downvoted"
+            | "post_acknowledged"
+            | "post_implemented"
+            | "comment_upvoted"
+            | "reported_content"
+            | "manual_adjustment";
           points_change?: number;
           related_post_id?: string | null;
           related_comment_id?: string | null;
@@ -517,12 +517,12 @@ export interface Database {
           description: string;
           icon: string;
           requirement_type:
-          | "posts_count"
-          | "upvotes_received"
-          | "reputation_score"
-          | "days_active"
-          | "implementations"
-          | "comments_count";
+            | "posts_count"
+            | "upvotes_received"
+            | "reputation_score"
+            | "days_active"
+            | "implementations"
+            | "comments_count";
           requirement_value: number;
           created_at: string;
         };
@@ -532,12 +532,12 @@ export interface Database {
           description: string;
           icon: string;
           requirement_type:
-          | "posts_count"
-          | "upvotes_received"
-          | "reputation_score"
-          | "days_active"
-          | "implementations"
-          | "comments_count";
+            | "posts_count"
+            | "upvotes_received"
+            | "reputation_score"
+            | "days_active"
+            | "implementations"
+            | "comments_count";
           requirement_value: number;
           created_at?: string;
         };
@@ -547,12 +547,12 @@ export interface Database {
           description?: string;
           icon?: string;
           requirement_type?:
-          | "posts_count"
-          | "upvotes_received"
-          | "reputation_score"
-          | "days_active"
-          | "implementations"
-          | "comments_count";
+            | "posts_count"
+            | "upvotes_received"
+            | "reputation_score"
+            | "days_active"
+            | "implementations"
+            | "comments_count";
           requirement_value?: number;
           created_at?: string;
         };
@@ -682,7 +682,13 @@ export interface Database {
           id: string;
           target_user_id: string;
           admin_id: string;
-          action: "promote" | "demote" | "ban" | "unban" | "kick" | "reset_password";
+          action:
+            | "promote"
+            | "demote"
+            | "ban"
+            | "unban"
+            | "kick"
+            | "reset_password";
           action_details: string | null;
           created_at: string;
         };
@@ -690,7 +696,13 @@ export interface Database {
           id?: string;
           target_user_id: string;
           admin_id: string;
-          action: "promote" | "demote" | "ban" | "unban" | "kick" | "reset_password";
+          action:
+            | "promote"
+            | "demote"
+            | "ban"
+            | "unban"
+            | "kick"
+            | "reset_password";
           action_details?: string | null;
           created_at?: string;
         };
@@ -698,7 +710,13 @@ export interface Database {
           id?: string;
           target_user_id?: string;
           admin_id?: string;
-          action?: "promote" | "demote" | "ban" | "unban" | "kick" | "reset_password";
+          action?:
+            | "promote"
+            | "demote"
+            | "ban"
+            | "unban"
+            | "kick"
+            | "reset_password";
           action_details?: string | null;
           created_at?: string;
         };

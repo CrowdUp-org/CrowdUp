@@ -43,7 +43,9 @@ export default function CompanyPage({
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
   );
-  const [officialResponseFlags, setOfficialResponseFlags] = useState<Record<string, boolean>>({});
+  const [officialResponseFlags, setOfficialResponseFlags] = useState<
+    Record<string, boolean>
+  >({});
   const [isOwnerOrAdmin, setIsOwnerOrAdmin] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);

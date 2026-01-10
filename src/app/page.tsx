@@ -57,7 +57,9 @@ export default function Home() {
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
   );
-  const [officialResponseFlags, setOfficialResponseFlags] = useState<Record<string, boolean>>({});
+  const [officialResponseFlags, setOfficialResponseFlags] = useState<
+    Record<string, boolean>
+  >({});
   const [sortBy, setSortBy] = useState<"featured" | "new" | "top">("featured");
   const [displayCount, setDisplayCount] = useState(10);
   const [showSortMenu, setShowSortMenu] = useState(false);

@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase";
 
-export type NotificationType = 
-  | "badge" 
-  | "level" 
-  | "verification" 
+export type NotificationType =
+  | "badge"
+  | "level"
+  | "verification"
   | "milestone"
   | "official_response"
   | "vote"

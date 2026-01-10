@@ -24,19 +24,19 @@ import { Badge } from "@/components/ui/badge";
 interface Notification {
   id: string;
   notification_type:
-  | "vote"
-  | "comment"
-  | "reply"
-  | "follow"
-  | "mention"
-  | "status_change"
-  | "official_response"
-  | "post_mention"
-  | "company_post"
-  | "vote_milestone"
-  | "priority_alert"
-  | "trending"
-  | "sentiment_alert";
+    | "vote"
+    | "comment"
+    | "reply"
+    | "follow"
+    | "mention"
+    | "status_change"
+    | "official_response"
+    | "post_mention"
+    | "company_post"
+    | "vote_milestone"
+    | "priority_alert"
+    | "trending"
+    | "sentiment_alert";
   title: string;
   message?: string;
   link?: string;
@@ -314,7 +314,8 @@ export default function NotificationsPage() {
           ) : (
             <div className="divide-y divide-gray-100 dark:divide-gray-800">
               {notifications.map((notification) => {
-                const Icon = notificationIcons[notification.notification_type] || Bell;
+                const Icon =
+                  notificationIcons[notification.notification_type] || Bell;
                 const colorClass =
                   notificationColors[notification.notification_type] ||
                   "text-gray-500 bg-gray-50";
@@ -323,10 +324,11 @@ export default function NotificationsPage() {
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`flex items-start gap-4 p-4 sm:p-6 transition-colors cursor-pointer ${notification.is_read
+                    className={`flex items-start gap-4 p-4 sm:p-6 transition-colors cursor-pointer ${
+                      notification.is_read
                         ? "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                         : "bg-orange-50/30 dark:bg-orange-950/10 hover:bg-orange-50/50 dark:hover:bg-orange-950/20"
-                      }`}
+                    }`}
                   >
                     <div
                       className={`flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center ${colorClass}`}
@@ -337,10 +339,11 @@ export default function NotificationsPage() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <h4
-                            className={`text-sm sm:text-base ${notification.is_read
+                            className={`text-sm sm:text-base ${
+                              notification.is_read
                                 ? "text-gray-900 dark:text-gray-100"
                                 : "text-gray-900 dark:text-gray-100 font-semibold"
-                              }`}
+                            }`}
                           >
                             {notification.title}
                           </h4>

@@ -651,7 +651,8 @@ export default function SettingsPage() {
               <div className="space-y-0.5">
                 <Label className="text-base">Company Notifications</Label>
                 <p className="text-sm text-gray-500">
-                  Manage notifications for companies you manage (new posts, sentiment alerts, etc.)
+                  Manage notifications for companies you manage (new posts,
+                  sentiment alerts, etc.)
                 </p>
               </div>
               <Button

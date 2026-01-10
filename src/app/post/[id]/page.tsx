@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronUp, ChevronDown, Share2, Flag, Send, Building2 } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  Share2,
+  Flag,
+  Send,
+  Building2,
+} from "lucide-react";
 import { OfficialResponseCard } from "@/components/OfficialResponseCard";
 import { OfficialResponseForm } from "@/components/OfficialResponseForm";
 import {
@@ -77,10 +84,13 @@ export default function PostDetailPage({
   const [submitting, setSubmitting] = useState(false);
   const [upvoters, setUpvoters] = useState<any[]>([]);
   const [upvotersDialogOpen, setUpvotersDialogOpen] = useState(false);
-  const [officialResponses, setOfficialResponses] = useState<OfficialResponseWithUser[]>([]);
+  const [officialResponses, setOfficialResponses] = useState<
+    OfficialResponseWithUser[]
+  >([]);
   const [canRespond, setCanRespond] = useState(false);
   const [showResponseForm, setShowResponseForm] = useState(false);
-  const [editingResponse, setEditingResponse] = useState<OfficialResponseWithUser | null>(null);
+  const [editingResponse, setEditingResponse] =
+    useState<OfficialResponseWithUser | null>(null);
   const [responseSubmitting, setResponseSubmitting] = useState(false);
 
   useEffect(() => {
@@ -182,7 +192,7 @@ export default function PostDetailPage({
       userId,
       data.content,
       data.responseType,
-      data.isPinned
+      data.isPinned,
     );
 
     setResponseSubmitting(false);
@@ -208,7 +218,7 @@ export default function PostDetailPage({
     const { success, error } = await updateOfficialResponse(
       editingResponse.id,
       userId,
-      data
+      data,
     );
 
     setResponseSubmitting(false);
@@ -616,7 +626,9 @@ export default function PostDetailPage({
             <OfficialResponseForm
               postId={id}
               existingResponse={editingResponse || undefined}
-              onSubmit={editingResponse ? handleUpdateResponse : handleCreateResponse}
+              onSubmit={
+                editingResponse ? handleUpdateResponse : handleCreateResponse
+              }
               onCancel={handleCancelResponse}
               isSubmitting={responseSubmitting}
             />

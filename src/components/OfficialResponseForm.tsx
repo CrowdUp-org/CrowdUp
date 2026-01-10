@@ -91,11 +91,9 @@ export function OfficialResponseForm({
 }: OfficialResponseFormProps) {
   const [content, setContent] = useState(existingResponse?.content || "");
   const [responseType, setResponseType] = useState<ResponseType>(
-    existingResponse?.response_type || "acknowledgment"
+    existingResponse?.response_type || "acknowledgment",
   );
-  const [isPinned, setIsPinned] = useState(
-    existingResponse?.is_pinned ?? true
-  );
+  const [isPinned, setIsPinned] = useState(existingResponse?.is_pinned ?? true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -133,7 +131,7 @@ export function OfficialResponseForm({
   };
 
   const selectedOption = RESPONSE_TYPE_OPTIONS.find(
-    (opt) => opt.value === responseType
+    (opt) => opt.value === responseType,
   );
   const SelectedIcon = selectedOption?.icon || CheckCircle2;
 
@@ -152,7 +150,10 @@ export function OfficialResponseForm({
               </div>
             )}
           </div>
-          <Select value={responseType} onValueChange={(value) => setResponseType(value as ResponseType)}>
+          <Select
+            value={responseType}
+            onValueChange={(value) => setResponseType(value as ResponseType)}
+          >
             <SelectTrigger id="response-type" className="bg-white">
               <SelectValue />
             </SelectTrigger>
@@ -178,7 +179,10 @@ export function OfficialResponseForm({
         </div>
 
         <div>
-          <Label htmlFor="content" className="text-base font-semibold mb-2 block">
+          <Label
+            htmlFor="content"
+            className="text-base font-semibold mb-2 block"
+          >
             Official Response
           </Label>
           <Textarea
@@ -232,7 +236,11 @@ export function OfficialResponseForm({
                 {existingResponse ? "Updating..." : "Posting..."}
               </>
             ) : (
-              <>{existingResponse ? "Update Response" : "Post Official Response"}</>
+              <>
+                {existingResponse
+                  ? "Update Response"
+                  : "Post Official Response"}
+              </>
             )}
           </Button>
           <Button

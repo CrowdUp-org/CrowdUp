@@ -2,9 +2,12 @@ import { supabase } from "@/lib/supabase";
 import { Database } from "@/lib/database.types";
 import { createNotification } from "./notifications.service";
 
-type OfficialResponse = Database["public"]["Tables"]["official_responses"]["Row"];
-type OfficialResponseInsert = Database["public"]["Tables"]["official_responses"]["Insert"];
-type OfficialResponseUpdate = Database["public"]["Tables"]["official_responses"]["Update"];
+type OfficialResponse =
+  Database["public"]["Tables"]["official_responses"]["Row"];
+type OfficialResponseInsert =
+  Database["public"]["Tables"]["official_responses"]["Insert"];
+type OfficialResponseUpdate =
+  Database["public"]["Tables"]["official_responses"]["Update"];
 
 export type ResponseType =
   | "acknowledgment"
@@ -35,7 +38,7 @@ export interface OfficialResponseWithUser extends OfficialResponse {
  */
 export async function canUserRespond(
   userId: string,
-  postId: string
+  postId: string,
 ): Promise<{ canRespond: boolean; companyId?: string; error?: string }> {
   try {
     // Get the post's company
@@ -78,7 +81,10 @@ export async function canUserRespond(
       .single();
 
     if (memberError || !membership) {
-      return { canRespond: false, error: "User is not a verified company member" };
+      return {
+        canRespond: false,
+        error: "User is not a verified company member",
+      };
     }
 
     return { canRespond: true, companyId };
@@ -96,7 +102,7 @@ export async function createOfficialResponse(
   userId: string,
   content: string,
   responseType: ResponseType = "acknowledgment",
-  isPinned: boolean = true
+  isPinned: boolean = true,
 ): Promise<{
   success: boolean;
   data?: OfficialResponseWithUser;
@@ -104,7 +110,11 @@ export async function createOfficialResponse(
 }> {
   try {
     // Verify user can respond
-    const { canRespond, companyId, error: permError } = await canUserRespond(userId, postId);
+    const {
+      canRespond,
+      companyId,
+      error: permError,
+    } = await canUserRespond(userId, postId);
 
     if (!canRespond) {
       return { success: false, error: permError || "Permission denied" };
@@ -128,7 +138,7 @@ export async function createOfficialResponse(
         *,
         users (id, username, display_name, avatar_url),
         companies (id, name, display_name, logo_url)
-      `
+      `,
       )
       .single();
 
@@ -158,7 +168,7 @@ export async function createOfficialResponse(
         "official_response",
         "Official Response to Your Post",
         `${companyName} has responded to your post: "${(post as any).title}"`,
-        `/post/${postId}`
+        `/post/${postId}`,
       );
     }
 
@@ -180,7 +190,7 @@ export async function updateOfficialResponse(
     content?: string;
     response_type?: ResponseType;
     is_pinned?: boolean;
-  }
+  },
 ): Promise<{ success: boolean; data?: OfficialResponse; error?: string }> {
   try {
     // Get the response to check permissions
@@ -220,8 +230,9 @@ export async function updateOfficialResponse(
       updated_at: new Date().toISOString(),
     };
 
-    const { data: updatedResponse, error: updateError } = await (supabase
-      .from("official_responses") as any)
+    const { data: updatedResponse, error: updateError } = await (
+      supabase.from("official_responses") as any
+    )
       .update(updateData as any)
       .eq("id", responseId)
       .select()
@@ -245,7 +256,7 @@ export async function updateOfficialResponse(
  */
 export async function deleteOfficialResponse(
   responseId: string,
-  userId: string
+  userId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Get the response to check permissions
@@ -301,9 +312,7 @@ export async function deleteOfficialResponse(
  * Get all official responses for a post
  * Returns pinned responses first, then by creation date
  */
-export async function getResponsesForPost(
-  postId: string
-): Promise<{
+export async function getResponsesForPost(postId: string): Promise<{
   success: boolean;
   data?: OfficialResponseWithUser[];
   error?: string;
@@ -316,7 +325,7 @@ export async function getResponsesForPost(
         *,
         users (id, username, display_name, avatar_url),
         companies (id, name, display_name, logo_url)
-      `
+      `,
       )
       .eq("post_id", postId)
       .order("is_pinned", { ascending: false })
@@ -327,7 +336,10 @@ export async function getResponsesForPost(
       return { success: false, error: "Failed to fetch responses" };
     }
 
-    return { success: true, data: (responses || []) as OfficialResponseWithUser[] };
+    return {
+      success: true,
+      data: (responses || []) as OfficialResponseWithUser[],
+    };
   } catch (error) {
     console.error("Error in getResponsesForPost:", error);
     return { success: false, error: "An unexpected error occurred" };
@@ -341,7 +353,7 @@ export async function getResponsesForPost(
 export async function togglePinResponse(
   responseId: string,
   userId: string,
-  isPinned: boolean
+  isPinned: boolean,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Get the response to check permissions
@@ -366,15 +378,19 @@ export async function togglePinResponse(
         .single();
 
       if (!membership) {
-        return { success: false, error: "Only company admins can pin/unpin responses" };
+        return {
+          success: false,
+          error: "Only company admins can pin/unpin responses",
+        };
       }
     } else {
       return { success: false, error: "Company not found" };
     }
 
     // Update pin status
-    const { error: updateError } = await (supabase
-      .from("official_responses") as any)
+    const { error: updateError } = await (
+      supabase.from("official_responses") as any
+    )
       .update({ is_pinned: isPinned } as any)
       .eq("id", responseId);
 

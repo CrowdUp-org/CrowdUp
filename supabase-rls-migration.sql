@@ -13,7 +13,9 @@ ALTER TABLE apps ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_role_audit ENABLE ROW LEVEL SECURITY;
 
 -- 2. Basic User Policies
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON users;
 CREATE POLICY "Public profiles are viewable by everyone" ON users FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Users can update their own profile" ON users;
 CREATE POLICY "Users can update their own profile" 
   ON users 
   FOR UPDATE 
@@ -27,25 +29,38 @@ CREATE POLICY "Users can update their own profile"
 -- For this migration, we'll keep the basic policy but add a comment about privileged fields.
 
 -- 3. Post Policies
+DROP POLICY IF EXISTS "Posts are viewable by everyone" ON posts;
 CREATE POLICY "Posts are viewable by everyone" ON posts FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Authenticated users can create posts" ON posts;
 CREATE POLICY "Authenticated users can create posts" ON posts FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Users can update their own posts" ON posts;
 CREATE POLICY "Users can update their own posts" ON posts FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own posts" ON posts;
 CREATE POLICY "Users can delete their own posts" ON posts FOR DELETE USING (auth.uid() = user_id);
 
 -- 4. Comment Policies
+DROP POLICY IF EXISTS "Comments are viewable by everyone" ON comments;
 CREATE POLICY "Comments are viewable by everyone" ON comments FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Authenticated users can create comments" ON comments;
 CREATE POLICY "Authenticated users can create comments" ON comments FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Users can update their own comments" ON comments;
 CREATE POLICY "Users can update their own comments" ON comments FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own comments" ON comments;
 CREATE POLICY "Users can delete their own comments" ON comments FOR DELETE USING (auth.uid() = user_id);
 
 -- 5. Vote Policies
+DROP POLICY IF EXISTS "Votes are viewable by everyone" ON votes;
 CREATE POLICY "Votes are viewable by everyone" ON votes FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Authenticated users can vote" ON votes;
 CREATE POLICY "Authenticated users can vote" ON votes FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Users can update their own votes" ON votes;
 CREATE POLICY "Users can update their own votes" ON votes FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete their own votes" ON votes;
 CREATE POLICY "Users can delete their own votes" ON votes FOR DELETE USING (auth.uid() = user_id);
 
 -- 6. Admin & Audit (Strict)
 -- Note: Uses a custom `is_admin` claim from the JWT for better performance
+DROP POLICY IF EXISTS "Admins can view all audit logs" ON user_role_audit;
 CREATE POLICY "Admins can view all audit logs" ON user_role_audit FOR SELECT USING (
   COALESCE((auth.jwt()->>'is_admin')::boolean, false) = true
 );

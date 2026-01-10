@@ -220,8 +220,8 @@ export async function updateOfficialResponse(
       updated_at: new Date().toISOString(),
     };
 
-    const { data: updatedResponse, error: updateError } = await supabase
-      .from("official_responses")
+    const { data: updatedResponse, error: updateError } = await (supabase
+      .from("official_responses") as any)
       .update(updateData as any)
       .eq("id", responseId)
       .select()
@@ -373,8 +373,8 @@ export async function togglePinResponse(
     }
 
     // Update pin status
-    const { error: updateError } = await supabase
-      .from("official_responses")
+    const { error: updateError } = await (supabase
+      .from("official_responses") as any)
       .update({ is_pinned: isPinned } as any)
       .eq("id", responseId);
 

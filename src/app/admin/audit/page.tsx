@@ -6,12 +6,10 @@ import {
     Search,
     ChevronLeft,
     ChevronRight,
-    Shield,
     Users,
     LayoutDashboard,
     Clock,
     User,
-    Activity,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";

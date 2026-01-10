@@ -22,6 +22,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -98,6 +99,7 @@ export function OfficialResponseCard({
   onDelete,
   canModify = false,
 }: OfficialResponseCardProps) {
+  const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const config = RESPONSE_TYPE_CONFIG[response.response_type];
   const Icon = config.icon;
@@ -193,7 +195,7 @@ export function OfficialResponseCard({
             <button
               onClick={() => {
                 if (response.users.username) {
-                  window.location.href = `/profile/${response.users.username}`;
+                  router.push(`/profile/${response.users.username}`);
                 }
               }}
               className="font-semibold text-gray-900 hover:underline"
@@ -207,7 +209,7 @@ export function OfficialResponseCard({
                 <button
                   onClick={() => {
                     if (response.companies?.name) {
-                      window.location.href = `/company/${response.companies.name}`;
+                      router.push(`/company/${response.companies.name}`);
                     }
                   }}
                   className="text-sm text-gray-600 hover:underline flex items-center gap-1.5"

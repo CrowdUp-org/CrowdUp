@@ -16,7 +16,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { getCurrentUserId } from "@/lib/services/auth.service";
 import { useRouter } from "next/navigation";
-import { Bell, Building2, Mail, ArrowLeft } from "lucide-react";
+import { Building2, ArrowLeft } from "lucide-react";
 
 interface NotificationPreferences {
   id: string;
@@ -154,7 +154,7 @@ export default function NotificationSettingsPage() {
         .upsert(updates, { onConflict: "user_id, company_id" });
 
       if (error) throw error;
-      
+
       // Refresh data to get real IDs
       // For now just stop saving
     } catch (error) {
@@ -198,7 +198,7 @@ export default function NotificationSettingsPage() {
         <div className="space-y-6">
           {/* Global Settings (if needed, or just use company settings) */}
           {/* For now, let's assume global settings apply to user-centric notifications */}
-          
+
           {companies.map((company) => {
             const prefs = preferences[company.id];
             if (!prefs) return null;

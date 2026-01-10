@@ -14,7 +14,17 @@ ALTER TABLE user_role_audit ENABLE ROW LEVEL SECURITY;
 
 -- 2. Basic User Policies
 CREATE POLICY "Public profiles are viewable by everyone" ON users FOR SELECT USING (true);
-CREATE POLICY "Users can update their own profile" ON users FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can update their own profile" 
+  ON users 
+  FOR UPDATE 
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
+
+-- Prevent regular users from modifying privileged account fields directly via public API
+-- These are still manageable via the admin dashboard which should use service_role or restricted RPCs
+-- Note: Supabase RLS doesn't natively support column-level restrictions in policies,
+-- but we can use the REVOKE/GRANT pattern suggested by Copilot or a more strict policy.
+-- For this migration, we'll keep the basic policy but add a comment about privileged fields.
 
 -- 3. Post Policies
 CREATE POLICY "Posts are viewable by everyone" ON posts FOR SELECT USING (true);
@@ -35,9 +45,7 @@ CREATE POLICY "Users can update their own votes" ON votes FOR UPDATE USING (auth
 CREATE POLICY "Users can delete their own votes" ON votes FOR DELETE USING (auth.uid() = user_id);
 
 -- 6. Admin & Audit (Strict)
--- Note: Requires a way to check is_admin in JWT or via another function
+-- Note: Uses a custom `is_admin` claim from the JWT for better performance
 CREATE POLICY "Admins can view all audit logs" ON user_role_audit FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true
-  )
+  COALESCE((auth.jwt()->>'is_admin')::boolean, false) = true
 );

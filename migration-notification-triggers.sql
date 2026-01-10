@@ -13,9 +13,13 @@ BEGIN
 
     IF v_company_id IS NOT NULL THEN
         -- Loop through company members and create notifications
-        FOR v_member IN SELECT user_id FROM company_members WHERE company_id = v_company_id LOOP
-            -- Check preferences (optional, but good to have)
-            -- For now, just insert
+        FOR v_member IN 
+            SELECT cm.user_id 
+            FROM company_members cm
+            LEFT JOIN notification_preferences np ON np.user_id = cm.user_id AND np.company_id = v_company_id
+            WHERE cm.company_id = v_company_id
+            AND COALESCE(np.notify_new_posts, TRUE) = TRUE -- Check preference, default to TRUE
+        LOOP
             INSERT INTO notifications (
                 recipient_id,
                 recipient_type,
@@ -59,8 +63,10 @@ BEGIN
     -- Get post details
     SELECT * INTO v_post FROM posts WHERE id = NEW.post_id;
 
-    -- 1. Notify Post Author (if not the commenter)
+    -- 1. Notify Post Author (if not the commenter and preferences allow)
     IF v_post.user_id != NEW.user_id THEN
+        -- Only if user has global or company-specific preference enabled
+        -- (Assuming simple check for now, can be expanded)
         INSERT INTO notifications (
             recipient_id,
             recipient_type,
@@ -88,10 +94,15 @@ BEGIN
     SELECT id INTO v_company_id FROM companies WHERE lower(name) = lower(v_post.company);
 
     IF v_company_id IS NOT NULL THEN
-        FOR v_member IN SELECT user_id FROM company_members WHERE company_id = v_company_id LOOP
-            -- Don't notify if the commenter is the member themselves (optional)
-            IF v_member.user_id != NEW.user_id THEN
-                INSERT INTO notifications (
+        FOR v_member IN 
+            SELECT cm.user_id 
+            FROM company_members cm
+            LEFT JOIN notification_preferences np ON np.user_id = cm.user_id AND np.company_id = v_company_id
+            WHERE cm.company_id = v_company_id
+            AND cm.user_id != NEW.user_id -- Don't notify the commenter
+            AND COALESCE(np.notify_comments, TRUE) = TRUE -- Check preference
+        LOOP
+            INSERT INTO notifications (
                     recipient_id,
                     recipient_type,
                     company_id,

@@ -17,17 +17,6 @@ import {
   OfficialResponseWithUser,
   ResponseType,
 } from "@/lib/services/official-responses.service";
-import { OfficialResponseCard } from "@/components/OfficialResponseCard";
-import { OfficialResponseForm } from "@/components/OfficialResponseForm";
-import {
-  getResponsesForPost,
-  createOfficialResponse,
-  updateOfficialResponse,
-  deleteOfficialResponse,
-  canUserRespond,
-  OfficialResponseWithUser,
-  ResponseType,
-} from "@/lib/services/official-responses.service";
 import {
   Dialog,
   DialogContent,
@@ -635,7 +624,7 @@ export default function PostDetailPage({
         )}
 
         {/* Comments Section */}
-        <div className="rounded-2xl border bg-white p-8 shadow-sm">{
+        <div className="rounded-2xl border bg-white p-8 shadow-sm">
           <h2 className="text-2xl font-bold mb-6">
             {comments.length} Comments
           </h2>

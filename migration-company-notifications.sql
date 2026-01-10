@@ -7,7 +7,8 @@ DO $$
 BEGIN
     -- Add recipient_id if it doesn't exist (we'll use user_id as recipient_id for now, but let's standardize)
     -- If user_id exists, we can rename it or just use it. The request uses recipient_id.
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'user_id') THEN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'user_id') 
+       AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'recipient_id') THEN
         ALTER TABLE notifications RENAME COLUMN user_id TO recipient_id;
     END IF;
 
@@ -23,12 +24,14 @@ BEGIN
     END IF;
 
     -- Add notification_type (rename type if exists, or add)
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'type') THEN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'type')
+       AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'notification_type') THEN
         ALTER TABLE notifications RENAME COLUMN type TO notification_type;
     END IF;
     
     -- Add message (rename content if exists)
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'content') THEN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'content')
+       AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'message') THEN
         ALTER TABLE notifications RENAME COLUMN content TO message;
     END IF;
 

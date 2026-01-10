@@ -126,7 +126,6 @@ BEGIN
                     'medium',
                     NEW.user_id
                 );
-            END IF;
         END LOOP;
     END IF;
 

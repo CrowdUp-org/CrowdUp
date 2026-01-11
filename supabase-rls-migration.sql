@@ -22,16 +22,15 @@ CREATE POLICY "Users can update their own profile"
   USING (auth.uid() = id)
   WITH CHECK (
     auth.uid() = id
-    AND COALESCE(is_admin, false) = false
-    AND COALESCE(is_banned, false) = false
   );
 
 -- Prevent regular users from modifying privileged account fields directly via public API
 -- These are still manageable via the admin dashboard which should use service_role or restricted RPCs
 -- Note: Supabase RLS doesn't natively support column-level restrictions in policies,
 -- but we can use the REVOKE/GRANT pattern suggested by Copilot or a more strict policy.
--- For this migration, we restrict updates so that privileged fields like is_admin and is_banned
--- cannot be set to TRUE by regular authenticated users; admin tooling should use the service_role.
+-- Here we revoke UPDATE privileges on privileged columns from non-service roles, so only
+-- admin tooling using the service_role key (which bypasses RLS/privileges) can change them.
+REVOKE UPDATE (is_admin, is_banned) ON users FROM PUBLIC;
 
 -- 3. Post Policies
 DROP POLICY IF EXISTS "Posts are viewable by everyone" ON posts;

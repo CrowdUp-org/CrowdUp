@@ -10,6 +10,14 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
+  MoreVertical,
+  Ban,
+  UserX,
+  Key,
+  Unlock,
+  AlertTriangle,
+  LayoutDashboard,
+  History,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -19,10 +27,33 @@ import {
   getAllUsers,
   updateUserAdminStatus,
   isCurrentUserAdmin,
+  banUser,
+  unbanUser,
+  kickUser,
+  resetUserPassword,
 } from "@/lib/services/verification.service";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { ReputationBadge } from "@/components/ui/reputation-badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function UserManagementPage() {
   const router = useRouter();
@@ -33,6 +64,14 @@ export default function UserManagementPage() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const pageSize = 20;
+
+  // New states for actions
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [banModalOpen, setBanModalOpen] = useState(false);
+  const [banReason, setBanReason] = useState("");
+  const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [kickModalOpen, setKickModalOpen] = useState(false);
 
   useEffect(() => {
     checkAdmin();
@@ -97,6 +136,81 @@ export default function UserManagementPage() {
     }
   };
 
+  const handleBan = async () => {
+    if (!selectedUser || !currentUserId) return;
+
+    const { success, error } = await banUser(
+      selectedUser.id,
+      banReason,
+      currentUserId,
+    );
+
+    if (success) {
+      toast.success(`User ${selectedUser.username} has been banned`);
+      setUsers(
+        users.map((u) =>
+          u.id === selectedUser.id
+            ? { ...u, is_banned: true, banned_reason: banReason }
+            : u,
+        ),
+      );
+      setBanModalOpen(false);
+      setBanReason("");
+    } else {
+      toast.error(error || "Failed to ban user");
+    }
+  };
+
+  const handleUnban = async (user: any) => {
+    if (!currentUserId) return;
+
+    const { success, error } = await unbanUser(user.id, currentUserId);
+
+    if (success) {
+      toast.success(`User ${user.username} has been unbanned`);
+      setUsers(
+        users.map((u) =>
+          u.id === user.id
+            ? { ...u, is_banned: false, banned_reason: null }
+            : u,
+        ),
+      );
+    } else {
+      toast.error(error || "Failed to unban user");
+    }
+  };
+
+  const handleKick = async () => {
+    if (!selectedUser || !currentUserId) return;
+
+    const { success, error } = await kickUser(selectedUser.id, currentUserId);
+
+    if (success) {
+      toast.success(`User ${selectedUser.username} has been kicked`);
+      setKickModalOpen(false);
+    } else {
+      toast.error(error || "Failed to kick user");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!selectedUser || !currentUserId || !newPassword) return;
+
+    const { success, error } = await resetUserPassword(
+      selectedUser.id,
+      newPassword,
+      currentUserId,
+    );
+
+    if (success) {
+      toast.success(`Password reset for ${selectedUser.username}`);
+      setResetPasswordOpen(false);
+      setNewPassword("");
+    } else {
+      toast.error(error || "Failed to reset password");
+    }
+  };
+
   const filteredUsers = users.filter(
     (user) =>
       user.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -122,6 +236,14 @@ export default function UserManagementPage() {
           </div>
           <div className="flex gap-4">
             <Button
+              onClick={() => router.push("/admin")}
+              variant="outline"
+              className="gap-2"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Button>
+            <Button
               onClick={() => router.push("/admin/verification")}
               variant="outline"
               className="gap-2"
@@ -130,12 +252,12 @@ export default function UserManagementPage() {
               Verifications
             </Button>
             <Button
-              onClick={() => router.push("/leaderboard")}
+              onClick={() => router.push("/admin/audit")}
               variant="outline"
               className="gap-2"
             >
-              <TrendingUp className="h-4 w-4" />
-              Leaderboard
+              <History className="h-4 w-4" />
+              Audit Logs
             </Button>
           </div>
         </div>
@@ -222,42 +344,101 @@ export default function UserManagementPage() {
                       {format(new Date(user.created_at), "MMM d, yyyy")}
                     </td>
                     <td className="px-6 py-4">
-                      {user.is_admin ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
-                          <Shield className="h-3 w-3" />
-                          Admin
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
-                          User
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button
-                        variant={user.is_admin ? "outline" : "default"}
-                        size="sm"
-                        className={
-                          user.is_admin
-                            ? "text-red-600 hover:text-red-700 hover:bg-red-50"
-                            : "bg-blue-600 hover:bg-blue-700"
-                        }
-                        onClick={() =>
-                          handleToggleAdmin(user.id, user.is_admin)
-                        }
-                      >
+                      <div className="flex flex-col gap-1">
                         {user.is_admin ? (
-                          <span className="flex items-center gap-1">
-                            <ShieldAlert className="h-3 w-3" />
-                            Revoke Admin
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium w-fit">
+                            <Shield className="h-3 w-3" />
+                            Admin
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1">
-                            <Shield className="h-3 w-3" />
-                            Make Admin
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium w-fit">
+                            User
                           </span>
                         )}
-                      </Button>
+                        {user.is_banned && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium w-fit">
+                            <Ban className="h-3 w-3" />
+                            Banned
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuLabel>Admin Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleToggleAdmin(user.id, user.is_admin)
+                            }
+                            className={
+                              user.is_admin ? "text-red-600" : "text-blue-600"
+                            }
+                          >
+                            {user.is_admin ? (
+                              <>
+                                <ShieldAlert className="mr-2 h-4 w-4" />
+                                Revoke Admin
+                              </>
+                            ) : (
+                              <>
+                                <Shield className="mr-2 h-4 w-4" />
+                                Make Admin
+                              </>
+                            )}
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setResetPasswordOpen(true);
+                            }}
+                          >
+                            <Key className="mr-2 h-4 w-4" />
+                            Reset Password
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setKickModalOpen(true);
+                            }}
+                          >
+                            <UserX className="mr-2 h-4 w-4" />
+                            Kick User
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
+                          {user.is_banned ? (
+                            <DropdownMenuItem
+                              onClick={() => handleUnban(user)}
+                              className="text-green-600 font-medium"
+                            >
+                              <Unlock className="mr-2 h-4 w-4" />
+                              Unban User
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setBanModalOpen(true);
+                              }}
+                              className="text-red-600 font-medium"
+                            >
+                              <Ban className="mr-2 h-4 w-4" />
+                              Ban User
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </td>
                   </tr>
                 ))
@@ -290,6 +471,116 @@ export default function UserManagementPage() {
             </div>
           </div>
         </div>
+
+        {/* Ban User Modal */}
+        <Dialog open={banModalOpen} onOpenChange={setBanModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-600">
+                <Ban className="h-5 w-5" />
+                Ban User: {selectedUser?.username}
+              </DialogTitle>
+              <DialogDescription>
+                This will prevent the user from accessing the platform. This
+                action will be logged.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reason">Reason for Ban</Label>
+                <Textarea
+                  id="reason"
+                  placeholder="Inappropriate behavior, spam, etc."
+                  value={banReason}
+                  onChange={(e) => setBanReason(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBanModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleBan}
+                disabled={!banReason}
+              >
+                Confirm Ban
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Kick User Modal */}
+        <Dialog open={kickModalOpen} onOpenChange={setKickModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <UserX className="h-5 w-5 text-orange-500" />
+                Kick User: {selectedUser?.username}
+              </DialogTitle>
+              <DialogDescription>
+                Are you sure you want to kick this user? This will log the
+                action in the audit trail.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setKickModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                className="bg-orange-500 hover:bg-orange-600"
+                onClick={handleKick}
+              >
+                Confirm Kick
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reset Password Modal */}
+        <Dialog open={resetPasswordOpen} onOpenChange={setResetPasswordOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5 text-blue-600" />
+                Reset Password: {selectedUser?.username}
+              </DialogTitle>
+              <DialogDescription>
+                Enter a new password for this user. This action will be logged.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">New Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter new secure password..."
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setResetPasswordOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={handleResetPassword}
+                disabled={!newPassword}
+              >
+                Reset Password
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

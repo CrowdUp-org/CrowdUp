@@ -644,6 +644,24 @@ export default function SettingsPage() {
                 }
               />
             </div>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base">Company Notifications</Label>
+                <p className="text-sm text-gray-500">
+                  Manage notifications for companies you manage (new posts,
+                  sentiment alerts, etc.)
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/settings/notifications")}
+              >
+                Manage
+              </Button>
+            </div>
           </div>
         </div>
 

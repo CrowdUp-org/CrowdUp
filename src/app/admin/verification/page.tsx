@@ -24,6 +24,9 @@ import {
   Clock,
   Shield,
   Loader2,
+  LayoutDashboard,
+  Users,
+  History,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -102,13 +105,41 @@ export default function AdminVerificationPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-8">
-          <Shield className="w-8 h-8 text-blue-500" />
-          <div>
-            <h1 className="text-2xl font-bold">Verification Requests</h1>
-            <p className="text-muted-foreground">
-              Review and manage company representative verification requests
-            </p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <Shield className="w-8 h-8 text-blue-500" />
+            <div>
+              <h1 className="text-2xl font-bold">Verification Requests</h1>
+              <p className="text-muted-foreground">
+                Review and manage company representative verification requests
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push("/admin")}
+              variant="outline"
+              className="gap-2"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Button>
+            <Button
+              onClick={() => router.push("/admin/users")}
+              variant="outline"
+              className="gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Users
+            </Button>
+            <Button
+              onClick={() => router.push("/admin/audit")}
+              variant="outline"
+              className="gap-2"
+            >
+              <History className="h-4 w-4" />
+              Audit Logs
+            </Button>
           </div>
         </div>
 

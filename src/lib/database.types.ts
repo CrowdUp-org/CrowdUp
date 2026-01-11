@@ -21,6 +21,8 @@ export interface Database {
           reputation_score: number;
           reputation_level: string;
           is_admin: boolean;
+          is_banned: boolean;
+          banned_reason: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -324,6 +326,59 @@ export interface Database {
           created_at?: string;
         };
       };
+      official_responses: {
+        Row: {
+          id: string;
+          post_id: string;
+          company_id: string | null;
+          responder_id: string;
+          content: string;
+          response_type:
+            | "acknowledgment"
+            | "investigating"
+            | "planned"
+            | "fixed"
+            | "wont_fix"
+            | "duplicate";
+          is_pinned: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          company_id?: string | null;
+          responder_id: string;
+          content: string;
+          response_type?:
+            | "acknowledgment"
+            | "investigating"
+            | "planned"
+            | "fixed"
+            | "wont_fix"
+            | "duplicate";
+          is_pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          company_id?: string | null;
+          responder_id?: string;
+          content?: string;
+          response_type?:
+            | "acknowledgment"
+            | "investigating"
+            | "planned"
+            | "fixed"
+            | "wont_fix"
+            | "duplicate";
+          is_pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
       conversations: {
         Row: {
           id: string;
@@ -525,33 +580,101 @@ export interface Database {
       notifications: {
         Row: {
           id: string;
-          user_id: string;
-          type: "badge" | "level" | "verification" | "milestone";
+          recipient_id: string;
+          recipient_type: "user" | "company";
+          company_id: string | null;
+          notification_type: string;
           title: string;
-          content: string;
+          message: string;
           link: string | null;
+          related_post_id: string | null;
+          related_comment_id: string | null;
+          priority: "low" | "medium" | "high" | "urgent";
           is_read: boolean;
+          read_at: string | null;
+          actor_id: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
-          user_id: string;
-          type: "badge" | "level" | "verification" | "milestone";
+          recipient_id: string;
+          recipient_type?: "user" | "company";
+          company_id?: string | null;
+          notification_type: string;
           title: string;
-          content: string;
+          message: string;
           link?: string | null;
+          related_post_id?: string | null;
+          related_comment_id?: string | null;
+          priority?: "low" | "medium" | "high" | "urgent";
           is_read?: boolean;
+          read_at?: string | null;
+          actor_id?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
-          user_id?: string;
-          type?: "badge" | "level" | "verification" | "milestone";
+          recipient_id?: string;
+          recipient_type?: "user" | "company";
+          company_id?: string | null;
+          notification_type?: string;
           title?: string;
-          content?: string;
+          message?: string;
           link?: string | null;
+          related_post_id?: string | null;
+          related_comment_id?: string | null;
+          priority?: "low" | "medium" | "high" | "urgent";
           is_read?: boolean;
+          read_at?: string | null;
+          actor_id?: string | null;
           created_at?: string;
+        };
+      };
+      notification_preferences: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          company_id: string | null;
+          notify_new_posts: boolean;
+          notify_comments: boolean;
+          notify_high_votes: boolean;
+          notify_trending: boolean;
+          notify_negative_sentiment: boolean;
+          email_notifications: boolean;
+          email_frequency: "realtime" | "hourly" | "daily" | "weekly";
+          push_notifications: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          company_id?: string | null;
+          notify_new_posts?: boolean;
+          notify_comments?: boolean;
+          notify_high_votes?: boolean;
+          notify_trending?: boolean;
+          notify_negative_sentiment?: boolean;
+          email_notifications?: boolean;
+          email_frequency?: "realtime" | "hourly" | "daily" | "weekly";
+          push_notifications?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          company_id?: string | null;
+          notify_new_posts?: boolean;
+          notify_comments?: boolean;
+          notify_high_votes?: boolean;
+          notify_trending?: boolean;
+          notify_negative_sentiment?: boolean;
+          email_notifications?: boolean;
+          email_frequency?: "realtime" | "hourly" | "daily" | "weekly";
+          push_notifications?: boolean;
+          created_at?: string;
+          updated_at?: string;
         };
       };
       user_role_audit: {
@@ -559,21 +682,42 @@ export interface Database {
           id: string;
           target_user_id: string;
           admin_id: string;
-          action: "promote" | "demote";
+          action:
+            | "promote"
+            | "demote"
+            | "ban"
+            | "unban"
+            | "kick"
+            | "reset_password";
+          action_details: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           target_user_id: string;
           admin_id: string;
-          action: "promote" | "demote";
+          action:
+            | "promote"
+            | "demote"
+            | "ban"
+            | "unban"
+            | "kick"
+            | "reset_password";
+          action_details?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           target_user_id?: string;
           admin_id?: string;
-          action?: "promote" | "demote";
+          action?:
+            | "promote"
+            | "demote"
+            | "ban"
+            | "unban"
+            | "kick"
+            | "reset_password";
+          action_details?: string | null;
           created_at?: string;
         };
       };

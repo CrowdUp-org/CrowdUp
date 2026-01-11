@@ -43,6 +43,9 @@ export default function CompanyPage({
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
   );
+  const [officialResponseFlags, setOfficialResponseFlags] = useState<
+    Record<string, boolean>
+  >({});
   const [isOwnerOrAdmin, setIsOwnerOrAdmin] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
@@ -90,7 +93,7 @@ export default function CompanyPage({
     if (data) {
       setPosts(data);
 
-      // Fetch comment counts
+      // Fetch comment counts and official response flags
       const postIds = data.map((p: any) => p.id);
       if (postIds.length > 0) {
         const { data: commentsData } = await supabase
@@ -104,6 +107,20 @@ export default function CompanyPage({
             counts[comment.post_id] = (counts[comment.post_id] || 0) + 1;
           });
           setCommentCounts(counts);
+        }
+
+        // Check for official responses
+        const { data: responsesData } = await supabase
+          .from("official_responses")
+          .select("post_id")
+          .in("post_id", postIds);
+
+        if (responsesData) {
+          const flags: Record<string, boolean> = {};
+          responsesData.forEach((response: any) => {
+            flags[response.post_id] = true;
+          });
+          setOfficialResponseFlags(flags);
         }
       }
     }
@@ -426,6 +443,7 @@ export default function CompanyPage({
                     addSuffix: true,
                   })}
                   comments={commentCounts[post.id] || 0}
+                  hasOfficialResponse={officialResponseFlags[post.id] || false}
                 />
               ))}
             </div>

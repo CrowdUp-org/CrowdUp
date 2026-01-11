@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 export interface User {
   id: string;
   username: string;
@@ -113,6 +115,20 @@ export async function signIn(
   } catch (error) {
     return { user: null, error: "An error occurred during sign in" };
   }
+}
+
+/**
+ * Check if a specific account is banned
+ */
+export async function isAccountBanned(userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("users")
+    .select("is_banned")
+    .eq("id", userId)
+    .single();
+
+  if (error || !data) return false;
+  return (data as any).is_banned === true;
 }
 
 /**

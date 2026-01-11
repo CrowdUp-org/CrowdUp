@@ -2,7 +2,10 @@
 
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/services/notifications.service";
+import bcrypt from "bcryptjs";
 import type { Json } from "@/lib/database.types";
+
+const SALT_ROUNDS = 10;
 
 /**
  * Verification document structure
@@ -377,7 +380,7 @@ export async function getAllUsers(
   const { data, error } = await supabase
     .from("users")
     .select(
-      "id, username, display_name, email, is_admin, reputation_score, reputation_level, created_at",
+      "id, username, display_name, email, is_admin, is_banned, banned_reason, reputation_score, reputation_level, created_at",
     )
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
@@ -388,4 +391,239 @@ export async function getAllUsers(
   }
 
   return data;
+}
+
+/**
+ * Ban a user (admin only)
+ */
+export async function banUser(
+  userId: string,
+  reason: string,
+  currentAdminId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = (await (supabase.from("users") as any)
+      .update({
+        is_banned: true,
+        banned_reason: reason,
+      })
+      .eq("id", userId)) as any;
+
+    if (error) {
+      console.error("Ban user error:", error);
+      return { success: false, error: "Failed to ban user" };
+    }
+
+    // Log the action
+    await supabase.from("user_role_audit").insert({
+      target_user_id: userId,
+      admin_id: currentAdminId,
+      action: "ban",
+      action_details: reason,
+    } as any);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Ban user error:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Unban a user (admin only)
+ */
+export async function unbanUser(
+  userId: string,
+  currentAdminId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = (await (supabase.from("users") as any)
+      .update({
+        is_banned: false,
+        banned_reason: null,
+      })
+      .eq("id", userId)) as any;
+
+    if (error) {
+      console.error("Unban user error:", error);
+      return { success: false, error: "Failed to unban user" };
+    }
+
+    // Log the action
+    await supabase.from("user_role_audit").insert({
+      target_user_id: userId,
+      admin_id: currentAdminId,
+      action: "unban",
+    } as any);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Unban user error:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Kick a user (admin only)
+ * Note: Primarily logs the action for now as sessions are client-side.
+ */
+export async function kickUser(
+  userId: string,
+  currentAdminId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Log the action
+    await supabase.from("user_role_audit").insert({
+      target_user_id: userId,
+      admin_id: currentAdminId,
+      action: "kick",
+    } as any);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Kick user error:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Reset a user's password (admin only)
+ */
+export async function resetUserPassword(
+  userId: string,
+  newPassword: string,
+  currentAdminId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const password_hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    const { error } = (await (supabase.from("users") as any)
+      .update({ password_hash })
+      .eq("id", userId)) as any;
+
+    if (error) {
+      console.error("Password reset error:", error);
+      return { success: false, error: "Failed to reset password" };
+    }
+
+    // Log the action
+    await supabase.from("user_role_audit").insert({
+      target_user_id: userId,
+      admin_id: currentAdminId,
+      action: "reset_password",
+    } as any);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Password reset error:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Get trending companies (admin only)
+ */
+export async function getTrendingCompanies(limit: number = 6): Promise<any[]> {
+  const { data, error } = await (supabase.rpc as any)(
+    "get_trending_companies",
+    {
+      limit_count: limit,
+    },
+  );
+
+  if (error) {
+    console.error("Get trending companies error:", error);
+    return [];
+  }
+
+  return data;
+}
+
+/**
+ * Get trending topics (admin only)
+ */
+export async function getTrendingTopics(limit: number = 6): Promise<any[]> {
+  const { data, error } = await (supabase.rpc as any)("get_trending_topics", {
+    limit_count: limit,
+  });
+
+  if (error) {
+    console.error("Get trending topics error:", error);
+    return [];
+  }
+
+  return data;
+}
+
+/**
+ * Get audit logs (admin only)
+ */
+export async function getAuditLogs(
+  limit: number = 50,
+  offset: number = 0,
+): Promise<any[]> {
+  const { data, error } = await supabase
+    .from("user_role_audit")
+    .select(
+      `
+      id,
+      action,
+      action_details,
+      created_at,
+      target_user:target_user_id (id, username, display_name),
+      admin:admin_id (id, username, display_name)
+    `,
+    )
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error("Get audit logs error:", error);
+    return [];
+  }
+
+  return (data || []).map((log: any) => ({
+    ...log,
+    target_user: log.target_user,
+    admin: log.admin,
+  }));
+}
+
+/**
+ * Get general platform statistics (admin only)
+ */
+export async function getPlatformStats(): Promise<{
+  totalUsers: number;
+  totalPosts: number;
+  totalComments: number;
+  totalVotes: number;
+}> {
+  try {
+    const [
+      { count: userCount },
+      { count: postCount },
+      { count: commentCount },
+      { count: voteCount },
+    ] = await Promise.all([
+      supabase.from("users").select("*", { count: "exact", head: true }),
+      supabase.from("posts").select("*", { count: "exact", head: true }),
+      supabase.from("comments").select("*", { count: "exact", head: true }),
+      supabase.from("votes").select("*", { count: "exact", head: true }),
+    ]);
+
+    return {
+      totalUsers: userCount || 0,
+      totalPosts: postCount || 0,
+      totalComments: commentCount || 0,
+      totalVotes: voteCount || 0,
+    };
+  } catch (error) {
+    console.error("Get platform stats error:", error);
+    return {
+      totalUsers: 0,
+      totalPosts: 0,
+      totalComments: 0,
+      totalVotes: 0,
+    };
+  }
 }

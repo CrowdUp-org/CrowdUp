@@ -117,6 +117,33 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
   UNIQUE(user_id, company_id)
 );
 
+-- Enable Row Level Security on notification_preferences
+ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to view only their own notification preferences
+CREATE POLICY "Users can view own notification preferences"
+  ON notification_preferences
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Allow users to insert notification preferences only for themselves
+CREATE POLICY "Users can insert own notification preferences"
+  ON notification_preferences
+  FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- Allow users to update only their own notification preferences
+CREATE POLICY "Users can update own notification preferences"
+  ON notification_preferences
+  FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- Allow users to delete only their own notification preferences
+CREATE POLICY "Users can delete own notification preferences"
+  ON notification_preferences
+  FOR DELETE
+  USING (auth.uid() = user_id);
 -- 3. Create indexes
 CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications(recipient_id, is_read);
 CREATE INDEX IF NOT EXISTS idx_notifications_company ON notifications(company_id, created_at DESC);

@@ -93,7 +93,9 @@ export function OfficialResponseForm({
   const [responseType, setResponseType] = useState<ResponseType>(
     existingResponse?.response_type || "acknowledgment",
   );
-  const [isPinned, setIsPinned] = useState(existingResponse?.is_pinned ?? false);
+  const [isPinned, setIsPinned] = useState(
+    existingResponse?.is_pinned ?? false,
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

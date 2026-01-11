@@ -47,7 +47,7 @@ CREATE POLICY "Users can delete their own posts" ON posts FOR DELETE USING (auth
 DROP POLICY IF EXISTS "Comments are viewable by everyone" ON comments;
 CREATE POLICY "Comments are viewable by everyone" ON comments FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Authenticated users can create comments" ON comments;
-CREATE POLICY "Authenticated users can create comments" ON comments FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Authenticated users can create comments" ON comments FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND user_id = auth.uid());
 DROP POLICY IF EXISTS "Users can update their own comments" ON comments;
 CREATE POLICY "Users can update their own comments" ON comments FOR UPDATE USING (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Users can delete their own comments" ON comments;

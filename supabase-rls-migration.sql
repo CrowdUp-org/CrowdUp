@@ -37,7 +37,7 @@ CREATE POLICY "Users can update their own profile"
 DROP POLICY IF EXISTS "Posts are viewable by everyone" ON posts;
 CREATE POLICY "Posts are viewable by everyone" ON posts FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Authenticated users can create posts" ON posts;
-CREATE POLICY "Authenticated users can create posts" ON posts FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Authenticated users can create posts" ON posts FOR INSERT WITH CHECK (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Users can update their own posts" ON posts;
 CREATE POLICY "Users can update their own posts" ON posts FOR UPDATE USING (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Users can delete their own posts" ON posts;

@@ -102,7 +102,7 @@ export async function createOfficialResponse(
   userId: string,
   content: string,
   responseType: ResponseType = "acknowledgment",
-  isPinned: boolean = true,
+  isPinned: boolean = false,
 ): Promise<{
   success: boolean;
   data?: OfficialResponseWithUser;

@@ -4,12 +4,49 @@
 -- We'll alter the existing table to match the new requirements while preserving data if possible
 
 DO $$
+DECLARE
+    notification_user_fk RECORD;
 BEGIN
     -- Add recipient_id if it doesn't exist (we'll use user_id as recipient_id for now, but let's standardize)
     -- If user_id exists, we can rename it or just use it. The request uses recipient_id.
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'user_id') 
        AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'notifications' AND column_name = 'recipient_id') THEN
+        -- Drop any existing foreign key constraints that reference notifications.user_id
+        FOR notification_user_fk IN
+            SELECT con.conname
+            FROM pg_constraint AS con
+            JOIN pg_class AS rel ON rel.oid = con.conrelid
+            JOIN pg_namespace AS nsp ON nsp.oid = rel.relnamespace
+            JOIN LATERAL unnest(con.conkey) AS colnum(attnum) ON TRUE
+            JOIN pg_attribute AS att ON att.attrelid = rel.oid AND att.attnum = colnum.attnum
+            WHERE con.contype = 'f'
+              AND nsp.nspname = 'public'
+              AND rel.relname = 'notifications'
+              AND att.attname = 'user_id'
+        LOOP
+            EXECUTE format('ALTER TABLE public.notifications DROP CONSTRAINT %I', notification_user_fk.conname);
+        END LOOP;
+
+        -- Rename user_id to recipient_id
         ALTER TABLE notifications RENAME COLUMN user_id TO recipient_id;
+
+        -- Ensure there is a foreign key constraint on recipient_id pointing to users(id)
+        IF NOT EXISTS (
+            SELECT 1
+            FROM pg_constraint AS con
+            JOIN pg_class AS rel ON rel.oid = con.conrelid
+            JOIN pg_namespace AS nsp ON nsp.oid = rel.relnamespace
+            JOIN LATERAL unnest(con.conkey) AS colnum(attnum) ON TRUE
+            JOIN pg_attribute AS att ON att.attrelid = rel.oid AND att.attnum = colnum.attnum
+            WHERE con.contype = 'f'
+              AND nsp.nspname = 'public'
+              AND rel.relname = 'notifications'
+              AND att.attname = 'recipient_id'
+        ) THEN
+            ALTER TABLE public.notifications
+                ADD CONSTRAINT notifications_recipient_id_fkey
+                FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE;
+        END IF;
     END IF;
 
     -- Add recipient_type

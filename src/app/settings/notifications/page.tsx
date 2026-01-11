@@ -153,7 +153,7 @@ export default function NotificationSettingsPage() {
 
       const { error } = await (
         supabase.from("notification_preferences") as any
-      ).upsert(updates, { onConflict: "user_id, company_id" });
+      ).upsert(updates, { onConflict: ["user_id", "company_id"] });
 
       if (error) throw error;
 

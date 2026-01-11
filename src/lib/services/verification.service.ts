@@ -2,7 +2,11 @@
 
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/services/notifications.service";
+import bcrypt from "bcryptjs";
 import type { Json } from "@/lib/database.types";
+
+const SALT_ROUNDS = 10;
+
 /**
  * Verification document structure
  */

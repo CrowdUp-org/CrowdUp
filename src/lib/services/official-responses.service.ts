@@ -433,15 +433,19 @@ export async function getResponseCount(postId: string): Promise<number> {
  */
 export async function hasOfficialResponse(postId: string): Promise<boolean> {
   try {
-    const { data, error } = await supabase
+    const { count, error } = await supabase
       .from("official_responses")
-      .select("id")
-      .eq("post_id", postId)
-      .limit(1)
-      .single();
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId);
 
-    return !error && !!data;
+    if (error) {
+      console.error("Error checking for official responses:", error);
+      return false;
+    }
+
+    return (count ?? 0) > 0;
   } catch (error) {
+    console.error("Error in hasOfficialResponse:", error);
     return false;
   }
 }

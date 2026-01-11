@@ -57,7 +57,9 @@ CREATE POLICY "Users can delete their own comments" ON comments FOR DELETE USING
 DROP POLICY IF EXISTS "Votes are viewable by everyone" ON votes;
 CREATE POLICY "Votes are viewable by everyone" ON votes FOR SELECT USING (true);
 DROP POLICY IF EXISTS "Authenticated users can vote" ON votes;
-CREATE POLICY "Authenticated users can vote" ON votes FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+CREATE POLICY "Authenticated users can vote" ON votes
+  FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL AND user_id = auth.uid());
 DROP POLICY IF EXISTS "Users can update their own votes" ON votes;
 CREATE POLICY "Users can update their own votes" ON votes FOR UPDATE USING (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Users can delete their own votes" ON votes;

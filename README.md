@@ -78,65 +78,11 @@ src/
     └── database.types.ts     # TS types for DB schema
 ```
 
-## Environment
+## Setup
 
-Create `.env.local` with the following variables:
+**For Maintainers:** See `internal/docs/setup/` for detailed development and deployment instructions.
 
-```
-NEXT_PUBLIC_SUPABASE_URL="https://<your-project>.supabase.co"
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="<your-publishable-key>"
-SUPABASE_SECRET_KEY="<your-service-role-key>"
-```
-
-Notes:
-
-- `src/lib/supabase.ts` includes placeholder URL/key fallbacks allowing `next build` without envs. Provide real values at runtime.
-- Treat the client-first pattern as a development bootstrap. For sensitive operations, prefer server mediation with the Secret API key.
-
-## Setup (Local Development)
-
-Follow the wiki for end-to-end guidance:
-
-- Getting Started: https://github.com/CrowdUp-org/CrowdUp/wiki/Getting-Started
-- Features: https://github.com/CrowdUp-org/CrowdUp/wiki/Features
-- Troubleshooting: https://github.com/CrowdUp-org/CrowdUp/wiki/Troubleshooting
-
-Quick start:
-
-1. Create a Supabase project and run the SQL schema from `supabase-schema.sql`.
-2. Add your Supabase credentials to `.env.local` (see above).
-3. Install dependencies and start dev server:
-
-```bash
-npm install
-npm run dev
-```
-
-4. Build and preview:
-
-```bash
-npm run build
-npm start
-```
-
-5. Lint:
-
-```bash
-npm run lint
-```
-
-## Build Notes
-
-- TypeScript/ESLint: `next.config.ts` is configured to ignore TS and ESLint errors during production builds for speed. Avoid introducing new errors.
-- Turbopack: `npm run dev` uses Turbopack. The visual-edits loader is enabled via `next.config.ts` and consumed by `src/visual-edits/VisualEditsMessenger.tsx`.
-- Ports: Dev defaults to 3000 unless overridden.
-
-## Database
-
-- Primary schema: `supabase-schema.sql`; additional migrations in root (e.g., `migration-google-oauth.sql`, `migration-reputation.sql`, etc.).
-- Core tables: `users`, `posts`, `comments`, `votes`; plus `connections`, `apps`, `companies`, `conversations`, `messages`.
-- Types: defined in `src/lib/database.types.ts`.
-- Row Level Security: disabled in the provided schema (development bootstrap).
+**For Contributors:** Follow the contributing guidelines below to submit pull requests.
 
 ## Contributing
 

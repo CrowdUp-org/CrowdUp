@@ -4,6 +4,10 @@
 .env*
 !.env.local.template
 
+# development
+.vscode/
+.github/prompts/
+
 # dependencies
 /node_modules
 /.pnp

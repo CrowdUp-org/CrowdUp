@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   try {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
     if (!clientId) {
+      logger.warn("Google OAuth not configured");
       return NextResponse.json(
         { error: "Google OAuth is not configured" },
         { status: 500 },
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(googleAuthUrl.toString());
   } catch (error) {
-    console.error("Error initiating Google OAuth:", error);
+    logger.error("Error initiating Google OAuth", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "Failed to initiate Google sign-in" },
       { status: 500 },

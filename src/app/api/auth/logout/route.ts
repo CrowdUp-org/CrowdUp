@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { verifyRefreshToken } from "@/lib/jwt";
+import { logger } from "@/lib/logger";
 import {
   getClearAccessTokenCookie,
   getClearRefreshTokenCookie,
@@ -39,8 +40,8 @@ import {
  * See: SECURITY_FIX_SUMMARY.md for full analysis
  */
 export async function POST(request: NextRequest) {
-  console.log("[Logout API] Request received");
-  console.log("[Logout API] Cookies:", {
+  logger.debug("Logout request received");
+  logger.debug("Cookie status", {
     refresh_token: request.cookies.get("refresh_token")?.value
       ? "present"
       : "missing",
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Revoke refresh token in database if present
     if (refreshToken) {
-      console.log("[Logout API] Verifying and revoking refresh token");
+      logger.debug("Verifying and revoking refresh token");
       const payload = await verifyRefreshToken(refreshToken);
       if (payload?.jti) {
         const { error } = await supabaseAdmin
@@ -64,22 +65,23 @@ export async function POST(request: NextRequest) {
           .eq("jti", payload.jti);
 
         if (error) {
-          console.error(
-            "[Logout API] Token revocation failed in database:",
-            error,
+          logger.error(
+            "Token revocation failed in database",
+            new Error(error.message),
+            { jti: payload.jti }
           );
           revocationSuccess = false;
         } else {
-          console.log("[Logout API] Refresh token revoked:", payload.jti);
+          logger.debug("Refresh token revoked", { jti: payload.jti });
         }
       }
     } else {
-      console.log("[Logout API] No refresh token to revoke");
+      logger.debug("No refresh token to revoke");
     }
 
     // If revocation failed, return error BEFORE clearing cookies
     if (!revocationSuccess) {
-      console.error("[Logout API] Aborting logout: token revocation failed");
+      logger.error("Aborting logout: token revocation failed");
       return NextResponse.json(
         { success: false, error: "Token revocation failed" },
         { status: 500 },
@@ -92,15 +94,15 @@ export async function POST(request: NextRequest) {
     const clearAccessCookie = getClearAccessTokenCookie();
     const clearRefreshCookie = getClearRefreshTokenCookie();
 
-    console.log("[Logout API] Clearing cookies");
+    logger.debug("Clearing authentication cookies");
 
     response.cookies.set(clearAccessCookie);
     response.cookies.set(clearRefreshCookie);
 
-    console.log("[Logout API] Logout successful");
+    logger.info("Logout successful");
     return response;
   } catch (error) {
-    console.error("[Logout API] Logout error:", error);
+    logger.error("Logout error", error instanceof Error ? error : undefined);
     // Still clear cookies even on error (fallback)
     const response = NextResponse.json(
       { success: false, error: "Logout encountered an error" },
@@ -108,7 +110,7 @@ export async function POST(request: NextRequest) {
     );
     response.cookies.set(getClearAccessTokenCookie());
     response.cookies.set(getClearRefreshTokenCookie());
-    console.log("[Logout API] Cookies cleared despite error");
+    logger.debug("Cookies cleared despite error");
     return response;
   }
 }

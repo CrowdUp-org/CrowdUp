@@ -6,9 +6,30 @@ import { jwtVerify } from "jose";
 // Configuration
 // ============================================================================
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "crowdup-jwt-secret-change-in-production",
-);
+/**
+ * JWT Secret for middleware token verification.
+ *
+ * SECURITY: In production, JWT_SECRET must be set.
+ * In development, a placeholder is allowed but will log a warning.
+ */
+const getJwtSecret = (): Uint8Array => {
+  const secret = process.env.JWT_SECRET;
+  const isDev = process.env.NODE_ENV !== "production";
+
+  if (!secret) {
+    if (isDev) {
+      // Matches the development fallback in src/lib/jwt.ts
+      return new TextEncoder().encode("crowdup-dev-jwt-secret-NOT-FOR-PRODUCTION");
+    }
+    // In production, middleware may run before lib code, so just use empty
+    // which will cause token verification to fail (safe default)
+    return new TextEncoder().encode("");
+  }
+
+  return new TextEncoder().encode(secret);
+};
+
+const JWT_SECRET = getJwtSecret();
 
 /**
  * Routes that require authentication

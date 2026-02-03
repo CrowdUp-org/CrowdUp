@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { verifyAccessToken } from "@/lib/jwt";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
-    console.error("Get current user error:", error);
+    logger.error("Get current user error", error instanceof Error ? error : undefined);
     return NextResponse.json({ user: null }, { status: 200 });
   }
 }

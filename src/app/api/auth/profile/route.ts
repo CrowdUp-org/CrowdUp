@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { verifyAccessToken } from "@/lib/jwt";
+import { logger } from "@/lib/logger";
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ user: updatedUser }, { status: 200 });
   } catch (error) {
-    console.error("Update profile error:", error);
+    logger.error("Update profile error", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "An error occurred while updating profile" },
       { status: 500 },

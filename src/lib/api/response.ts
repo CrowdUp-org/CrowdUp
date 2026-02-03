@@ -3,9 +3,13 @@
  *
  * Standardized response helpers for API routes.
  * Ensures consistent error handling and generic messages to clients.
+ *
+ * SECURITY: All errors are logged server-side with details,
+ * but only generic messages are returned to clients.
  */
 
 import { NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import {
   ValidationError,
   NotFoundError,
@@ -48,12 +52,17 @@ export function noContentResponse(): NextResponse {
  * Converts an error to a client-safe JSON response.
  * Logs detailed error server-side but returns generic messages to clients.
  *
+ * SECURITY: Never expose internal error details, stack traces, or
+ * database errors to clients. All details are logged server-side only.
+ *
  * @param error - Error to convert
  * @returns NextResponse with appropriate status and generic message
  */
 export function errorResponse(error: unknown): NextResponse {
-  // Log detailed error server-side for debugging
-  console.error('[API Error]', error);
+  // Log detailed error server-side (structured logging)
+  logger.error('API error occurred', error instanceof Error ? error : undefined, {
+    errorType: error?.constructor?.name ?? 'Unknown',
+  });
 
   // Validation errors - include field details
   if (error instanceof ValidationError) {

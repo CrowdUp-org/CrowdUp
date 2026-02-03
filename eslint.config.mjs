@@ -15,7 +15,8 @@ const eslintConfig = [
       "react/no-unescaped-entities": "off",
       "@next/next/no-img-element": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      // Note: @typescript-eslint/no-explicit-any requires proper TypeScript ESLint plugin setup
+      // TODO: Configure @typescript-eslint plugin for flat config to enable no-explicit-any rule
       "react-hooks/exhaustive-deps": "off",
       "import/no-unresolved": "error",
       "import/named": "error",

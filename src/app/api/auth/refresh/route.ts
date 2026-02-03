@@ -11,6 +11,7 @@ import {
   getClearAccessTokenCookie,
   getClearRefreshTokenCookie,
 } from "@/lib/cookies";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Token refresh error:", error);
+    logger.error("Token refresh error", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "An error occurred during token refresh" },
       { status: 500 },

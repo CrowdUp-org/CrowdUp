@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { verifyAccessToken } from "@/lib/jwt";
+import { logger } from "@/lib/logger";
 
 const SALT_ROUNDS = 10;
 
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error("Change password error:", error);
+    logger.error("Change password error", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "An error occurred while changing password" },
       { status: 500 },

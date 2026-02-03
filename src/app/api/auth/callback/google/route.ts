@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { signAccessToken, signRefreshToken } from "@/lib/jwt";
 import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
+import { logger } from "@/lib/logger";
 
 interface GoogleTokenResponse {
   access_token: string;
@@ -200,7 +201,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Error in Google OAuth callback:", error);
+    logger.error("Error in Google OAuth callback", error instanceof Error ? error : undefined);
     return NextResponse.redirect(
       `${request.nextUrl.origin}/auth/signin?error=callback_failed`,
     );

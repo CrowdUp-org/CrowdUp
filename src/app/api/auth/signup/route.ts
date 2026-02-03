@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken } from "@/lib/jwt";
 import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
+import { logger } from "@/lib/logger";
 
 const SALT_ROUNDS = 10;
 
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Signup error:", error);
+    logger.error("Signup error", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "An error occurred during sign up" },
       { status: 500 },

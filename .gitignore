@@ -5,11 +5,47 @@
 internal/docs/**/draft-*
 internal/docs/**/PRIVATE-*
 
-# secrets
+# ============================================================================
+# SECRETS & SENSITIVE FILES
+# ============================================================================
+
+# Environment files (may contain secrets)
 .env*
 !.env.local.template
+!.env.example
 
-# development
+# SSL/TLS certificates and keys
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# SSH keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# API keys, tokens, credentials
+*.credential
+*.credentials
+*.secrets
+secrets.json
+credentials.json
+
+# Google Cloud credentials
+**/google-credentials.json
+**/service-account.json
+
+# AWS credentials
+.aws/
+
+# ============================================================================
+# DEVELOPMENT
+# ============================================================================
+
 .vscode/
 .github/prompts/
 
@@ -35,7 +71,6 @@ internal/docs/**/PRIVATE-*
 
 # misc
 .DS_Store
-*.pem
 
 # debug
 npm-debug.log*

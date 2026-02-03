@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { signAccessToken, signRefreshToken } from "@/lib/jwt";
 import { getAccessTokenCookie, getRefreshTokenCookie } from "@/lib/cookies";
 import { buildSafeEqOr } from "@/lib/utils/safe-query";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error("Login error", error instanceof Error ? error : undefined);
     return NextResponse.json(
       { error: "An error occurred during sign in" },
       { status: 500 },

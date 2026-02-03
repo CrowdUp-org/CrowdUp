@@ -1,3 +1,7 @@
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+[![Contributions: PR Only](https://img.shields.io/badge/Contributions-PR%20Only-yellow.svg)](CONTRIBUTING.md)
+
+
 # CrowdUp
 
 Public repository for community contributions via pull requests. The production website is operated privately by the maintainer and a collaborator. Pull requests do not trigger deployments; deployment and operations are restricted.
@@ -162,4 +166,12 @@ See the wiki for common issues and solutions:
 
 ## License
 
-This work is licensed under CC BY-NC-ND 4.0. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-nd/4.0/
+**CrowdUp is proprietary software.** The source code is visible for transparency and to accept community contributions, but is NOT open source.
+
+See [LICENSE](./LICENSE) for full terms.
+
+**TL;DR:**
+- ❌ You CANNOT use, run, or deploy this software
+- ❌ You CANNOT create competing products
+- ✅ You CAN contribute bug fixes via pull requests
+- ✅ You CAN report issues

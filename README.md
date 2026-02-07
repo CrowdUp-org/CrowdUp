@@ -1,10 +1,9 @@
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Contributions: PR Only](https://img.shields.io/badge/Contributions-PR%20Only-yellow.svg)](CONTRIBUTING.md)
 
-
 # CrowdUp
 
-Public repository for community contributions via pull requests. The production website is operated privately by the maintainer and a collaborator. Pull requests do not trigger deployments; deployment and operations are restricted.
+CrowdUp is a community feedback and reputation platform where people report bugs, suggest features, and raise complaints about companies and products. This repository accepts contributions via pull requests; production deployment and operations are managed privately by the maintainers.
 
 ## Overview
 
@@ -31,84 +30,37 @@ CrowdUp is a social feedback platform where users submit and vote on bug reports
 - Supabase (PostgreSQL + Storage)
 - bcryptjs for password hashing
 
-## Architecture
+## Architecture (high level)
 
-- Client-first data access using Supabase from client components/hooks.
-- Client-side auth: sessions stored in `localStorage`; helpers in `src/lib/auth.ts`; middleware does not gate routes.
-- Feed ranking logic combines engagement, velocity, recency, personalization, and diversity (`src/lib/algorithm.ts`), used by the homepage (`src/app/page.tsx`).
-- Messaging uses Supabase realtime channels (`postgres_changes`) (`src/lib/messaging.ts`).
-- Voting pattern follows upsert/delete on `votes` with denormalized `posts.votes` updates (`src/components/PostCard.tsx`).
-- Styling via Tailwind and shadcn primitives (`src/components/ui/*`); class composition via `cn()` (`src/lib/utils.ts`).
-- Visual Edits: Turbopack loader injects tags consumed by `src/visual-edits/VisualEditsMessenger.tsx` (see `next.config.ts`).
+- Clean layers: presentation → application/services → infrastructure/repositories. Components use services/hooks; repositories are not called from UI directly.
+- Auth & permissions: enforced server-side (Server Actions / API routes) and backed by Supabase RLS.
+- Feed ranking: see `src/lib/algorithm.ts`; messaging uses `src/lib/messaging.ts`.
+- Visual edits: Turbopack loader + `src/visual-edits/VisualEditsMessenger.tsx` (see `next.config.ts`).
 
-### Key Files
+## Key Files & Entry Points
 
-- `src/app/page.tsx` — Home feed, sorting, data shaping
+- `src/app/page.tsx` — Home feed and sorting
+- `src/components/PostCard.tsx` — Voting UI and client flows
+- `src/lib/supabase.ts` — Supabase client helpers
 - `src/lib/algorithm.ts` — Ranking utilities
-- `src/lib/auth.ts` — Client auth/session helpers (bcrypt, localStorage)
-- `src/lib/messaging.ts` — Conversations/messages + realtime
-- `src/components/PostCard.tsx` — Vote flows + UI patterns
-- `src/lib/supabase.ts` — Supabase client (publishable + server usage notes)
-- `next.config.ts` — Build flags and visual-edits loader
-- `src/visual-edits/VisualEditsMessenger.tsx` — Visual Edits messenger
 
 ## Repository Structure
 
-```
-src/
-├── app/                      # Next.js App Router pages
-│   ├── auth/                 # Authentication pages
-│   ├── create/               # Post creation
-│   ├── messages/             # 1:1 messaging
-│   ├── trending/             # Trending feed
-│   ├── leaderboard/          # Leaderboard
-│   ├── profile/              # User profiles
-│   ├── apps/                 # Apps pages
-│   ├── company/              # Company pages
-│   ├── settings/             # User settings
-│   └── page.tsx              # Home page
-├── components/               # React components
-│   ├── ui/                   # shadcn/ui primitives
-│   └── PostCard.tsx         # Voting UI and logic
-└── lib/                      # Utilities
-    ├── auth.ts               # Authentication logic
-    ├── supabase.ts           # Supabase client
-    ├── algorithm.ts          # Feed ranking
-    ├── messaging.ts          # Messaging utilities
-    └── database.types.ts     # TS types for DB schema
-```
+Top-level source: `src/` — app routes, components, hooks, and lib utilities. Database migrations and schema live at the repo root (`supabase-schema.sql`, `supabase_migrations/`).
 
-## Setup
+## For Contributors
 
-**For Maintainers:** See `internal/docs/setup/` for detailed development and deployment instructions.
+1. Read the project wiki for contribution guidelines and coding conventions: https://github.com/CrowdUp-org/CrowdUp/wiki/Contributing
+2. Follow branch naming and Conventional Commits; open focused PRs.
+3. Ensure changes pass linting and type checks used in CI (`npx prettier --check .`, `npm run lint`, `npx tsc --noEmit`).
 
-**For Contributors:** Follow the contributing guidelines below to submit pull requests.
+Notes:
+- Do not include production secrets or deployment instructions in PRs.
+- This repository is intended for code-level contributions; internal ops/runbooks are in the private `internal/` docs for maintainers.
 
-## Contributing
+## Maintainers & Deployment
 
-This public repository exists to accept contributions via PRs. Please review the wiki before opening a PR:
-
-- Contributing: https://github.com/CrowdUp-org/CrowdUp/wiki/Contributing
-- Development Conventions: https://github.com/CrowdUp-org/CrowdUp/wiki/Development-Conventions
-
-Guidelines (summary):
-
-- Branch naming: `type/scope-description` (e.g., `feature/feed-personalization`).
-- Conventional Commits: `feat|fix|docs|refactor|chore|test|perf`.
-- PR checklist: up-to-date with `main`, passes `npm run lint` and `npm run build`, documented changes and test steps.
-- Scope: one focused feature/fix per PR; maintainers review and decide roadmap. PRs do not deploy.
-
-## Deployment & Operations
-
-Production deployment and operations are private and managed by the maintainer and a collaborator. Contributions do not grant deploy access and PRs do not trigger deployments. For administrators, a restricted Deployment page exists:
-
-- Deployment (restricted): https://github.com/CrowdUp-org/CrowdUp/wiki/Deployment
-
-## Troubleshooting
-
-See the wiki for common issues and solutions:
-
-- Troubleshooting: https://github.com/CrowdUp-org/CrowdUp/wiki/Troubleshooting
+Production deployments are handled privately by project maintainers. Pull requests do not trigger deployments and do not confer any operational privileges.
 
 ## License
 
@@ -116,8 +68,9 @@ See the wiki for common issues and solutions:
 
 See [LICENSE](./LICENSE) for full terms.
 
-**TL;DR:**
-- ❌ You CANNOT use, run, or deploy this software
-- ❌ You CANNOT create competing products
-- ✅ You CAN contribute bug fixes via pull requests
-- ✅ You CAN report issues
+## Quick Contact
+
+Report issues via GitHub issues in this repository or open a PR with a suggested fix. For sensitive security reports, contact the maintainers privately (see internal docs).
+
+---
+_This README provides a high-level overview for contributors and reviewers. For internal setup, deployment, and operational runbooks see the `internal/` docs (maintainers only)._

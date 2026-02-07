@@ -1,0 +1,14 @@
+{
+  "$schema": "./.speckit/schema/speckit.config.schema.json",
+  "version": "2.0.0",
+  "paths": {
+    "memory": "internal/.speckit/memory",
+    "scripts": "internal/.speckit/scripts/bash",
+    "templates": "internal/.speckit/templates",
+    "specs": "internal/specs"
+  },
+  "features": {
+    "dualRepo": true,
+    "internalSubmodule": "internal"
+  }
+}

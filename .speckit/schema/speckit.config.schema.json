@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://crowdup.dev/speckit.config.schema.json",
+  "title": "Speckit Configuration",
+  "description": "Schema for .speckit.config.json — centralised path configuration for speckit agents and scripts.",
+  "type": "object",
+  "required": ["version", "paths"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference for IDE validation."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version of this config schema (MAJOR.MINOR.PATCH)."
+    },
+    "paths": {
+      "type": "object",
+      "description": "Relative paths (from repo root) to speckit directories.",
+      "required": ["memory", "scripts", "templates"],
+      "additionalProperties": false,
+      "properties": {
+        "memory": {
+          "type": "string",
+          "description": "Directory containing constitution.md and other governance files.",
+          "default": ".specify/memory"
+        },
+        "scripts": {
+          "type": "string",
+          "description": "Directory containing bash helper scripts (common.sh, check-prerequisites.sh, etc.).",
+          "default": ".specify/scripts/bash"
+        },
+        "templates": {
+          "type": "string",
+          "description": "Directory containing spec, plan, tasks, and checklist templates.",
+          "default": ".specify/templates"
+        },
+        "specs": {
+          "type": "string",
+          "description": "Directory for feature specifications and planning artifacts (spec.md, plan.md, tasks.md, etc.).",
+          "default": "internal/specs"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Optional feature flags for advanced workflows.",
+      "additionalProperties": false,
+      "properties": {
+        "dualRepo": {
+          "type": "boolean",
+          "description": "When true, the project uses a public + private (internal/) dual-repository layout.",
+          "default": false
+        },
+        "internalSubmodule": {
+          "type": "string",
+          "description": "Relative path to the internal/private submodule (relevant when dualRepo is true).",
+          "default": "internal"
+        }
+      }
+    }
+  }
+}

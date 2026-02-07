@@ -9,17 +9,17 @@
  * App category types.
  */
 export type AppCategory =
-  | 'Productivity'
-  | 'Social'
-  | 'Entertainment'
-  | 'Education'
-  | 'Finance'
-  | 'Health'
-  | 'Utilities'
-  | 'Games'
-  | 'Lifestyle'
-  | 'Developer Tools'
-  | 'Other';
+  | "Productivity"
+  | "Social"
+  | "Entertainment"
+  | "Education"
+  | "Finance"
+  | "Health"
+  | "Utilities"
+  | "Games"
+  | "Lifestyle"
+  | "Developer Tools"
+  | "Other";
 
 /**
  * Core app entity.

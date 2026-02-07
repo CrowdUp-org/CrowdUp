@@ -5,7 +5,7 @@
  * Domain layer - no external dependencies.
  */
 
-import type { ReputationLevel } from '../entities/user';
+import type { ReputationLevel } from "../entities/user";
 
 /**
  * DTO for creating a new user (registration).

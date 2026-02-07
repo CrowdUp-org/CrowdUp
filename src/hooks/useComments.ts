@@ -3,10 +3,10 @@
  *
  * Fetches comments for a post with pagination and mutation support.
  */
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import type { Comment } from '@/lib/domain/entities/comment';
+import { useState, useEffect, useCallback } from "react";
+import type { Comment } from "@/lib/domain/entities/comment";
 
 /**
  * Options for useComments hook.
@@ -56,7 +56,7 @@ export interface UseCommentsResult {
  */
 export function useComments(
   postId: string,
-  options: UseCommentsOptions = {}
+  options: UseCommentsOptions = {},
 ): UseCommentsResult {
   const { limit = 50, ascending = true, skip = false } = options;
 
@@ -87,13 +87,13 @@ export function useComments(
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error ?? 'Failed to load comments');
+          throw new Error(errorData.error ?? "Failed to load comments");
         }
 
         const data = await response.json();
         const fetchedComments: Comment[] = data.comments ?? data;
         const count =
-          typeof data.total === 'number' ? data.total : fetchedComments.length;
+          typeof data.total === "number" ? data.total : fetchedComments.length;
 
         if (append) {
           setComments((prev) => [...prev, ...fetchedComments]);
@@ -105,7 +105,7 @@ export function useComments(
         setHasMore(fetchedComments.length === limit);
         setOffset(currentOffset + fetchedComments.length);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
         if (!append) {
           setComments([]);
         }
@@ -113,7 +113,7 @@ export function useComments(
         setLoading(false);
       }
     },
-    [postId, limit, ascending]
+    [postId, limit, ascending],
   );
 
   const loadMore = useCallback(async () => {
@@ -135,34 +135,34 @@ export function useComments(
       setError(null);
 
       try {
-        const response = await fetch('/api/comments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/comments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ postId, content }),
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error ?? 'Failed to add comment');
+          throw new Error(errorData.error ?? "Failed to add comment");
         }
 
         const newComment: Comment = await response.json();
 
         // Add to list (at end for ascending, at start for descending)
         setComments((prev) =>
-          ascending ? [...prev, newComment] : [newComment, ...prev]
+          ascending ? [...prev, newComment] : [newComment, ...prev],
         );
         setTotalCount((prev) => prev + 1);
 
         return newComment;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to add comment');
+        setError(err instanceof Error ? err.message : "Failed to add comment");
         return null;
       } finally {
         setAdding(false);
       }
     },
-    [postId, ascending]
+    [postId, ascending],
   );
 
   useEffect(() => {

@@ -68,7 +68,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    logger.error("Change password error", error instanceof Error ? error : undefined);
+    logger.error(
+      "Change password error",
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.json(
       { error: "An error occurred while changing password" },
       { status: 500 },

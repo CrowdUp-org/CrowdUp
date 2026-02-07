@@ -55,6 +55,7 @@ Top-level source: `src/` — app routes, components, hooks, and lib utilities. D
 3. Ensure changes pass linting and type checks used in CI (`npx prettier --check .`, `npm run lint`, `npx tsc --noEmit`).
 
 Notes:
+
 - Do not include production secrets or deployment instructions in PRs.
 - This repository is intended for code-level contributions; internal ops/runbooks are in the private `internal/` docs for maintainers.
 
@@ -73,4 +74,5 @@ See [LICENSE](./LICENSE) for full terms.
 Report issues via GitHub issues in this repository or open a PR with a suggested fix. For sensitive security reports, contact the maintainers privately (see internal docs).
 
 ---
+
 _This README provides a high-level overview for contributors and reviewers. For internal setup, deployment, and operational runbooks see the `internal/` docs (maintainers only)._

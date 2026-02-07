@@ -19,7 +19,9 @@ const getJwtSecret = (): Uint8Array => {
   if (!secret) {
     if (isDev) {
       // Matches the development fallback in src/lib/jwt.ts
-      return new TextEncoder().encode("crowdup-dev-jwt-secret-NOT-FOR-PRODUCTION");
+      return new TextEncoder().encode(
+        "crowdup-dev-jwt-secret-NOT-FOR-PRODUCTION",
+      );
     }
     // In production, middleware may run before lib code, so just use empty
     // which will cause token verification to fail (safe default)

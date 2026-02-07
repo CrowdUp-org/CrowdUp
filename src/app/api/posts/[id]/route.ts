@@ -6,14 +6,14 @@
  * DELETE /api/posts/[id] - Delete post
  */
 
-import { NextRequest } from 'next/server';
-import { postService } from '@/lib/application/services';
-import { getUserFromRequest } from '@/lib/api/auth';
+import { NextRequest } from "next/server";
+import { postService } from "@/lib/application/services";
+import { getUserFromRequest } from "@/lib/api/auth";
 import {
   successResponse,
   noContentResponse,
   errorResponse,
-} from '@/lib/api/response';
+} from "@/lib/api/response";
 
 /**
  * Route context with dynamic params.
@@ -29,7 +29,7 @@ interface RouteContext {
  */
 export async function GET(
   _request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<Response> {
   try {
     const { id } = await context.params;
@@ -53,7 +53,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<Response> {
   try {
     const { id } = await context.params;
@@ -74,7 +74,7 @@ export async function PUT(
  */
 export async function DELETE(
   _request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<Response> {
   try {
     const { id } = await context.params;

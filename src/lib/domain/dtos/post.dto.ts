@@ -5,7 +5,7 @@
  * Domain layer - no external dependencies.
  */
 
-import type { PostType } from '../entities/post';
+import type { PostType } from "../entities/post";
 
 /**
  * DTO for creating a new post.
@@ -65,10 +65,10 @@ export interface PostListQueryDTO {
   userId?: string;
 
   /** Sort field */
-  sortBy?: 'votes' | 'createdAt' | 'updatedAt';
+  sortBy?: "votes" | "createdAt" | "updatedAt";
 
   /** Sort direction */
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 /**

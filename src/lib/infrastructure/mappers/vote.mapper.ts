@@ -5,12 +5,12 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { Vote } from '@/lib/domain/entities/vote';
-import type { CreateVoteDTO } from '@/lib/domain/dtos/vote.dto';
-import type { Database } from '@/lib/database.types';
+import type { Vote } from "@/lib/domain/entities/vote";
+import type { CreateVoteDTO } from "@/lib/domain/dtos/vote.dto";
+import type { Database } from "@/lib/database.types";
 
-type VoteRow = Database['public']['Tables']['votes']['Row'];
-type VoteInsert = Database['public']['Tables']['votes']['Insert'];
+type VoteRow = Database["public"]["Tables"]["votes"]["Row"];
+type VoteInsert = Database["public"]["Tables"]["votes"]["Insert"];
 
 /**
  * Maps a database row to a Vote entity.
@@ -33,7 +33,10 @@ export const mapRowToVote = (row: VoteRow): Vote => ({
  * @param userId - Voter's user ID
  * @returns Database insert object
  */
-export const mapVoteToInsert = (dto: CreateVoteDTO, userId: string): VoteInsert => ({
+export const mapVoteToInsert = (
+  dto: CreateVoteDTO,
+  userId: string,
+): VoteInsert => ({
   post_id: dto.postId,
   user_id: userId,
   vote_type: dto.voteType,

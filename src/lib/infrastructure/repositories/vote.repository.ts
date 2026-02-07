@@ -5,10 +5,10 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { Vote, VoteType } from '@/lib/domain/entities/vote';
-import type { CreateVoteDTO } from '@/lib/domain/dtos/vote.dto';
-import { mapRowToVote, mapVoteToInsert } from '../mappers/vote.mapper';
+import { supabase } from "@/lib/supabase";
+import type { Vote, VoteType } from "@/lib/domain/entities/vote";
+import type { CreateVoteDTO } from "@/lib/domain/dtos/vote.dto";
+import { mapRowToVote, mapVoteToInsert } from "../mappers/vote.mapper";
 
 /**
  * Vote repository with CRUD and query operations.
@@ -25,7 +25,7 @@ export const voteRepository = {
   async create(dto: CreateVoteDTO, userId: string): Promise<Vote> {
     const insert = mapVoteToInsert(dto, userId);
     const { data, error } = await supabase
-      .from('votes')
+      .from("votes")
       .insert(insert as never)
       .select()
       .single();
@@ -44,10 +44,14 @@ export const voteRepository = {
    * @throws Error if query fails
    */
   async findById(id: string): Promise<Vote | null> {
-    const { data, error } = await supabase.from('votes').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("votes")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch vote: ${error.message}`);
@@ -62,12 +66,15 @@ export const voteRepository = {
    * @param userId - User ID
    * @returns Vote entity or null if not found
    */
-  async findByPostAndUser(postId: string, userId: string): Promise<Vote | null> {
+  async findByPostAndUser(
+    postId: string,
+    userId: string,
+  ): Promise<Vote | null> {
     const { data, error } = await supabase
-      .from('votes')
-      .select('*')
-      .eq('post_id', postId)
-      .eq('user_id', userId)
+      .from("votes")
+      .select("*")
+      .eq("post_id", postId)
+      .eq("user_id", userId)
       .maybeSingle();
 
     if (error) {
@@ -85,10 +92,10 @@ export const voteRepository = {
    */
   async findByPost(postId: string): Promise<Vote[]> {
     const { data, error } = await supabase
-      .from('votes')
-      .select('*')
-      .eq('post_id', postId)
-      .order('created_at', { ascending: false });
+      .from("votes")
+      .select("*")
+      .eq("post_id", postId)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch post votes: ${error.message}`);
@@ -107,10 +114,10 @@ export const voteRepository = {
    */
   async findByUser(userId: string, limit = 100, offset = 0): Promise<Vote[]> {
     const { data, error } = await supabase
-      .from('votes')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .from("votes")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -129,9 +136,9 @@ export const voteRepository = {
    */
   async update(id: string, voteType: VoteType): Promise<Vote> {
     const { data, error } = await supabase
-      .from('votes')
+      .from("votes")
       .update({ vote_type: voteType } as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -148,7 +155,7 @@ export const voteRepository = {
    * @throws Error if deletion fails
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('votes').delete().eq('id', id);
+    const { error } = await supabase.from("votes").delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete vote: ${error.message}`);
@@ -164,10 +171,10 @@ export const voteRepository = {
    */
   async deleteByPostAndUser(postId: string, userId: string): Promise<void> {
     const { error } = await supabase
-      .from('votes')
+      .from("votes")
       .delete()
-      .eq('post_id', postId)
-      .eq('user_id', userId);
+      .eq("post_id", postId)
+      .eq("user_id", userId);
 
     if (error) {
       throw new Error(`Failed to delete vote: ${error.message}`);
@@ -181,20 +188,22 @@ export const voteRepository = {
    * @returns Object with upvotes and downvotes counts
    * @throws Error if query fails
    */
-  async countByPost(postId: string): Promise<{ upvotes: number; downvotes: number }> {
+  async countByPost(
+    postId: string,
+  ): Promise<{ upvotes: number; downvotes: number }> {
     const { data, error } = await supabase
-      .from('votes')
-      .select('vote_type')
-      .eq('post_id', postId);
+      .from("votes")
+      .select("vote_type")
+      .eq("post_id", postId);
 
     if (error) {
       throw new Error(`Failed to count votes: ${error.message}`);
     }
 
-    type VoteRow = { vote_type: 'up' | 'down' };
+    type VoteRow = { vote_type: "up" | "down" };
     const votes = data as VoteRow[];
-    const upvotes = votes.filter((v) => v.vote_type === 'up').length;
-    const downvotes = votes.filter((v) => v.vote_type === 'down').length;
+    const upvotes = votes.filter((v) => v.vote_type === "up").length;
+    const downvotes = votes.filter((v) => v.vote_type === "down").length;
 
     return { upvotes, downvotes };
   },
@@ -208,17 +217,17 @@ export const voteRepository = {
    */
   async getVoteStatusesForPosts(
     userId: string,
-    postIds: string[]
+    postIds: string[],
   ): Promise<Map<string, VoteType>> {
     if (postIds.length === 0) {
       return new Map();
     }
 
     const { data, error } = await supabase
-      .from('votes')
-      .select('post_id, vote_type')
-      .eq('user_id', userId)
-      .in('post_id', postIds);
+      .from("votes")
+      .select("post_id, vote_type")
+      .eq("user_id", userId)
+      .in("post_id", postIds);
 
     if (error) {
       throw new Error(`Failed to fetch vote statuses: ${error.message}`);

@@ -5,19 +5,22 @@
  * validation, ownership, and authorization.
  */
 
-import { companyRepository } from '@/lib/infrastructure/repositories/company.repository';
+import { companyRepository } from "@/lib/infrastructure/repositories/company.repository";
 import {
   CreateCompanySchema,
   UpdateCompanySchema,
-} from '@/lib/validators/company.validator';
-import type { Company } from '@/lib/domain/entities/company';
-import type { CreateCompanyDTO, UpdateCompanyDTO } from '@/lib/domain/dtos/company.dto';
+} from "@/lib/validators/company.validator";
+import type { Company } from "@/lib/domain/entities/company";
+import type {
+  CreateCompanyDTO,
+  UpdateCompanyDTO,
+} from "@/lib/domain/dtos/company.dto";
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '../errors';
+} from "../errors";
 
 /**
  * Maximum companies a user can own.
@@ -51,7 +54,7 @@ export const companyService = {
     if (!nameAvailable) {
       throw new BusinessRuleError(
         `Company slug "${dto.name}" is already taken`,
-        'COMPANY_NAME_TAKEN'
+        "COMPANY_NAME_TAKEN",
       );
     }
 
@@ -60,7 +63,7 @@ export const companyService = {
     if (ownedCompanies.length >= MAX_COMPANIES_PER_USER) {
       throw new BusinessRuleError(
         `Maximum ${MAX_COMPANIES_PER_USER} companies per user exceeded`,
-        'COMPANY_LIMIT_EXCEEDED'
+        "COMPANY_LIMIT_EXCEEDED",
       );
     }
 
@@ -78,7 +81,7 @@ export const companyService = {
   async getCompanyById(id: string): Promise<Company> {
     const company = await companyRepository.findById(id);
     if (!company) {
-      throw new NotFoundError('Company', id);
+      throw new NotFoundError("Company", id);
     }
     return company;
   },
@@ -93,7 +96,7 @@ export const companyService = {
   async getCompanyByName(name: string): Promise<Company> {
     const company = await companyRepository.findByName(name);
     if (!company) {
-      throw new NotFoundError('Company', name);
+      throw new NotFoundError("Company", name);
     }
     return company;
   },
@@ -112,7 +115,7 @@ export const companyService = {
   async updateCompany(
     id: string,
     rawData: unknown,
-    userId: string
+    userId: string,
   ): Promise<Company> {
     // 1. Validate input
     const parseResult = UpdateCompanySchema.safeParse(rawData);
@@ -123,11 +126,11 @@ export const companyService = {
     // 2. Check existence and ownership
     const existingCompany = await companyRepository.findById(id);
     if (!existingCompany) {
-      throw new NotFoundError('Company', id);
+      throw new NotFoundError("Company", id);
     }
 
     if (existingCompany.ownerId !== userId) {
-      throw new ForbiddenError('Not authorized to update this company');
+      throw new ForbiddenError("Not authorized to update this company");
     }
 
     // 3. Build update DTO
@@ -146,14 +149,18 @@ export const companyService = {
    * @throws NotFoundError - If company does not exist
    * @throws ForbiddenError - If user is not authorized to delete
    */
-  async deleteCompany(id: string, userId: string, isAdmin = false): Promise<void> {
+  async deleteCompany(
+    id: string,
+    userId: string,
+    isAdmin = false,
+  ): Promise<void> {
     const company = await companyRepository.findById(id);
     if (!company) {
-      throw new NotFoundError('Company', id);
+      throw new NotFoundError("Company", id);
     }
 
     if (company.ownerId !== userId && !isAdmin) {
-      throw new ForbiddenError('Not authorized to delete this company');
+      throw new ForbiddenError("Not authorized to delete this company");
     }
 
     await companyRepository.delete(id);
@@ -217,7 +224,7 @@ export const companyService = {
   async getCompaniesByCategory(
     category: string,
     limit = 20,
-    offset = 0
+    offset = 0,
   ): Promise<Company[]> {
     return await companyRepository.findByCategory(category, limit, offset);
   },

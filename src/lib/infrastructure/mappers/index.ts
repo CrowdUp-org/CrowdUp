@@ -5,7 +5,7 @@
  */
 
 // Post mappers
-export { mapRowToPost, mapPostToInsert, mapPostToUpdate } from './post.mapper';
+export { mapRowToPost, mapPostToInsert, mapPostToUpdate } from "./post.mapper";
 
 // User mappers
 export {
@@ -13,19 +13,27 @@ export {
   mapUserToPublic,
   mapUserToInsert,
   mapUserToUpdate,
-} from './user.mapper';
+} from "./user.mapper";
 
 // Vote mappers
-export { mapRowToVote, mapVoteToInsert } from './vote.mapper';
+export { mapRowToVote, mapVoteToInsert } from "./vote.mapper";
 
 // Comment mappers
-export { mapRowToComment, mapCommentToInsert, mapCommentToUpdate } from './comment.mapper';
+export {
+  mapRowToComment,
+  mapCommentToInsert,
+  mapCommentToUpdate,
+} from "./comment.mapper";
 
 // Company mappers
-export { mapRowToCompany, mapCompanyToInsert, mapCompanyToUpdate } from './company.mapper';
+export {
+  mapRowToCompany,
+  mapCompanyToInsert,
+  mapCompanyToUpdate,
+} from "./company.mapper";
 
 // App mappers
-export { mapRowToApp, mapAppToInsert, mapAppToUpdate } from './app.mapper';
+export { mapRowToApp, mapAppToInsert, mapAppToUpdate } from "./app.mapper";
 
 // Message mappers
 export {
@@ -33,11 +41,11 @@ export {
   mapMessageToInsert,
   mapRowToConversation,
   mapConversationToInsert,
-} from './message.mapper';
+} from "./message.mapper";
 
 // Notification mappers
 export {
   mapRowToNotification,
   mapNotificationToInsert,
   type CreateNotificationDTO,
-} from './notification.mapper';
+} from "./notification.mapper";

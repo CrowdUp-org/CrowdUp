@@ -5,10 +5,17 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { Company } from '@/lib/domain/entities/company';
-import type { CreateCompanyDTO, UpdateCompanyDTO } from '@/lib/domain/dtos/company.dto';
-import { mapRowToCompany, mapCompanyToInsert, mapCompanyToUpdate } from '../mappers/company.mapper';
+import { supabase } from "@/lib/supabase";
+import type { Company } from "@/lib/domain/entities/company";
+import type {
+  CreateCompanyDTO,
+  UpdateCompanyDTO,
+} from "@/lib/domain/dtos/company.dto";
+import {
+  mapRowToCompany,
+  mapCompanyToInsert,
+  mapCompanyToUpdate,
+} from "../mappers/company.mapper";
 
 /**
  * Company repository with CRUD and query operations.
@@ -25,7 +32,7 @@ export const companyRepository = {
   async create(dto: CreateCompanyDTO, ownerId?: string): Promise<Company> {
     const insert = mapCompanyToInsert(dto, ownerId);
     const { data, error } = await supabase
-      .from('companies')
+      .from("companies")
       .insert(insert as never)
       .select()
       .single();
@@ -44,10 +51,14 @@ export const companyRepository = {
    * @throws Error if query fails
    */
   async findById(id: string): Promise<Company | null> {
-    const { data, error } = await supabase.from('companies').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("companies")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch company: ${error.message}`);
@@ -64,13 +75,13 @@ export const companyRepository = {
    */
   async findByName(name: string): Promise<Company | null> {
     const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('name', name)
+      .from("companies")
+      .select("*")
+      .eq("name", name)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch company: ${error.message}`);
@@ -87,10 +98,10 @@ export const companyRepository = {
    */
   async findByOwner(ownerId: string): Promise<Company[]> {
     const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('owner_id', ownerId)
-      .order('created_at', { ascending: false });
+      .from("companies")
+      .select("*")
+      .eq("owner_id", ownerId)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch owner companies: ${error.message}`);
@@ -109,9 +120,9 @@ export const companyRepository = {
   async update(id: string, dto: UpdateCompanyDTO): Promise<Company> {
     const update = mapCompanyToUpdate(dto);
     const { data, error } = await supabase
-      .from('companies')
+      .from("companies")
       .update(update as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -128,7 +139,7 @@ export const companyRepository = {
    * @throws Error if deletion fails
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('companies').delete().eq('id', id);
+    const { error } = await supabase.from("companies").delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete company: ${error.message}`);
@@ -145,9 +156,9 @@ export const companyRepository = {
    */
   async findAll(limit = 20, offset = 0): Promise<Company[]> {
     const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .order('display_name', { ascending: true })
+      .from("companies")
+      .select("*")
+      .order("display_name", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -166,10 +177,10 @@ export const companyRepository = {
    */
   async search(query: string, limit = 20): Promise<Company[]> {
     const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .ilike('display_name', `%${query}%`)
-      .order('display_name', { ascending: true })
+      .from("companies")
+      .select("*")
+      .ilike("display_name", `%${query}%`)
+      .order("display_name", { ascending: true })
       .limit(limit);
 
     if (error) {
@@ -187,16 +198,22 @@ export const companyRepository = {
    * @returns Array of company entities
    * @throws Error if query fails
    */
-  async findByCategory(category: string, limit = 20, offset = 0): Promise<Company[]> {
+  async findByCategory(
+    category: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Company[]> {
     const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('category', category)
-      .order('display_name', { ascending: true })
+      .from("companies")
+      .select("*")
+      .eq("category", category)
+      .order("display_name", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (error) {
-      throw new Error(`Failed to fetch companies by category: ${error.message}`);
+      throw new Error(
+        `Failed to fetch companies by category: ${error.message}`,
+      );
     }
     return data.map(mapRowToCompany);
   },
@@ -209,9 +226,9 @@ export const companyRepository = {
    */
   async isNameAvailable(name: string): Promise<boolean> {
     const { data, error } = await supabase
-      .from('companies')
-      .select('id')
-      .eq('name', name)
+      .from("companies")
+      .select("id")
+      .eq("name", name)
       .maybeSingle();
 
     if (error) {

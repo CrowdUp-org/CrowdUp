@@ -5,13 +5,13 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { Post } from '@/lib/domain/entities/post';
-import type { CreatePostDTO, UpdatePostDTO } from '@/lib/domain/dtos/post.dto';
-import type { Database } from '@/lib/database.types';
+import type { Post } from "@/lib/domain/entities/post";
+import type { CreatePostDTO, UpdatePostDTO } from "@/lib/domain/dtos/post.dto";
+import type { Database } from "@/lib/database.types";
 
-type PostRow = Database['public']['Tables']['posts']['Row'];
-type PostInsert = Database['public']['Tables']['posts']['Insert'];
-type PostUpdate = Database['public']['Tables']['posts']['Update'];
+type PostRow = Database["public"]["Tables"]["posts"]["Row"];
+type PostInsert = Database["public"]["Tables"]["posts"]["Insert"];
+type PostUpdate = Database["public"]["Tables"]["posts"]["Update"];
 
 /**
  * Maps a database row to a Post entity.
@@ -40,7 +40,10 @@ export const mapRowToPost = (row: PostRow): Post => ({
  * @param userId - Author's user ID
  * @returns Database insert object
  */
-export const mapPostToInsert = (dto: CreatePostDTO, userId: string): PostInsert => ({
+export const mapPostToInsert = (
+  dto: CreatePostDTO,
+  userId: string,
+): PostInsert => ({
   user_id: userId,
   type: dto.type,
   company: dto.company,

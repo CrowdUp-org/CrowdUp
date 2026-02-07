@@ -95,7 +95,10 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    logger.error("Token refresh error", error instanceof Error ? error : undefined);
+    logger.error(
+      "Token refresh error",
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.json(
       { error: "An error occurred during token refresh" },
       { status: 500 },

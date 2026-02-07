@@ -5,10 +5,17 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { Comment } from '@/lib/domain/entities/comment';
-import type { CreateCommentDTO, UpdateCommentDTO } from '@/lib/domain/dtos/comment.dto';
-import { mapRowToComment, mapCommentToInsert, mapCommentToUpdate } from '../mappers/comment.mapper';
+import { supabase } from "@/lib/supabase";
+import type { Comment } from "@/lib/domain/entities/comment";
+import type {
+  CreateCommentDTO,
+  UpdateCommentDTO,
+} from "@/lib/domain/dtos/comment.dto";
+import {
+  mapRowToComment,
+  mapCommentToInsert,
+  mapCommentToUpdate,
+} from "../mappers/comment.mapper";
 
 /**
  * Comment repository with CRUD and query operations.
@@ -25,7 +32,7 @@ export const commentRepository = {
   async create(dto: CreateCommentDTO, userId: string): Promise<Comment> {
     const insert = mapCommentToInsert(dto, userId);
     const { data, error } = await supabase
-      .from('comments')
+      .from("comments")
       .insert(insert as never)
       .select()
       .single();
@@ -44,10 +51,14 @@ export const commentRepository = {
    * @throws Error if query fails
    */
   async findById(id: string): Promise<Comment | null> {
-    const { data, error } = await supabase.from('comments').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch comment: ${error.message}`);
@@ -66,9 +77,9 @@ export const commentRepository = {
   async update(id: string, dto: UpdateCommentDTO): Promise<Comment> {
     const update = mapCommentToUpdate(dto.content);
     const { data, error } = await supabase
-      .from('comments')
+      .from("comments")
       .update(update as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -85,7 +96,7 @@ export const commentRepository = {
    * @throws Error if deletion fails
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('comments').delete().eq('id', id);
+    const { error } = await supabase.from("comments").delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete comment: ${error.message}`);
@@ -106,13 +117,13 @@ export const commentRepository = {
     postId: string,
     limit = 50,
     offset = 0,
-    ascending = true
+    ascending = true,
   ): Promise<Comment[]> {
     const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('post_id', postId)
-      .order('created_at', { ascending })
+      .from("comments")
+      .select("*")
+      .eq("post_id", postId)
+      .order("created_at", { ascending })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -132,10 +143,10 @@ export const commentRepository = {
    */
   async findByUser(userId: string, limit = 20, offset = 0): Promise<Comment[]> {
     const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .from("comments")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -153,9 +164,9 @@ export const commentRepository = {
    */
   async countByPost(postId: string): Promise<number> {
     const { count, error } = await supabase
-      .from('comments')
-      .select('*', { count: 'exact', head: true })
-      .eq('post_id', postId);
+      .from("comments")
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId);
 
     if (error) {
       throw new Error(`Failed to count comments: ${error.message}`);

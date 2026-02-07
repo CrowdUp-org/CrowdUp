@@ -5,11 +5,15 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { Notification, NotificationType } from '@/lib/domain/entities/notification';
-import type { Database } from '@/lib/database.types';
+import type {
+  Notification,
+  NotificationType,
+} from "@/lib/domain/entities/notification";
+import type { Database } from "@/lib/database.types";
 
-type NotificationRow = Database['public']['Tables']['notifications']['Row'];
-type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
+type NotificationRow = Database["public"]["Tables"]["notifications"]["Row"];
+type NotificationInsert =
+  Database["public"]["Tables"]["notifications"]["Insert"];
 
 /**
  * DTO for creating a notification.
@@ -45,7 +49,9 @@ export const mapRowToNotification = (row: NotificationRow): Notification => ({
  * @param dto - Create notification DTO
  * @returns Database insert object
  */
-export const mapNotificationToInsert = (dto: CreateNotificationDTO): NotificationInsert => ({
+export const mapNotificationToInsert = (
+  dto: CreateNotificationDTO,
+): NotificationInsert => ({
   user_id: dto.userId,
   type: dto.type,
   title: dto.title,

@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 /**
  * Creates a mock Supabase client for testing.
@@ -20,7 +20,10 @@ import { vi } from 'vitest';
 export const createMockSupabase = () => {
   const mockFrom = vi.fn();
 
-  const createChainedMethods = (data: unknown = null, error: unknown = null) => ({
+  const createChainedMethods = (
+    data: unknown = null,
+    error: unknown = null,
+  ) => ({
     select: vi.fn().mockReturnThis(),
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
@@ -42,7 +45,7 @@ export const createMockSupabase = () => {
     limit: vi.fn().mockReturnThis(),
     single: vi.fn().mockResolvedValue({ data, error }),
     maybeSingle: vi.fn().mockResolvedValue({ data, error }),
-    then: vi.fn((resolve) => resolve({ data, error }))
+    then: vi.fn((resolve) => resolve({ data, error })),
   });
 
   mockFrom.mockImplementation(() => createChainedMethods());
@@ -51,26 +54,32 @@ export const createMockSupabase = () => {
     from: mockFrom,
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
-      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      getSession: vi
+        .fn()
+        .mockResolvedValue({ data: { session: null }, error: null }),
       signInWithPassword: vi.fn(),
       signUp: vi.fn(),
       signOut: vi.fn(),
       onAuthStateChange: vi.fn(() => ({
-        data: { subscription: { unsubscribe: vi.fn() } }
-      }))
+        data: { subscription: { unsubscribe: vi.fn() } },
+      })),
     },
     storage: {
       from: vi.fn(() => ({
-        upload: vi.fn().mockResolvedValue({ data: { path: 'test-path' }, error: null }),
-        getPublicUrl: vi.fn(() => ({ data: { publicUrl: 'https://example.com/test.jpg' } })),
-        remove: vi.fn().mockResolvedValue({ data: null, error: null })
-      }))
+        upload: vi
+          .fn()
+          .mockResolvedValue({ data: { path: "test-path" }, error: null }),
+        getPublicUrl: vi.fn(() => ({
+          data: { publicUrl: "https://example.com/test.jpg" },
+        })),
+        remove: vi.fn().mockResolvedValue({ data: null, error: null }),
+      })),
     },
     channel: vi.fn(() => ({
       on: vi.fn().mockReturnThis(),
-      subscribe: vi.fn()
+      subscribe: vi.fn(),
     })),
-    removeChannel: vi.fn()
+    removeChannel: vi.fn(),
   };
 };
 
@@ -81,7 +90,7 @@ export const mockQueryResult = <T>(
   mockSupabase: ReturnType<typeof createMockSupabase>,
   tableName: string,
   data: T | T[] | null,
-  error: { message: string; code?: string } | null = null
+  error: { message: string; code?: string } | null = null,
 ) => {
   const chainedMethods = {
     select: vi.fn().mockReturnThis(),
@@ -103,9 +112,13 @@ export const mockQueryResult = <T>(
     range: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue({ data: Array.isArray(data) ? data[0] : data, error }),
-    maybeSingle: vi.fn().mockResolvedValue({ data: Array.isArray(data) ? data[0] : data, error }),
-    then: vi.fn((resolve) => resolve({ data, error }))
+    single: vi
+      .fn()
+      .mockResolvedValue({ data: Array.isArray(data) ? data[0] : data, error }),
+    maybeSingle: vi
+      .fn()
+      .mockResolvedValue({ data: Array.isArray(data) ? data[0] : data, error }),
+    then: vi.fn((resolve) => resolve({ data, error })),
   };
 
   mockSupabase.from.mockImplementation((table: string) => {
@@ -114,7 +127,7 @@ export const mockQueryResult = <T>(
     }
     return {
       select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: null, error: null })
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
     };
   });
 
@@ -126,21 +139,21 @@ export const mockQueryResult = <T>(
  */
 export const mockAuthenticatedUser = (
   mockSupabase: ReturnType<typeof createMockSupabase>,
-  user: { id: string; email?: string; [key: string]: unknown }
+  user: { id: string; email?: string; [key: string]: unknown },
 ) => {
   mockSupabase.auth.getUser.mockResolvedValue({
     data: { user },
-    error: null
+    error: null,
   });
 
   mockSupabase.auth.getSession.mockResolvedValue({
     data: {
       session: {
         user,
-        access_token: 'mock-access-token',
-        refresh_token: 'mock-refresh-token'
-      }
+        access_token: "mock-access-token",
+        refresh_token: "mock-refresh-token",
+      },
     },
-    error: null
+    error: null,
   });
 };

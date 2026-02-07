@@ -5,14 +5,14 @@
  * POST /api/posts - Create a new post
  */
 
-import { NextRequest } from 'next/server';
-import { postService } from '@/lib/application/services';
-import { getUserFromRequest, getOptionalUserFromRequest } from '@/lib/api/auth';
+import { NextRequest } from "next/server";
+import { postService } from "@/lib/application/services";
+import { getUserFromRequest, getOptionalUserFromRequest } from "@/lib/api/auth";
 import {
   successResponse,
   createdResponse,
   errorResponse,
-} from '@/lib/api/response';
+} from "@/lib/api/response";
 
 /**
  * GET /api/posts
@@ -29,12 +29,12 @@ import {
 export async function GET(request: NextRequest): Promise<Response> {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const limit = parseInt(searchParams.get('limit') ?? '20', 10);
-    const offset = parseInt(searchParams.get('offset') ?? '0', 10);
-    const company = searchParams.get('company');
-    const appId = searchParams.get('appId');
-    const userId = searchParams.get('userId');
-    const trending = searchParams.get('trending') === 'true';
+    const limit = parseInt(searchParams.get("limit") ?? "20", 10);
+    const offset = parseInt(searchParams.get("offset") ?? "0", 10);
+    const company = searchParams.get("company");
+    const appId = searchParams.get("appId");
+    const userId = searchParams.get("userId");
+    const trending = searchParams.get("trending") === "true";
 
     let posts;
 

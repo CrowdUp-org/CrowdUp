@@ -39,5 +39,5 @@ export interface CommentListQueryDTO {
   limit?: number;
 
   /** Sort direction (default: oldest first) */
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }

@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           logger.error(
             "Token revocation failed in database",
             new Error(error.message),
-            { jti: payload.jti }
+            { jti: payload.jti },
           );
           revocationSuccess = false;
         } else {

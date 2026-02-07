@@ -5,10 +5,14 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { User } from '@/lib/domain/entities/user';
-import type { CreateUserDTO, UpdateUserDTO } from '@/lib/domain/dtos/user.dto';
-import { mapRowToUser, mapUserToInsert, mapUserToUpdate } from '../mappers/user.mapper';
+import { supabase } from "@/lib/supabase";
+import type { User } from "@/lib/domain/entities/user";
+import type { CreateUserDTO, UpdateUserDTO } from "@/lib/domain/dtos/user.dto";
+import {
+  mapRowToUser,
+  mapUserToInsert,
+  mapUserToUpdate,
+} from "../mappers/user.mapper";
 
 /**
  * User repository with CRUD and query operations.
@@ -25,7 +29,7 @@ export const userRepository = {
   async create(dto: CreateUserDTO, passwordHash: string): Promise<User> {
     const insert = mapUserToInsert(dto, passwordHash);
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .insert(insert as never)
       .select()
       .single();
@@ -44,10 +48,14 @@ export const userRepository = {
    * @throws Error if query fails
    */
   async findById(id: string): Promise<User | null> {
-    const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch user: ${error.message}`);
@@ -64,13 +72,13 @@ export const userRepository = {
    */
   async findByUsername(username: string): Promise<User | null> {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
+      .from("users")
+      .select("*")
+      .eq("username", username)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch user: ${error.message}`);
@@ -86,10 +94,14 @@ export const userRepository = {
    * @throws Error if query fails
    */
   async findByEmail(email: string): Promise<User | null> {
-    const { data, error } = await supabase.from('users').select('*').eq('email', email).single();
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch user: ${error.message}`);
@@ -108,9 +120,9 @@ export const userRepository = {
   async update(id: string, dto: UpdateUserDTO): Promise<User> {
     const update = mapUserToUpdate(dto);
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .update(update as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -127,7 +139,7 @@ export const userRepository = {
    * @throws Error if deletion fails
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('users').delete().eq('id', id);
+    const { error } = await supabase.from("users").delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
@@ -144,9 +156,9 @@ export const userRepository = {
    */
   async findAll(limit = 20, offset = 0): Promise<User[]> {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .from("users")
+      .select("*")
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -164,9 +176,9 @@ export const userRepository = {
    */
   async findTopByReputation(limit = 10): Promise<User[]> {
     const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .order('reputation_score', { ascending: false })
+      .from("users")
+      .select("*")
+      .order("reputation_score", { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -184,21 +196,31 @@ export const userRepository = {
    * @returns Updated user entity
    * @throws Error if update fails
    */
-  async updateReputation(id: string, points: number, newLevel?: string): Promise<User> {
+  async updateReputation(
+    id: string,
+    points: number,
+    newLevel?: string,
+  ): Promise<User> {
     // First get current reputation
     const { data: current, error: fetchError } = await supabase
-      .from('users')
-      .select('reputation_score')
-      .eq('id', id)
+      .from("users")
+      .select("reputation_score")
+      .eq("id", id)
       .single();
 
     if (fetchError) {
       throw new Error(`Failed to fetch user: ${fetchError.message}`);
     }
 
-    const newScore = Math.max(0, (current as { reputation_score: number }).reputation_score + points);
+    const newScore = Math.max(
+      0,
+      (current as { reputation_score: number }).reputation_score + points,
+    );
 
-    const updatePayload: { reputation_score: number; reputation_level?: string } = {
+    const updatePayload: {
+      reputation_score: number;
+      reputation_level?: string;
+    } = {
       reputation_score: newScore,
     };
 
@@ -207,9 +229,9 @@ export const userRepository = {
     }
 
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .update(updatePayload as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -227,9 +249,9 @@ export const userRepository = {
    */
   async isUsernameAvailable(username: string): Promise<boolean> {
     const { data, error } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', username)
+      .from("users")
+      .select("id")
+      .eq("username", username)
       .maybeSingle();
 
     if (error) {
@@ -246,9 +268,9 @@ export const userRepository = {
    */
   async isEmailAvailable(email: string): Promise<boolean> {
     const { data, error } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
+      .from("users")
+      .select("id")
+      .eq("email", email)
       .maybeSingle();
 
     if (error) {

@@ -21,8 +21,8 @@ export class ValidationError extends Error {
    * @param errors - Zod error format or custom error object
    */
   constructor(errors: unknown) {
-    super('Validation failed');
-    this.name = 'ValidationError';
+    super("Validation failed");
+    this.name = "ValidationError";
     this.errors = errors;
   }
 }
@@ -47,7 +47,7 @@ export class NotFoundError extends Error {
    */
   constructor(resource: string, id: string) {
     super(`${resource} not found: ${id}`);
-    this.name = 'NotFoundError';
+    this.name = "NotFoundError";
     this.resource = resource;
     this.resourceId = id;
   }
@@ -65,9 +65,9 @@ export class UnauthorizedError extends Error {
    *
    * @param message - Error message (default: 'Authentication required')
    */
-  constructor(message = 'Authentication required') {
+  constructor(message = "Authentication required") {
     super(message);
-    this.name = 'UnauthorizedError';
+    this.name = "UnauthorizedError";
   }
 }
 
@@ -83,9 +83,9 @@ export class ForbiddenError extends Error {
    *
    * @param message - Error message (default: 'Access denied')
    */
-  constructor(message = 'Access denied') {
+  constructor(message = "Access denied") {
     super(message);
-    this.name = 'ForbiddenError';
+    this.name = "ForbiddenError";
   }
 }
 
@@ -107,7 +107,7 @@ export class BusinessRuleError extends Error {
    */
   constructor(message: string, code: string) {
     super(message);
-    this.name = 'BusinessRuleError';
+    this.name = "BusinessRuleError";
     this.code = code;
   }
 }

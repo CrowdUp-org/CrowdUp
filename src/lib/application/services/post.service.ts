@@ -5,20 +5,20 @@
  * authorization, and trending post algorithms.
  */
 
-import { postRepository } from '@/lib/infrastructure/repositories/post.repository';
+import { postRepository } from "@/lib/infrastructure/repositories/post.repository";
 import {
   CreatePostSchema,
   UpdatePostSchema,
   TrendingPostsQuerySchema,
-} from '@/lib/validators/post.validator';
-import type { Post } from '@/lib/domain/entities/post';
-import type { CreatePostDTO, UpdatePostDTO } from '@/lib/domain/dtos/post.dto';
+} from "@/lib/validators/post.validator";
+import type { Post } from "@/lib/domain/entities/post";
+import type { CreatePostDTO, UpdatePostDTO } from "@/lib/domain/dtos/post.dto";
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '../errors';
+} from "../errors";
 
 /**
  * Maximum posts a user can create per day.
@@ -48,7 +48,10 @@ export const postService = {
     const dto: CreatePostDTO = parseResult.data;
 
     // 2. Business rules - check rate limiting (optional enhancement)
-    const recentPosts = await postRepository.findByUser(userId, MAX_POSTS_PER_DAY);
+    const recentPosts = await postRepository.findByUser(
+      userId,
+      MAX_POSTS_PER_DAY,
+    );
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const postsToday = recentPosts.filter((post) => post.createdAt >= today);
@@ -56,7 +59,7 @@ export const postService = {
     if (postsToday.length >= MAX_POSTS_PER_DAY) {
       throw new BusinessRuleError(
         `Maximum ${MAX_POSTS_PER_DAY} posts per day exceeded`,
-        'RATE_LIMIT_EXCEEDED'
+        "RATE_LIMIT_EXCEEDED",
       );
     }
 
@@ -74,7 +77,7 @@ export const postService = {
   async getPostById(id: string): Promise<Post> {
     const post = await postRepository.findById(id);
     if (!post) {
-      throw new NotFoundError('Post', id);
+      throw new NotFoundError("Post", id);
     }
     return post;
   },
@@ -90,7 +93,11 @@ export const postService = {
    * @throws NotFoundError - If post does not exist
    * @throws ForbiddenError - If user is not the post author
    */
-  async updatePost(id: string, rawData: unknown, userId: string): Promise<Post> {
+  async updatePost(
+    id: string,
+    rawData: unknown,
+    userId: string,
+  ): Promise<Post> {
     // 1. Validate input
     const parseResult = UpdatePostSchema.safeParse(rawData);
     if (!parseResult.success) {
@@ -100,11 +107,11 @@ export const postService = {
     // 2. Check existence and authorization
     const existingPost = await postRepository.findById(id);
     if (!existingPost) {
-      throw new NotFoundError('Post', id);
+      throw new NotFoundError("Post", id);
     }
 
     if (existingPost.userId !== userId) {
-      throw new ForbiddenError('Not authorized to update this post');
+      throw new ForbiddenError("Not authorized to update this post");
     }
 
     // 3. Build update DTO
@@ -126,11 +133,11 @@ export const postService = {
   async deletePost(id: string, userId: string, isAdmin = false): Promise<void> {
     const post = await postRepository.findById(id);
     if (!post) {
-      throw new NotFoundError('Post', id);
+      throw new NotFoundError("Post", id);
     }
 
     if (post.userId !== userId && !isAdmin) {
-      throw new ForbiddenError('Not authorized to delete this post');
+      throw new ForbiddenError("Not authorized to delete this post");
     }
 
     await postRepository.delete(id);
@@ -144,7 +151,11 @@ export const postService = {
    * @param offset - Starting offset (default 0)
    * @returns Array of post entities
    */
-  async getPostsByUser(userId: string, limit = 20, offset = 0): Promise<Post[]> {
+  async getPostsByUser(
+    userId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Post[]> {
     return await postRepository.findByUser(userId, limit, offset);
   },
 
@@ -156,7 +167,11 @@ export const postService = {
    * @param offset - Starting offset (default 0)
    * @returns Array of post entities
    */
-  async getPostsByCompany(company: string, limit = 20, offset = 0): Promise<Post[]> {
+  async getPostsByCompany(
+    company: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Post[]> {
     return await postRepository.findByCompany(company, limit, offset);
   },
 
@@ -212,7 +227,7 @@ export const postService = {
   async updateVoteCount(postId: string, netVotes: number): Promise<Post> {
     const post = await postRepository.findById(postId);
     if (!post) {
-      throw new NotFoundError('Post', postId);
+      throw new NotFoundError("Post", postId);
     }
 
     // Calculate the increment needed

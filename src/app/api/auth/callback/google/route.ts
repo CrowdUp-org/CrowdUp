@@ -201,7 +201,10 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error) {
-    logger.error("Error in Google OAuth callback", error instanceof Error ? error : undefined);
+    logger.error(
+      "Error in Google OAuth callback",
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.redirect(
       `${request.nextUrl.origin}/auth/signin?error=callback_failed`,
     );

@@ -3,10 +3,10 @@
  *
  * Manages vote state with optimistic updates.
  */
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import type { VoteType } from '@/lib/domain/entities/vote';
+import { useState, useCallback } from "react";
+import type { VoteType } from "@/lib/domain/entities/vote";
 
 /**
  * Result of useVote hook.
@@ -48,7 +48,7 @@ export interface UseVoteResult {
 export function useVote(
   postId: string,
   initialVote: VoteType | null = null,
-  initialVoteCount = 0
+  initialVoteCount = 0,
 ): UseVoteResult {
   const [currentVote, setCurrentVote] = useState<VoteType | null>(initialVote);
   const [voteCount, setVoteCount] = useState(initialVoteCount);
@@ -68,13 +68,13 @@ export function useVote(
       let countChange = 0;
       if (previousVote === null) {
         // No previous vote → adding new vote
-        countChange = voteType === 'up' ? 1 : -1;
+        countChange = voteType === "up" ? 1 : -1;
       } else if (newVote === null) {
         // Removing vote
-        countChange = previousVote === 'up' ? -1 : 1;
+        countChange = previousVote === "up" ? -1 : 1;
       } else {
         // Switching vote
-        countChange = voteType === 'up' ? 2 : -2;
+        countChange = voteType === "up" ? 2 : -2;
       }
       setVoteCount(previousCount + countChange);
 
@@ -82,40 +82,40 @@ export function useVote(
       setError(null);
 
       try {
-        const response = await fetch('/api/votes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/votes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ postId, voteType }),
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error ?? 'Failed to vote');
+          throw new Error(errorData.error ?? "Failed to vote");
         }
 
         const result = await response.json();
 
         // Update with actual server values
-        if (result.action === 'removed') {
+        if (result.action === "removed") {
           setCurrentVote(null);
         } else if (result.vote) {
           setCurrentVote(result.vote.voteType);
         }
 
         // Use server's authoritative vote count
-        if (typeof result.netVotes === 'number') {
+        if (typeof result.netVotes === "number") {
           setVoteCount(result.netVotes);
         }
       } catch (err) {
         // Rollback on error
         setCurrentVote(previousVote);
         setVoteCount(previousCount);
-        setError(err instanceof Error ? err.message : 'Vote failed');
+        setError(err instanceof Error ? err.message : "Vote failed");
       } finally {
         setLoading(false);
       }
     },
-    [postId, currentVote, voteCount]
+    [postId, currentVote, voteCount],
   );
 
   const clearError = useCallback(() => {

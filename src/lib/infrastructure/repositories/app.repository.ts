@@ -5,10 +5,14 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { App } from '@/lib/domain/entities/app';
-import type { CreateAppDTO, UpdateAppDTO } from '@/lib/domain/dtos/app.dto';
-import { mapRowToApp, mapAppToInsert, mapAppToUpdate } from '../mappers/app.mapper';
+import { supabase } from "@/lib/supabase";
+import type { App } from "@/lib/domain/entities/app";
+import type { CreateAppDTO, UpdateAppDTO } from "@/lib/domain/dtos/app.dto";
+import {
+  mapRowToApp,
+  mapAppToInsert,
+  mapAppToUpdate,
+} from "../mappers/app.mapper";
 
 /**
  * App repository with CRUD and query operations.
@@ -25,7 +29,7 @@ export const appRepository = {
   async create(dto: CreateAppDTO, userId: string): Promise<App> {
     const insert = mapAppToInsert(dto, userId);
     const { data, error } = await supabase
-      .from('apps')
+      .from("apps")
       .insert(insert as never)
       .select()
       .single();
@@ -44,10 +48,14 @@ export const appRepository = {
    * @throws Error if query fails
    */
   async findById(id: string): Promise<App | null> {
-    const { data, error } = await supabase.from('apps').select('*').eq('id', id).single();
+    const { data, error } = await supabase
+      .from("apps")
+      .select("*")
+      .eq("id", id)
+      .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch app: ${error.message}`);
@@ -66,9 +74,9 @@ export const appRepository = {
   async update(id: string, dto: UpdateAppDTO): Promise<App> {
     const update = mapAppToUpdate(dto);
     const { data, error } = await supabase
-      .from('apps')
+      .from("apps")
       .update(update as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -85,7 +93,7 @@ export const appRepository = {
    * @throws Error if deletion fails
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('apps').delete().eq('id', id);
+    const { error } = await supabase.from("apps").delete().eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete app: ${error.message}`);
@@ -101,12 +109,16 @@ export const appRepository = {
    * @returns Array of app entities
    * @throws Error if query fails
    */
-  async findByCompany(companyId: string, limit = 20, offset = 0): Promise<App[]> {
+  async findByCompany(
+    companyId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<App[]> {
     const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .eq('company_id', companyId)
-      .order('name', { ascending: true })
+      .from("apps")
+      .select("*")
+      .eq("company_id", companyId)
+      .order("name", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -124,12 +136,16 @@ export const appRepository = {
    * @returns Array of app entities
    * @throws Error if query fails
    */
-  async findByCategory(category: string, limit = 20, offset = 0): Promise<App[]> {
+  async findByCategory(
+    category: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<App[]> {
     const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .eq('category', category)
-      .order('average_rating', { ascending: false })
+      .from("apps")
+      .select("*")
+      .eq("category", category)
+      .order("average_rating", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -149,10 +165,10 @@ export const appRepository = {
    */
   async findByUser(userId: string, limit = 20, offset = 0): Promise<App[]> {
     const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .from("apps")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -171,9 +187,9 @@ export const appRepository = {
    */
   async findAll(limit = 20, offset = 0): Promise<App[]> {
     const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .order('average_rating', { ascending: false })
+      .from("apps")
+      .select("*")
+      .order("average_rating", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -192,10 +208,10 @@ export const appRepository = {
    */
   async search(query: string, limit = 20): Promise<App[]> {
     const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .ilike('name', `%${query}%`)
-      .order('average_rating', { ascending: false })
+      .from("apps")
+      .select("*")
+      .ilike("name", `%${query}%`)
+      .order("average_rating", { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -213,10 +229,10 @@ export const appRepository = {
    */
   async findTopRated(limit = 10): Promise<App[]> {
     const { data, error } = await supabase
-      .from('apps')
-      .select('*')
-      .gte('total_reviews', 5) // Only apps with at least 5 reviews
-      .order('average_rating', { ascending: false })
+      .from("apps")
+      .select("*")
+      .gte("total_reviews", 5) // Only apps with at least 5 reviews
+      .order("average_rating", { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -237,12 +253,15 @@ export const appRepository = {
   async updateRatingStats(
     id: string,
     averageRating: number,
-    totalReviews: number
+    totalReviews: number,
   ): Promise<App> {
     const { data, error } = await supabase
-      .from('apps')
-      .update({ average_rating: averageRating, total_reviews: totalReviews } as never)
-      .eq('id', id)
+      .from("apps")
+      .update({
+        average_rating: averageRating,
+        total_reviews: totalReviews,
+      } as never)
+      .eq("id", id)
       .select()
       .single();
 

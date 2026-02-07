@@ -5,13 +5,13 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { Comment } from '@/lib/domain/entities/comment';
-import type { CreateCommentDTO } from '@/lib/domain/dtos/comment.dto';
-import type { Database } from '@/lib/database.types';
+import type { Comment } from "@/lib/domain/entities/comment";
+import type { CreateCommentDTO } from "@/lib/domain/dtos/comment.dto";
+import type { Database } from "@/lib/database.types";
 
-type CommentRow = Database['public']['Tables']['comments']['Row'];
-type CommentInsert = Database['public']['Tables']['comments']['Insert'];
-type CommentUpdate = Database['public']['Tables']['comments']['Update'];
+type CommentRow = Database["public"]["Tables"]["comments"]["Row"];
+type CommentInsert = Database["public"]["Tables"]["comments"]["Insert"];
+type CommentUpdate = Database["public"]["Tables"]["comments"]["Update"];
 
 /**
  * Maps a database row to a Comment entity.
@@ -35,7 +35,10 @@ export const mapRowToComment = (row: CommentRow): Comment => ({
  * @param userId - Author's user ID
  * @returns Database insert object
  */
-export const mapCommentToInsert = (dto: CreateCommentDTO, userId: string): CommentInsert => ({
+export const mapCommentToInsert = (
+  dto: CreateCommentDTO,
+  userId: string,
+): CommentInsert => ({
   post_id: dto.postId,
   user_id: userId,
   content: dto.content,

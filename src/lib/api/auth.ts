@@ -4,9 +4,9 @@
  * Helpers for extracting and validating user authentication in API routes.
  */
 
-import { cookies } from 'next/headers';
-import { verifyAccessToken } from '@/lib/jwt';
-import { UnauthorizedError } from '@/lib/application/errors';
+import { cookies } from "next/headers";
+import { verifyAccessToken } from "@/lib/jwt";
+import { UnauthorizedError } from "@/lib/application/errors";
 
 /**
  * Authenticated user context.
@@ -28,15 +28,15 @@ export interface AuthenticatedUser {
  */
 export async function getUserFromRequest(): Promise<AuthenticatedUser> {
   const cookieStore = await cookies();
-  const token = cookieStore.get('access_token')?.value;
+  const token = cookieStore.get("access_token")?.value;
 
   if (!token) {
-    throw new UnauthorizedError('No access token');
+    throw new UnauthorizedError("No access token");
   }
 
   const payload = await verifyAccessToken(token);
   if (!payload?.sub) {
-    throw new UnauthorizedError('Invalid token');
+    throw new UnauthorizedError("Invalid token");
   }
 
   return { userId: payload.sub };

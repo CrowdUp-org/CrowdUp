@@ -8,15 +8,15 @@
  * but only generic messages are returned to clients.
  */
 
-import { NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
   UnauthorizedError,
   BusinessRuleError,
-} from '@/lib/application/errors';
+} from "@/lib/application/errors";
 
 /**
  * Creates a successful JSON response.
@@ -60,46 +60,50 @@ export function noContentResponse(): NextResponse {
  */
 export function errorResponse(error: unknown): NextResponse {
   // Log detailed error server-side (structured logging)
-  logger.error('API error occurred', error instanceof Error ? error : undefined, {
-    errorType: error?.constructor?.name ?? 'Unknown',
-  });
+  logger.error(
+    "API error occurred",
+    error instanceof Error ? error : undefined,
+    {
+      errorType: error?.constructor?.name ?? "Unknown",
+    },
+  );
 
   // Validation errors - include field details
   if (error instanceof ValidationError) {
     return NextResponse.json(
-      { error: 'Invalid input', details: error.errors },
-      { status: 400 }
+      { error: "Invalid input", details: error.errors },
+      { status: 400 },
     );
   }
 
   // Not found errors - generic message
   if (error instanceof NotFoundError) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   // Authentication errors - prompt login
   if (error instanceof UnauthorizedError) {
     return NextResponse.json(
-      { error: 'Authentication required' },
-      { status: 401 }
+      { error: "Authentication required" },
+      { status: 401 },
     );
   }
 
   // Authorization errors - access denied
   if (error instanceof ForbiddenError) {
-    return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
   // Business rule violations - safe to expose message
   if (error instanceof BusinessRuleError) {
     return NextResponse.json(
       { error: error.message, code: error.code },
-      { status: 422 }
+      { status: 422 },
     );
   }
 
   // Generic error - never expose internal details
-  return NextResponse.json({ error: 'An error occurred' }, { status: 500 });
+  return NextResponse.json({ error: "An error occurred" }, { status: 500 });
 }
 
 /**
@@ -108,7 +112,7 @@ export function errorResponse(error: unknown): NextResponse {
  * @param message - Error message
  * @returns NextResponse with 400 status
  */
-export function badRequestResponse(message = 'Bad request'): NextResponse {
+export function badRequestResponse(message = "Bad request"): NextResponse {
   return NextResponse.json({ error: message }, { status: 400 });
 }
 
@@ -119,10 +123,10 @@ export function badRequestResponse(message = 'Bad request'): NextResponse {
  * @returns NextResponse with 405 status
  */
 export function methodNotAllowedResponse(
-  allowedMethods: string[]
+  allowedMethods: string[],
 ): NextResponse {
   return NextResponse.json(
-    { error: 'Method not allowed', allowed: allowedMethods },
-    { status: 405, headers: { Allow: allowedMethods.join(', ') } }
+    { error: "Method not allowed", allowed: allowedMethods },
+    { status: 405, headers: { Allow: allowedMethods.join(", ") } },
   );
 }

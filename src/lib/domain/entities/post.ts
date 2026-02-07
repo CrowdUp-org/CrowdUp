@@ -9,20 +9,20 @@
  * Types of posts users can create.
  */
 export type PostType =
-  | 'Bug Report'
-  | 'Feature Request'
-  | 'Complaint'
-  | 'App Review Request';
+  | "Bug Report"
+  | "Feature Request"
+  | "Complaint"
+  | "App Review Request";
 
 /**
  * Status of a post in its lifecycle.
  */
 export type PostStatus =
-  | 'open'
-  | 'acknowledged'
-  | 'in_progress'
-  | 'resolved'
-  | 'closed';
+  | "open"
+  | "acknowledged"
+  | "in_progress"
+  | "resolved"
+  | "closed";
 
 /**
  * Core post entity representing user feedback.

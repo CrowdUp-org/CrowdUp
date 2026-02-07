@@ -9,16 +9,16 @@
  * Company category types.
  */
 export type CompanyCategory =
-  | 'Technology'
-  | 'Finance'
-  | 'Healthcare'
-  | 'Retail'
-  | 'Entertainment'
-  | 'Education'
-  | 'Transportation'
-  | 'Food & Beverage'
-  | 'Real Estate'
-  | 'Other';
+  | "Technology"
+  | "Finance"
+  | "Healthcare"
+  | "Retail"
+  | "Entertainment"
+  | "Education"
+  | "Transportation"
+  | "Food & Beverage"
+  | "Real Estate"
+  | "Other";
 
 /**
  * Core company entity.
@@ -58,12 +58,12 @@ export interface Company {
 /**
  * Company member roles.
  */
-export type CompanyMemberRole = 'owner' | 'admin' | 'member';
+export type CompanyMemberRole = "owner" | "admin" | "member";
 
 /**
  * Verification status for company members.
  */
-export type VerificationStatus = 'pending' | 'approved' | 'rejected';
+export type VerificationStatus = "pending" | "approved" | "rejected";
 
 /**
  * Company member entity (linking users to companies).

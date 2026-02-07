@@ -5,17 +5,20 @@
  * validation, and authorization.
  */
 
-import { appRepository } from '@/lib/infrastructure/repositories/app.repository';
-import { companyRepository } from '@/lib/infrastructure/repositories/company.repository';
-import { CreateAppSchema, UpdateAppSchema } from '@/lib/validators/app.validator';
-import type { App } from '@/lib/domain/entities/app';
-import type { CreateAppDTO, UpdateAppDTO } from '@/lib/domain/dtos/app.dto';
+import { appRepository } from "@/lib/infrastructure/repositories/app.repository";
+import { companyRepository } from "@/lib/infrastructure/repositories/company.repository";
+import {
+  CreateAppSchema,
+  UpdateAppSchema,
+} from "@/lib/validators/app.validator";
+import type { App } from "@/lib/domain/entities/app";
+import type { CreateAppDTO, UpdateAppDTO } from "@/lib/domain/dtos/app.dto";
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '../errors';
+} from "../errors";
 
 /**
  * Maximum apps a user can create.
@@ -49,19 +52,22 @@ export const appService = {
     if (dto.companyId) {
       const company = await companyRepository.findById(dto.companyId);
       if (!company) {
-        throw new NotFoundError('Company', dto.companyId);
+        throw new NotFoundError("Company", dto.companyId);
       }
       if (company.ownerId !== userId) {
-        throw new ForbiddenError('Not authorized to add apps to this company');
+        throw new ForbiddenError("Not authorized to add apps to this company");
       }
     }
 
     // 3. Check user hasn't exceeded app limit
-    const userApps = await appRepository.findByUser(userId, MAX_APPS_PER_USER + 1);
+    const userApps = await appRepository.findByUser(
+      userId,
+      MAX_APPS_PER_USER + 1,
+    );
     if (userApps.length >= MAX_APPS_PER_USER) {
       throw new BusinessRuleError(
         `Maximum ${MAX_APPS_PER_USER} apps per user exceeded`,
-        'APP_LIMIT_EXCEEDED'
+        "APP_LIMIT_EXCEEDED",
       );
     }
 
@@ -79,7 +85,7 @@ export const appService = {
   async getAppById(id: string): Promise<App> {
     const app = await appRepository.findById(id);
     if (!app) {
-      throw new NotFoundError('App', id);
+      throw new NotFoundError("App", id);
     }
     return app;
   },
@@ -105,11 +111,11 @@ export const appService = {
     // 2. Check existence and ownership
     const existingApp = await appRepository.findById(id);
     if (!existingApp) {
-      throw new NotFoundError('App', id);
+      throw new NotFoundError("App", id);
     }
 
     if (existingApp.userId !== userId) {
-      throw new ForbiddenError('Not authorized to update this app');
+      throw new ForbiddenError("Not authorized to update this app");
     }
 
     // 3. Build update DTO
@@ -131,11 +137,11 @@ export const appService = {
   async deleteApp(id: string, userId: string, isAdmin = false): Promise<void> {
     const app = await appRepository.findById(id);
     if (!app) {
-      throw new NotFoundError('App', id);
+      throw new NotFoundError("App", id);
     }
 
     if (app.userId !== userId && !isAdmin) {
-      throw new ForbiddenError('Not authorized to delete this app');
+      throw new ForbiddenError("Not authorized to delete this app");
     }
 
     await appRepository.delete(id);
@@ -153,12 +159,12 @@ export const appService = {
   async getAppsByCompany(
     companyId: string,
     limit = 20,
-    offset = 0
+    offset = 0,
   ): Promise<App[]> {
     // Verify company exists
     const company = await companyRepository.findById(companyId);
     if (!company) {
-      throw new NotFoundError('Company', companyId);
+      throw new NotFoundError("Company", companyId);
     }
 
     return await appRepository.findByCompany(companyId, limit, offset);
@@ -187,7 +193,7 @@ export const appService = {
   async getAppsByCategory(
     category: string,
     limit = 20,
-    offset = 0
+    offset = 0,
   ): Promise<App[]> {
     return await appRepository.findByCategory(category, limit, offset);
   },
@@ -237,14 +243,18 @@ export const appService = {
   async updateRatingStats(
     appId: string,
     averageRating: number,
-    totalReviews: number
+    totalReviews: number,
   ): Promise<App> {
     const app = await appRepository.findById(appId);
     if (!app) {
-      throw new NotFoundError('App', appId);
+      throw new NotFoundError("App", appId);
     }
 
-    return await appRepository.updateRatingStats(appId, averageRating, totalReviews);
+    return await appRepository.updateRatingStats(
+      appId,
+      averageRating,
+      totalReviews,
+    );
   },
 
   /**

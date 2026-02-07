@@ -24,19 +24,21 @@ const getJwtSecret = (): Uint8Array => {
     if (isDev) {
       // Development fallback - NOT SECURE, only for local testing
       console.warn(
-        "[SECURITY WARNING] JWT_SECRET not set. Using insecure development fallback."
+        "[SECURITY WARNING] JWT_SECRET not set. Using insecure development fallback.",
       );
-      cachedSecret = new TextEncoder().encode("crowdup-dev-jwt-secret-NOT-FOR-PRODUCTION");
+      cachedSecret = new TextEncoder().encode(
+        "crowdup-dev-jwt-secret-NOT-FOR-PRODUCTION",
+      );
       return cachedSecret;
     }
     throw new Error(
-      "JWT_SECRET environment variable is required in production"
+      "JWT_SECRET environment variable is required in production",
     );
   }
 
   if (secret.length < 32) {
     console.warn(
-      "[SECURITY WARNING] JWT_SECRET should be at least 32 characters"
+      "[SECURITY WARNING] JWT_SECRET should be at least 32 characters",
     );
   }
 

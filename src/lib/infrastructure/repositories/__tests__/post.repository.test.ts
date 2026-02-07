@@ -4,54 +4,54 @@
  * Tests for the post repository with mocked Supabase client.
  */
 
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import { postRepository } from '../post.repository';
-import type { CreatePostDTO, UpdatePostDTO } from '@/lib/domain/dtos/post.dto';
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
+import { postRepository } from "../post.repository";
+import type { CreatePostDTO, UpdatePostDTO } from "@/lib/domain/dtos/post.dto";
 
 // Mock Supabase
-vi.mock('@/lib/supabase', () => ({
+vi.mock("@/lib/supabase", () => ({
   supabase: {
     from: vi.fn(),
   },
 }));
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
 
 // Mock data
 const mockPostRow = {
-  id: '123e4567-e89b-12d3-a456-426614174000',
-  user_id: '123e4567-e89b-12d3-a456-426614174001',
-  type: 'Bug Report' as const,
-  company: 'Test Company',
-  company_color: '#FF5733',
-  title: 'Test Post Title',
-  description: 'This is a test post description that is long enough.',
+  id: "123e4567-e89b-12d3-a456-426614174000",
+  user_id: "123e4567-e89b-12d3-a456-426614174001",
+  type: "Bug Report" as const,
+  company: "Test Company",
+  company_color: "#FF5733",
+  title: "Test Post Title",
+  description: "This is a test post description that is long enough.",
   votes: 10,
   app_id: null,
-  created_at: '2024-01-15T10:30:00.000Z',
-  updated_at: '2024-01-15T10:30:00.000Z',
+  created_at: "2024-01-15T10:30:00.000Z",
+  updated_at: "2024-01-15T10:30:00.000Z",
 };
 
 const mockCreateDTO: CreatePostDTO = {
-  type: 'Bug Report',
-  company: 'Test Company',
-  companyColor: '#FF5733',
-  title: 'Test Post Title',
-  description: 'This is a test post description that is long enough.',
+  type: "Bug Report",
+  company: "Test Company",
+  companyColor: "#FF5733",
+  title: "Test Post Title",
+  description: "This is a test post description that is long enough.",
 };
 
 const mockUpdateDTO: UpdatePostDTO = {
-  title: 'Updated Title',
-  description: 'Updated description that is also long enough.',
+  title: "Updated Title",
+  description: "Updated description that is also long enough.",
 };
 
-describe('postRepository', () => {
+describe("postRepository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('should create post and return mapped entity', async () => {
+  describe("create", () => {
+    it("should create post and return mapped entity", async () => {
       const mockChain = {
         insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
@@ -59,9 +59,12 @@ describe('postRepository', () => {
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
-      const result = await postRepository.create(mockCreateDTO, mockPostRow.user_id);
+      const result = await postRepository.create(
+        mockCreateDTO,
+        mockPostRow.user_id,
+      );
 
-      expect(supabase.from).toHaveBeenCalledWith('posts');
+      expect(supabase.from).toHaveBeenCalledWith("posts");
       expect(mockChain.insert).toHaveBeenCalledWith({
         user_id: mockPostRow.user_id,
         type: mockCreateDTO.type,
@@ -86,25 +89,25 @@ describe('postRepository', () => {
       });
     });
 
-    it('should throw error when creation fails', async () => {
+    it("should throw error when creation fails", async () => {
       const mockChain = {
         insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
           data: null,
-          error: { message: 'Insert failed' },
+          error: { message: "Insert failed" },
         }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
       await expect(
-        postRepository.create(mockCreateDTO, mockPostRow.user_id)
-      ).rejects.toThrow('Failed to create post: Insert failed');
+        postRepository.create(mockCreateDTO, mockPostRow.user_id),
+      ).rejects.toThrow("Failed to create post: Insert failed");
     });
   });
 
-  describe('findById', () => {
-    it('should return post when found', async () => {
+  describe("findById", () => {
+    it("should return post when found", async () => {
       const mockChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -114,48 +117,48 @@ describe('postRepository', () => {
 
       const result = await postRepository.findById(mockPostRow.id);
 
-      expect(supabase.from).toHaveBeenCalledWith('posts');
-      expect(mockChain.select).toHaveBeenCalledWith('*');
-      expect(mockChain.eq).toHaveBeenCalledWith('id', mockPostRow.id);
+      expect(supabase.from).toHaveBeenCalledWith("posts");
+      expect(mockChain.select).toHaveBeenCalledWith("*");
+      expect(mockChain.eq).toHaveBeenCalledWith("id", mockPostRow.id);
       expect(result).not.toBeNull();
       expect(result?.id).toBe(mockPostRow.id);
     });
 
-    it('should return null when not found', async () => {
+    it("should return null when not found", async () => {
       const mockChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
           data: null,
-          error: { code: 'PGRST116', message: 'Not found' },
+          error: { code: "PGRST116", message: "Not found" },
         }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
-      const result = await postRepository.findById('nonexistent-id');
+      const result = await postRepository.findById("nonexistent-id");
 
       expect(result).toBeNull();
     });
 
-    it('should throw error for other errors', async () => {
+    it("should throw error for other errors", async () => {
       const mockChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
           data: null,
-          error: { code: 'OTHER', message: 'Database error' },
+          error: { code: "OTHER", message: "Database error" },
         }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
-      await expect(postRepository.findById('some-id')).rejects.toThrow(
-        'Failed to fetch post: Database error'
+      await expect(postRepository.findById("some-id")).rejects.toThrow(
+        "Failed to fetch post: Database error",
       );
     });
   });
 
-  describe('update', () => {
-    it('should update post and return mapped entity', async () => {
+  describe("update", () => {
+    it("should update post and return mapped entity", async () => {
       const updatedRow = {
         ...mockPostRow,
         title: mockUpdateDTO.title!,
@@ -172,7 +175,7 @@ describe('postRepository', () => {
 
       const result = await postRepository.update(mockPostRow.id, mockUpdateDTO);
 
-      expect(supabase.from).toHaveBeenCalledWith('posts');
+      expect(supabase.from).toHaveBeenCalledWith("posts");
       expect(mockChain.update).toHaveBeenCalledWith({
         title: mockUpdateDTO.title,
         description: mockUpdateDTO.description,
@@ -181,57 +184,59 @@ describe('postRepository', () => {
       expect(result.description).toBe(mockUpdateDTO.description);
     });
 
-    it('should throw error when update fails', async () => {
+    it("should throw error when update fails", async () => {
       const mockChain = {
         update: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
           data: null,
-          error: { message: 'Update failed' },
+          error: { message: "Update failed" },
         }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
       await expect(
-        postRepository.update(mockPostRow.id, mockUpdateDTO)
-      ).rejects.toThrow('Failed to update post: Update failed');
+        postRepository.update(mockPostRow.id, mockUpdateDTO),
+      ).rejects.toThrow("Failed to update post: Update failed");
     });
   });
 
-  describe('delete', () => {
-    it('should delete post successfully', async () => {
+  describe("delete", () => {
+    it("should delete post successfully", async () => {
       const mockChain = {
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({ error: null }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
-      await expect(postRepository.delete(mockPostRow.id)).resolves.toBeUndefined();
+      await expect(
+        postRepository.delete(mockPostRow.id),
+      ).resolves.toBeUndefined();
 
-      expect(supabase.from).toHaveBeenCalledWith('posts');
+      expect(supabase.from).toHaveBeenCalledWith("posts");
       expect(mockChain.delete).toHaveBeenCalled();
-      expect(mockChain.eq).toHaveBeenCalledWith('id', mockPostRow.id);
+      expect(mockChain.eq).toHaveBeenCalledWith("id", mockPostRow.id);
     });
 
-    it('should throw error when deletion fails', async () => {
+    it("should throw error when deletion fails", async () => {
       const mockChain = {
         delete: vi.fn().mockReturnThis(),
         eq: vi.fn().mockResolvedValue({
-          error: { message: 'Delete failed' },
+          error: { message: "Delete failed" },
         }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
       await expect(postRepository.delete(mockPostRow.id)).rejects.toThrow(
-        'Failed to delete post: Delete failed'
+        "Failed to delete post: Delete failed",
       );
     });
   });
 
-  describe('findByUser', () => {
-    it('should return posts for user with pagination', async () => {
-      const mockPosts = [mockPostRow, { ...mockPostRow, id: 'another-id' }];
+  describe("findByUser", () => {
+    it("should return posts for user with pagination", async () => {
+      const mockPosts = [mockPostRow, { ...mockPostRow, id: "another-id" }];
 
       const mockChain = {
         select: vi.fn().mockReturnThis(),
@@ -241,36 +246,42 @@ describe('postRepository', () => {
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
-      const result = await postRepository.findByUser(mockPostRow.user_id, 20, 0);
+      const result = await postRepository.findByUser(
+        mockPostRow.user_id,
+        20,
+        0,
+      );
 
-      expect(supabase.from).toHaveBeenCalledWith('posts');
-      expect(mockChain.eq).toHaveBeenCalledWith('user_id', mockPostRow.user_id);
-      expect(mockChain.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(supabase.from).toHaveBeenCalledWith("posts");
+      expect(mockChain.eq).toHaveBeenCalledWith("user_id", mockPostRow.user_id);
+      expect(mockChain.order).toHaveBeenCalledWith("created_at", {
+        ascending: false,
+      });
       expect(mockChain.range).toHaveBeenCalledWith(0, 19);
       expect(result).toHaveLength(2);
       expect(result[0].userId).toBe(mockPostRow.user_id);
     });
 
-    it('should throw error when query fails', async () => {
+    it("should throw error when query fails", async () => {
       const mockChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         range: vi.fn().mockResolvedValue({
           data: null,
-          error: { message: 'Query failed' },
+          error: { message: "Query failed" },
         }),
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
       await expect(
-        postRepository.findByUser(mockPostRow.user_id)
-      ).rejects.toThrow('Failed to fetch user posts: Query failed');
+        postRepository.findByUser(mockPostRow.user_id),
+      ).rejects.toThrow("Failed to fetch user posts: Query failed");
     });
   });
 
-  describe('findByCompany', () => {
-    it('should return posts for company', async () => {
+  describe("findByCompany", () => {
+    it("should return posts for company", async () => {
       const mockPosts = [mockPostRow];
 
       const mockChain = {
@@ -281,17 +292,17 @@ describe('postRepository', () => {
       };
       (supabase.from as Mock).mockReturnValue(mockChain);
 
-      const result = await postRepository.findByCompany('Test Company');
+      const result = await postRepository.findByCompany("Test Company");
 
-      expect(mockChain.eq).toHaveBeenCalledWith('company', 'Test Company');
+      expect(mockChain.eq).toHaveBeenCalledWith("company", "Test Company");
       expect(result).toHaveLength(1);
-      expect(result[0].company).toBe('Test Company');
+      expect(result[0].company).toBe("Test Company");
     });
   });
 
-  describe('findByApp', () => {
-    it('should return posts for app', async () => {
-      const appId = 'app-123';
+  describe("findByApp", () => {
+    it("should return posts for app", async () => {
+      const appId = "app-123";
       const postWithApp = { ...mockPostRow, app_id: appId };
 
       const mockChain = {
@@ -304,14 +315,14 @@ describe('postRepository', () => {
 
       const result = await postRepository.findByApp(appId);
 
-      expect(mockChain.eq).toHaveBeenCalledWith('app_id', appId);
+      expect(mockChain.eq).toHaveBeenCalledWith("app_id", appId);
       expect(result).toHaveLength(1);
       expect(result[0].appId).toBe(appId);
     });
   });
 
-  describe('findAll', () => {
-    it('should return all posts with pagination', async () => {
+  describe("findAll", () => {
+    it("should return all posts with pagination", async () => {
       const mockPosts = [mockPostRow];
 
       const mockChain = {
@@ -328,11 +339,11 @@ describe('postRepository', () => {
     });
   });
 
-  describe('findTrending', () => {
-    it('should return trending posts sorted by votes', async () => {
+  describe("findTrending", () => {
+    it("should return trending posts sorted by votes", async () => {
       const trendingPosts = [
         { ...mockPostRow, votes: 100 },
-        { ...mockPostRow, id: 'post-2', votes: 50 },
+        { ...mockPostRow, id: "post-2", votes: 50 },
       ];
 
       const mockChain = {
@@ -344,15 +355,17 @@ describe('postRepository', () => {
 
       const result = await postRepository.findTrending(5);
 
-      expect(mockChain.order).toHaveBeenCalledWith('votes', { ascending: false });
+      expect(mockChain.order).toHaveBeenCalledWith("votes", {
+        ascending: false,
+      });
       expect(mockChain.limit).toHaveBeenCalledWith(5);
       expect(result).toHaveLength(2);
       expect(result[0].votes).toBe(100);
     });
   });
 
-  describe('updateVoteCount', () => {
-    it('should increment vote count', async () => {
+  describe("updateVoteCount", () => {
+    it("should increment vote count", async () => {
       const fetchChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -379,7 +392,7 @@ describe('postRepository', () => {
       expect(result.votes).toBe(11);
     });
 
-    it('should decrement vote count', async () => {
+    it("should decrement vote count", async () => {
       const fetchChain = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),

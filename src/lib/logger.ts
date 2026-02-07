@@ -8,7 +8,7 @@
  * SECURITY: Never log sensitive data (passwords, tokens, PII).
  */
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = process.env.NODE_ENV !== "production";
 
 /**
  * Redacts sensitive fields from metadata objects.
@@ -18,20 +18,20 @@ const isDev = process.env.NODE_ENV !== 'production';
  * @returns Object with sensitive fields replaced
  */
 export function redactSensitive(
-  obj: Record<string, unknown>
+  obj: Record<string, unknown>,
 ): Record<string, unknown> {
   const sensitiveKeys = [
-    'password',
-    'passwordHash',
-    'token',
-    'accessToken',
-    'refreshToken',
-    'secret',
-    'apiKey',
-    'authorization',
-    'cookie',
-    'creditCard',
-    'ssn',
+    "password",
+    "passwordHash",
+    "token",
+    "accessToken",
+    "refreshToken",
+    "secret",
+    "apiKey",
+    "authorization",
+    "cookie",
+    "creditCard",
+    "ssn",
   ];
 
   const redacted: Record<string, unknown> = {};
@@ -39,8 +39,8 @@ export function redactSensitive(
   for (const [key, value] of Object.entries(obj)) {
     const lowerKey = key.toLowerCase();
     if (sensitiveKeys.some((sk) => lowerKey.includes(sk.toLowerCase()))) {
-      redacted[key] = '[REDACTED]';
-    } else if (typeof value === 'object' && value !== null) {
+      redacted[key] = "[REDACTED]";
+    } else if (typeof value === "object" && value !== null) {
       redacted[key] = redactSensitive(value as Record<string, unknown>);
     } else {
       redacted[key] = value;
@@ -56,10 +56,10 @@ export function redactSensitive(
 function formatMessage(
   level: string,
   message: string,
-  meta?: Record<string, unknown>
+  meta?: Record<string, unknown>,
 ): string {
   const timestamp = new Date().toISOString();
-  const metaStr = meta ? ` ${JSON.stringify(meta)}` : '';
+  const metaStr = meta ? ` ${JSON.stringify(meta)}` : "";
   return `[${timestamp}] [${level}] ${message}${metaStr}`;
 }
 
@@ -80,7 +80,7 @@ export const logger = {
    */
   info: (message: string, meta?: Record<string, unknown>): void => {
     if (isDev) {
-      console.log(formatMessage('INFO', message, meta));
+      console.log(formatMessage("INFO", message, meta));
     }
   },
 
@@ -90,7 +90,7 @@ export const logger = {
    */
   warn: (message: string, meta?: Record<string, unknown>): void => {
     if (isDev) {
-      console.warn(formatMessage('WARN', message, meta));
+      console.warn(formatMessage("WARN", message, meta));
     }
   },
 
@@ -106,7 +106,7 @@ export const logger = {
   error: (
     message: string,
     error?: Error | unknown,
-    meta?: Record<string, unknown>
+    meta?: Record<string, unknown>,
   ): void => {
     const errorMeta: Record<string, unknown> = {
       ...(meta ? redactSensitive(meta) : {}),
@@ -124,7 +124,7 @@ export const logger = {
       errorMeta.error = String(error);
     }
 
-    console.error(formatMessage('ERROR', message, errorMeta));
+    console.error(formatMessage("ERROR", message, errorMeta));
 
     // TODO: In production, send to error tracking service
     // if (!isDev && error instanceof Error) {
@@ -138,7 +138,7 @@ export const logger = {
    */
   debug: (message: string, meta?: Record<string, unknown>): void => {
     if (isDev) {
-      console.debug(formatMessage('DEBUG', message, meta));
+      console.debug(formatMessage("DEBUG", message, meta));
     }
   },
 
@@ -150,7 +150,7 @@ export const logger = {
     method: string,
     path: string,
     status: number,
-    meta?: Record<string, unknown>
+    meta?: Record<string, unknown>,
   ): void => {
     if (isDev) {
       const logMeta = {
@@ -159,7 +159,7 @@ export const logger = {
         status,
         ...(meta ? redactSensitive(meta) : {}),
       };
-      console.log(formatMessage('API', `${method} ${path} ${status}`, logMeta));
+      console.log(formatMessage("API", `${method} ${path} ${status}`, logMeta));
     }
   },
 };

@@ -6,7 +6,7 @@
  */
 
 // Mappers
-export * from './mappers';
+export * from "./mappers";
 
 // Repositories
-export * from './repositories';
+export * from "./repositories";

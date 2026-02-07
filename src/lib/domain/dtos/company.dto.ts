@@ -5,7 +5,7 @@
  * Domain layer - no external dependencies.
  */
 
-import type { CompanyCategory, CompanyMemberRole } from '../entities/company';
+import type { CompanyCategory, CompanyMemberRole } from "../entities/company";
 
 /**
  * DTO for creating a new company.

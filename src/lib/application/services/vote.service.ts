@@ -5,22 +5,18 @@
  * Handles vote creation, updates, and removal with automatic post vote recalculation.
  */
 
-import { voteRepository } from '@/lib/infrastructure/repositories/vote.repository';
-import { postRepository } from '@/lib/infrastructure/repositories/post.repository';
-import { CreateVoteSchema } from '@/lib/validators/vote.validator';
-import type { Vote, VoteType } from '@/lib/domain/entities/vote';
-import {
-  ValidationError,
-  NotFoundError,
-  BusinessRuleError,
-} from '../errors';
+import { voteRepository } from "@/lib/infrastructure/repositories/vote.repository";
+import { postRepository } from "@/lib/infrastructure/repositories/post.repository";
+import { CreateVoteSchema } from "@/lib/validators/vote.validator";
+import type { Vote, VoteType } from "@/lib/domain/entities/vote";
+import { ValidationError, NotFoundError, BusinessRuleError } from "../errors";
 
 /**
  * Result of a vote toggle operation.
  */
 export interface VoteToggleResult {
   /** Action performed: created new vote, updated existing, or removed vote */
-  action: 'created' | 'updated' | 'removed';
+  action: "created" | "updated" | "removed";
   /** The vote entity (undefined if removed) */
   vote?: Vote;
   /** Updated net vote count for the post */
@@ -46,7 +42,10 @@ export const voteService = {
    * @throws NotFoundError - If post does not exist
    * @throws BusinessRuleError - If user tries to vote on own post
    */
-  async toggleVote(rawData: unknown, userId: string): Promise<VoteToggleResult> {
+  async toggleVote(
+    rawData: unknown,
+    userId: string,
+  ): Promise<VoteToggleResult> {
     // 1. Validate input
     const parseResult = CreateVoteSchema.safeParse(rawData);
     if (!parseResult.success) {
@@ -58,14 +57,14 @@ export const voteService = {
     // 2. Verify post exists
     const post = await postRepository.findById(postId);
     if (!post) {
-      throw new NotFoundError('Post', postId);
+      throw new NotFoundError("Post", postId);
     }
 
     // 3. Business rule: Prevent self-voting
     if (post.userId === userId) {
       throw new BusinessRuleError(
-        'Cannot vote on your own post',
-        'SELF_VOTE_NOT_ALLOWED'
+        "Cannot vote on your own post",
+        "SELF_VOTE_NOT_ALLOWED",
       );
     }
 
@@ -79,18 +78,21 @@ export const voteService = {
         // Same vote type = remove vote (toggle off)
         await voteRepository.delete(existingVote.id);
         const netVotes = await this.recalculatePostVotes(postId);
-        result = { action: 'removed', netVotes };
+        result = { action: "removed", netVotes };
       } else {
         // Different vote type = update
-        const updatedVote = await voteRepository.update(existingVote.id, voteType);
+        const updatedVote = await voteRepository.update(
+          existingVote.id,
+          voteType,
+        );
         const netVotes = await this.recalculatePostVotes(postId);
-        result = { action: 'updated', vote: updatedVote, netVotes };
+        result = { action: "updated", vote: updatedVote, netVotes };
       }
     } else {
       // New vote
       const newVote = await voteRepository.create({ postId, voteType }, userId);
       const netVotes = await this.recalculatePostVotes(postId);
-      result = { action: 'created', vote: newVote, netVotes };
+      result = { action: "created", vote: newVote, netVotes };
     }
 
     return result;
@@ -125,7 +127,10 @@ export const voteService = {
    * @param userId - User ID
    * @returns Vote type ('up' | 'down') or null if no vote
    */
-  async getVoteStatus(postId: string, userId: string): Promise<VoteType | null> {
+  async getVoteStatus(
+    postId: string,
+    userId: string,
+  ): Promise<VoteType | null> {
     const vote = await voteRepository.findByPostAndUser(postId, userId);
     return vote?.voteType ?? null;
   },
@@ -140,7 +145,7 @@ export const voteService = {
    */
   async getVoteStatusesForPosts(
     userId: string,
-    postIds: string[]
+    postIds: string[],
   ): Promise<Map<string, VoteType>> {
     if (postIds.length === 0) {
       return new Map();
@@ -173,10 +178,12 @@ export const voteService = {
    * @returns Object with upvotes and downvotes counts
    * @throws NotFoundError - If post does not exist
    */
-  async getVoteCounts(postId: string): Promise<{ upvotes: number; downvotes: number; net: number }> {
+  async getVoteCounts(
+    postId: string,
+  ): Promise<{ upvotes: number; downvotes: number; net: number }> {
     const post = await postRepository.findById(postId);
     if (!post) {
-      throw new NotFoundError('Post', postId);
+      throw new NotFoundError("Post", postId);
     }
 
     const { upvotes, downvotes } = await voteRepository.countByPost(postId);

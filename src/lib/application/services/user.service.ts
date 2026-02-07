@@ -5,16 +5,16 @@
  * validation, and authorization.
  */
 
-import { userRepository } from '@/lib/infrastructure/repositories/user.repository';
-import { UpdateUserSchema } from '@/lib/validators/user.validator';
-import type { User, PublicUser } from '@/lib/domain/entities/user';
-import type { UpdateUserDTO } from '@/lib/domain/dtos/user.dto';
+import { userRepository } from "@/lib/infrastructure/repositories/user.repository";
+import { UpdateUserSchema } from "@/lib/validators/user.validator";
+import type { User, PublicUser } from "@/lib/domain/entities/user";
+import type { UpdateUserDTO } from "@/lib/domain/dtos/user.dto";
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '../errors';
+} from "../errors";
 
 /**
  * User service with business logic and validation.
@@ -30,7 +30,7 @@ export const userService = {
   async getUserById(id: string): Promise<User> {
     const user = await userRepository.findById(id);
     if (!user) {
-      throw new NotFoundError('User', id);
+      throw new NotFoundError("User", id);
     }
     return user;
   },
@@ -45,7 +45,7 @@ export const userService = {
   async getUserByUsername(username: string): Promise<User> {
     const user = await userRepository.findByUsername(username);
     if (!user) {
-      throw new NotFoundError('User', username);
+      throw new NotFoundError("User", username);
     }
     return user;
   },
@@ -60,7 +60,7 @@ export const userService = {
   async getPublicProfile(username: string): Promise<PublicUser> {
     const user = await userRepository.findByUsername(username);
     if (!user) {
-      throw new NotFoundError('User', username);
+      throw new NotFoundError("User", username);
     }
 
     // Map to public-safe user data
@@ -91,11 +91,11 @@ export const userService = {
   async updateProfile(
     id: string,
     rawData: unknown,
-    requestingUserId: string
+    requestingUserId: string,
   ): Promise<User> {
     // 1. Authorization check
     if (id !== requestingUserId) {
-      throw new ForbiddenError('Not authorized to update this profile');
+      throw new ForbiddenError("Not authorized to update this profile");
     }
 
     // 2. Validate input
@@ -107,7 +107,7 @@ export const userService = {
     // 3. Check user exists
     const existingUser = await userRepository.findById(id);
     if (!existingUser) {
-      throw new NotFoundError('User', id);
+      throw new NotFoundError("User", id);
     }
 
     // 4. Build update DTO
@@ -131,11 +131,11 @@ export const userService = {
   async adminUpdateProfile(
     id: string,
     rawData: unknown,
-    isAdmin: boolean
+    isAdmin: boolean,
   ): Promise<User> {
     // 1. Authorization check
     if (!isAdmin) {
-      throw new ForbiddenError('Admin privileges required');
+      throw new ForbiddenError("Admin privileges required");
     }
 
     // 2. Validate input
@@ -147,7 +147,7 @@ export const userService = {
     // 3. Check user exists
     const existingUser = await userRepository.findById(id);
     if (!existingUser) {
-      throw new NotFoundError('User', id);
+      throw new NotFoundError("User", id);
     }
 
     // 4. Update via repository
@@ -205,14 +205,14 @@ export const userService = {
   async updateReputation(userId: string, points: number): Promise<User> {
     const user = await userRepository.findById(userId);
     if (!user) {
-      throw new NotFoundError('User', userId);
+      throw new NotFoundError("User", userId);
     }
 
     const newScore = user.reputationScore + points;
     if (newScore < 0) {
       throw new BusinessRuleError(
-        'Reputation cannot go below 0',
-        'REPUTATION_FLOOR_REACHED'
+        "Reputation cannot go below 0",
+        "REPUTATION_FLOOR_REACHED",
       );
     }
 
@@ -229,14 +229,20 @@ export const userService = {
    * @returns Reputation level string
    */
   calculateReputationLevel(
-    score: number
-  ): 'Newcomer' | 'Contributor' | 'Active Member' | 'Trusted Voice' | 'Community Leader' | 'Legend' {
-    if (score >= 10000) return 'Legend';
-    if (score >= 5000) return 'Community Leader';
-    if (score >= 1000) return 'Trusted Voice';
-    if (score >= 500) return 'Active Member';
-    if (score >= 100) return 'Contributor';
-    return 'Newcomer';
+    score: number,
+  ):
+    | "Newcomer"
+    | "Contributor"
+    | "Active Member"
+    | "Trusted Voice"
+    | "Community Leader"
+    | "Legend" {
+    if (score >= 10000) return "Legend";
+    if (score >= 5000) return "Community Leader";
+    if (score >= 1000) return "Trusted Voice";
+    if (score >= 500) return "Active Member";
+    if (score >= 100) return "Contributor";
+    return "Newcomer";
   },
 
   /**

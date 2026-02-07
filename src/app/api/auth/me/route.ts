@@ -30,7 +30,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
-    logger.error("Get current user error", error instanceof Error ? error : undefined);
+    logger.error(
+      "Get current user error",
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.json({ user: null }, { status: 200 });
   }
 }

@@ -3,10 +3,10 @@
  *
  * Fetches a single post by ID with loading and error states.
  */
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import type { Post } from '@/lib/domain/entities/post';
+import { useState, useEffect, useCallback } from "react";
+import type { Post } from "@/lib/domain/entities/post";
 
 /**
  * Result of usePost hook.
@@ -50,13 +50,13 @@ export function usePost(id: string): UsePostResult {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? 'Failed to load post');
+        throw new Error(errorData.error ?? "Failed to load post");
       }
 
       const data = await response.json();
       setPost(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
       setPost(null);
     } finally {
       setLoading(false);

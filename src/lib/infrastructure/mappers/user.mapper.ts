@@ -5,13 +5,17 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { User, ReputationLevel, PublicUser } from '@/lib/domain/entities/user';
-import type { CreateUserDTO, UpdateUserDTO } from '@/lib/domain/dtos/user.dto';
-import type { Database } from '@/lib/database.types';
+import type {
+  User,
+  ReputationLevel,
+  PublicUser,
+} from "@/lib/domain/entities/user";
+import type { CreateUserDTO, UpdateUserDTO } from "@/lib/domain/dtos/user.dto";
+import type { Database } from "@/lib/database.types";
 
-type UserRow = Database['public']['Tables']['users']['Row'];
-type UserInsert = Database['public']['Tables']['users']['Insert'];
-type UserUpdate = Database['public']['Tables']['users']['Update'];
+type UserRow = Database["public"]["Tables"]["users"]["Row"];
+type UserInsert = Database["public"]["Tables"]["users"]["Insert"];
+type UserUpdate = Database["public"]["Tables"]["users"]["Update"];
 
 /**
  * Maps a database row to a User entity.
@@ -57,13 +61,16 @@ export const mapUserToPublic = (user: User): PublicUser => ({
  * @param passwordHash - Pre-hashed password
  * @returns Database insert object
  */
-export const mapUserToInsert = (dto: CreateUserDTO, passwordHash: string): UserInsert => ({
+export const mapUserToInsert = (
+  dto: CreateUserDTO,
+  passwordHash: string,
+): UserInsert => ({
   username: dto.username,
   display_name: dto.displayName,
   email: dto.email,
   password_hash: passwordHash,
   reputation_score: 0,
-  reputation_level: 'Newcomer',
+  reputation_level: "Newcomer",
   is_admin: false,
 });
 

@@ -4,10 +4,10 @@
  * POST /api/votes - Toggle vote on a post
  */
 
-import { NextRequest } from 'next/server';
-import { voteService } from '@/lib/application/services';
-import { getUserFromRequest } from '@/lib/api/auth';
-import { successResponse, errorResponse } from '@/lib/api/response';
+import { NextRequest } from "next/server";
+import { voteService } from "@/lib/application/services";
+import { getUserFromRequest } from "@/lib/api/auth";
+import { successResponse, errorResponse } from "@/lib/api/response";
 
 /**
  * POST /api/votes

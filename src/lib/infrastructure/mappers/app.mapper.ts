@@ -5,13 +5,13 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { App, AppCategory } from '@/lib/domain/entities/app';
-import type { CreateAppDTO, UpdateAppDTO } from '@/lib/domain/dtos/app.dto';
-import type { Database } from '@/lib/database.types';
+import type { App, AppCategory } from "@/lib/domain/entities/app";
+import type { CreateAppDTO, UpdateAppDTO } from "@/lib/domain/dtos/app.dto";
+import type { Database } from "@/lib/database.types";
 
-type AppRow = Database['public']['Tables']['apps']['Row'];
-type AppInsert = Database['public']['Tables']['apps']['Insert'];
-type AppUpdate = Database['public']['Tables']['apps']['Update'];
+type AppRow = Database["public"]["Tables"]["apps"]["Row"];
+type AppInsert = Database["public"]["Tables"]["apps"]["Insert"];
+type AppUpdate = Database["public"]["Tables"]["apps"]["Update"];
 
 /**
  * Maps a database row to an App entity.
@@ -41,7 +41,10 @@ export const mapRowToApp = (row: AppRow): App => ({
  * @param userId - Creator's user ID
  * @returns Database insert object
  */
-export const mapAppToInsert = (dto: CreateAppDTO, userId: string): AppInsert => ({
+export const mapAppToInsert = (
+  dto: CreateAppDTO,
+  userId: string,
+): AppInsert => ({
   user_id: userId,
   name: dto.name,
   description: dto.description,

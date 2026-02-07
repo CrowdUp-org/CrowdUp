@@ -8,7 +8,7 @@
 /**
  * Vote direction: upvote or downvote.
  */
-export type VoteType = 'up' | 'down';
+export type VoteType = "up" | "down";
 
 /**
  * Core vote entity - one per user per post.

@@ -5,20 +5,23 @@
  * validation, and authorization.
  */
 
-import { commentRepository } from '@/lib/infrastructure/repositories/comment.repository';
-import { postRepository } from '@/lib/infrastructure/repositories/post.repository';
+import { commentRepository } from "@/lib/infrastructure/repositories/comment.repository";
+import { postRepository } from "@/lib/infrastructure/repositories/post.repository";
 import {
   CreateCommentSchema,
   UpdateCommentSchema,
-} from '@/lib/validators/comment.validator';
-import type { Comment } from '@/lib/domain/entities/comment';
-import type { CreateCommentDTO, UpdateCommentDTO } from '@/lib/domain/dtos/comment.dto';
+} from "@/lib/validators/comment.validator";
+import type { Comment } from "@/lib/domain/entities/comment";
+import type {
+  CreateCommentDTO,
+  UpdateCommentDTO,
+} from "@/lib/domain/dtos/comment.dto";
 import {
   ValidationError,
   NotFoundError,
   ForbiddenError,
   BusinessRuleError,
-} from '../errors';
+} from "../errors";
 
 /**
  * Maximum comments per user per hour.
@@ -51,20 +54,23 @@ export const commentService = {
     // 2. Verify post exists
     const post = await postRepository.findById(postId);
     if (!post) {
-      throw new NotFoundError('Post', postId);
+      throw new NotFoundError("Post", postId);
     }
 
     // 3. Business rules - rate limiting (check recent comments)
-    const recentComments = await commentRepository.findByUser(userId, MAX_COMMENTS_PER_HOUR);
+    const recentComments = await commentRepository.findByUser(
+      userId,
+      MAX_COMMENTS_PER_HOUR,
+    );
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     const commentsLastHour = recentComments.filter(
-      (comment) => comment.createdAt >= oneHourAgo
+      (comment) => comment.createdAt >= oneHourAgo,
     );
 
     if (commentsLastHour.length >= MAX_COMMENTS_PER_HOUR) {
       throw new BusinessRuleError(
         `Maximum ${MAX_COMMENTS_PER_HOUR} comments per hour exceeded`,
-        'RATE_LIMIT_EXCEEDED'
+        "RATE_LIMIT_EXCEEDED",
       );
     }
 
@@ -83,7 +89,7 @@ export const commentService = {
   async getCommentById(id: string): Promise<Comment> {
     const comment = await commentRepository.findById(id);
     if (!comment) {
-      throw new NotFoundError('Comment', id);
+      throw new NotFoundError("Comment", id);
     }
     return comment;
   },
@@ -99,7 +105,11 @@ export const commentService = {
    * @throws NotFoundError - If comment does not exist
    * @throws ForbiddenError - If user is not the comment author
    */
-  async updateComment(id: string, rawData: unknown, userId: string): Promise<Comment> {
+  async updateComment(
+    id: string,
+    rawData: unknown,
+    userId: string,
+  ): Promise<Comment> {
     // 1. Validate input
     const parseResult = UpdateCommentSchema.safeParse(rawData);
     if (!parseResult.success) {
@@ -109,11 +119,11 @@ export const commentService = {
     // 2. Check existence and authorization
     const existingComment = await commentRepository.findById(id);
     if (!existingComment) {
-      throw new NotFoundError('Comment', id);
+      throw new NotFoundError("Comment", id);
     }
 
     if (existingComment.userId !== userId) {
-      throw new ForbiddenError('Not authorized to update this comment');
+      throw new ForbiddenError("Not authorized to update this comment");
     }
 
     // 3. Build update DTO
@@ -132,14 +142,18 @@ export const commentService = {
    * @throws NotFoundError - If comment does not exist
    * @throws ForbiddenError - If user is not authorized to delete
    */
-  async deleteComment(id: string, userId: string, isAdmin = false): Promise<void> {
+  async deleteComment(
+    id: string,
+    userId: string,
+    isAdmin = false,
+  ): Promise<void> {
     const comment = await commentRepository.findById(id);
     if (!comment) {
-      throw new NotFoundError('Comment', id);
+      throw new NotFoundError("Comment", id);
     }
 
     if (comment.userId !== userId && !isAdmin) {
-      throw new ForbiddenError('Not authorized to delete this comment');
+      throw new ForbiddenError("Not authorized to delete this comment");
     }
 
     await commentRepository.delete(id);
@@ -159,12 +173,12 @@ export const commentService = {
     postId: string,
     limit = 50,
     offset = 0,
-    ascending = true
+    ascending = true,
   ): Promise<Comment[]> {
     // Verify post exists
     const post = await postRepository.findById(postId);
     if (!post) {
-      throw new NotFoundError('Post', postId);
+      throw new NotFoundError("Post", postId);
     }
 
     return await commentRepository.findByPost(postId, limit, offset, ascending);
@@ -178,7 +192,11 @@ export const commentService = {
    * @param offset - Starting offset (default 0)
    * @returns Array of comment entities
    */
-  async getCommentsByUser(userId: string, limit = 20, offset = 0): Promise<Comment[]> {
+  async getCommentsByUser(
+    userId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Comment[]> {
     return await commentRepository.findByUser(userId, limit, offset);
   },
 

@@ -5,13 +5,16 @@
  * Infrastructure layer - depends on Domain and Database types.
  */
 
-import type { Company, CompanyCategory } from '@/lib/domain/entities/company';
-import type { CreateCompanyDTO, UpdateCompanyDTO } from '@/lib/domain/dtos/company.dto';
-import type { Database } from '@/lib/database.types';
+import type { Company, CompanyCategory } from "@/lib/domain/entities/company";
+import type {
+  CreateCompanyDTO,
+  UpdateCompanyDTO,
+} from "@/lib/domain/dtos/company.dto";
+import type { Database } from "@/lib/database.types";
 
-type CompanyRow = Database['public']['Tables']['companies']['Row'];
-type CompanyInsert = Database['public']['Tables']['companies']['Insert'];
-type CompanyUpdate = Database['public']['Tables']['companies']['Update'];
+type CompanyRow = Database["public"]["Tables"]["companies"]["Row"];
+type CompanyInsert = Database["public"]["Tables"]["companies"]["Insert"];
+type CompanyUpdate = Database["public"]["Tables"]["companies"]["Update"];
 
 /**
  * Maps a database row to a Company entity.
@@ -41,7 +44,7 @@ export const mapRowToCompany = (row: CompanyRow): Company => ({
  */
 export const mapCompanyToInsert = (
   dto: CreateCompanyDTO,
-  ownerId?: string | null
+  ownerId?: string | null,
 ): CompanyInsert => ({
   name: dto.name,
   display_name: dto.displayName,

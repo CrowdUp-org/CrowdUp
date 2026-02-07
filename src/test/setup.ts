@@ -1,6 +1,6 @@
-import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import "@testing-library/jest-dom/vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 
 // Cleanup after each test
 afterEach(() => {
@@ -8,32 +8,32 @@ afterEach(() => {
 });
 
 // Mock Next.js router
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
     back: vi.fn(),
     forward: vi.fn(),
     refresh: vi.fn(),
-    prefetch: vi.fn()
+    prefetch: vi.fn(),
   }),
-  usePathname: () => '/',
+  usePathname: () => "/",
   useSearchParams: () => new URLSearchParams(),
-  redirect: vi.fn()
+  redirect: vi.fn(),
 }));
 
 // Mock Next.js headers (for server components)
-vi.mock('next/headers', () => ({
+vi.mock("next/headers", () => ({
   cookies: () => ({
     get: vi.fn(),
     set: vi.fn(),
-    delete: vi.fn()
+    delete: vi.fn(),
   }),
-  headers: () => new Headers()
+  headers: () => new Headers(),
 }));
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
@@ -43,8 +43,8 @@ Object.defineProperty(window, 'matchMedia', {
     removeListener: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn()
-  }))
+    dispatchEvent: vi.fn(),
+  })),
 });
 
 // Mock IntersectionObserver
@@ -53,9 +53,9 @@ class MockIntersectionObserver {
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-Object.defineProperty(window, 'IntersectionObserver', {
+Object.defineProperty(window, "IntersectionObserver", {
   writable: true,
-  value: MockIntersectionObserver
+  value: MockIntersectionObserver,
 });
 
 // Mock ResizeObserver
@@ -64,7 +64,7 @@ class MockResizeObserver {
   unobserve = vi.fn();
   disconnect = vi.fn();
 }
-Object.defineProperty(window, 'ResizeObserver', {
+Object.defineProperty(window, "ResizeObserver", {
   writable: true,
-  value: MockResizeObserver
+  value: MockResizeObserver,
 });

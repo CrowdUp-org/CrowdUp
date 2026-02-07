@@ -3,10 +3,10 @@
  *
  * Fetches app/product data by ID.
  */
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import type { App } from '@/lib/domain/entities/app';
+import { useState, useEffect, useCallback } from "react";
+import type { App } from "@/lib/domain/entities/app";
 
 /**
  * Result of useApp hook.
@@ -50,13 +50,13 @@ export function useApp(id: string): UseAppResult {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? 'Failed to load app');
+        throw new Error(errorData.error ?? "Failed to load app");
       }
 
       const data = await response.json();
       setApp(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
       setApp(null);
     } finally {
       setLoading(false);
@@ -116,7 +116,14 @@ export interface UseAppsOptions {
  * const { apps, loading, loadMore } = useApps({ companyId: 'abc' });
  */
 export function useApps(options: UseAppsOptions = {}): UseAppsResult {
-  const { limit = 20, companyId, category, search, topRated, skip = false } = options;
+  const {
+    limit = 20,
+    companyId,
+    category,
+    search,
+    topRated,
+    skip = false,
+  } = options;
 
   const [apps, setApps] = useState<App[]>([]);
   const [loading, setLoading] = useState(!skip);
@@ -135,16 +142,16 @@ export function useApps(options: UseAppsOptions = {}): UseAppsResult {
           offset: String(currentOffset),
         });
 
-        if (companyId) params.set('companyId', companyId);
-        if (category) params.set('category', category);
-        if (search) params.set('search', search);
-        if (topRated) params.set('topRated', 'true');
+        if (companyId) params.set("companyId", companyId);
+        if (category) params.set("category", category);
+        if (search) params.set("search", search);
+        if (topRated) params.set("topRated", "true");
 
         const response = await fetch(`/api/apps?${params}`);
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error ?? 'Failed to load apps');
+          throw new Error(errorData.error ?? "Failed to load apps");
         }
 
         const data: App[] = await response.json();
@@ -158,7 +165,7 @@ export function useApps(options: UseAppsOptions = {}): UseAppsResult {
         setHasMore(data.length === limit);
         setOffset(currentOffset + data.length);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
         if (!append) {
           setApps([]);
         }
@@ -166,7 +173,7 @@ export function useApps(options: UseAppsOptions = {}): UseAppsResult {
         setLoading(false);
       }
     },
-    [limit, companyId, category, search, topRated]
+    [limit, companyId, category, search, topRated],
   );
 
   const loadMore = useCallback(async () => {

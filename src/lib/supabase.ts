@@ -21,12 +21,12 @@ const getSupabaseUrl = (): string => {
   if (!url) {
     if (isDev) {
       console.warn(
-        "[CONFIG] NEXT_PUBLIC_SUPABASE_URL not set. Using placeholder for build."
+        "[CONFIG] NEXT_PUBLIC_SUPABASE_URL not set. Using placeholder for build.",
       );
       return "https://placeholder.supabase.co";
     }
     throw new Error(
-      "NEXT_PUBLIC_SUPABASE_URL environment variable is required"
+      "NEXT_PUBLIC_SUPABASE_URL environment variable is required",
     );
   }
   return url;
@@ -41,12 +41,12 @@ const getSupabasePublishableKey = (): string => {
   if (!key) {
     if (isDev) {
       console.warn(
-        "[CONFIG] NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY not set. Using placeholder for build."
+        "[CONFIG] NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY not set. Using placeholder for build.",
       );
       return "placeholder-key";
     }
     throw new Error(
-      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable is required"
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable is required",
     );
   }
   return key;
@@ -61,12 +61,12 @@ const getSupabaseSecretKey = (): string => {
   if (!key) {
     if (isDev) {
       console.warn(
-        "[CONFIG] SUPABASE_SECRET_KEY not set. Admin operations will fail."
+        "[CONFIG] SUPABASE_SECRET_KEY not set. Admin operations will fail.",
       );
       return "placeholder-secret-key";
     }
     throw new Error(
-      "SUPABASE_SECRET_KEY environment variable is required in production"
+      "SUPABASE_SECRET_KEY environment variable is required in production",
     );
   }
   return key;

@@ -5,16 +5,16 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { Message, Conversation } from '@/lib/domain/entities/message';
-import type { SendMessageDTO } from '@/lib/domain/dtos/message.dto';
+import { supabase } from "@/lib/supabase";
+import type { Message, Conversation } from "@/lib/domain/entities/message";
+import type { SendMessageDTO } from "@/lib/domain/dtos/message.dto";
 import {
   mapRowToMessage,
   mapMessageToInsert,
   mapRowToConversation,
   mapConversationToInsert,
-} from '../mappers/message.mapper';
-import { buildSafeEqOr, sanitizeForPostgREST } from '@/lib/utils/safe-query';
+} from "../mappers/message.mapper";
+import { buildSafeEqOr, sanitizeForPostgREST } from "@/lib/utils/safe-query";
 
 /**
  * Builds a safe filter for finding conversations between two participants.
@@ -41,7 +41,7 @@ export const messageRepository = {
   async create(dto: SendMessageDTO, senderId: string): Promise<Message> {
     const insert = mapMessageToInsert(dto, senderId);
     const { data, error } = await supabase
-      .from('messages')
+      .from("messages")
       .insert(insert as never)
       .select()
       .single();
@@ -52,9 +52,9 @@ export const messageRepository = {
 
     // Update conversation timestamp
     await supabase
-      .from('conversations')
+      .from("conversations")
       .update({ updated_at: new Date().toISOString() } as never)
-      .eq('id', dto.conversationId);
+      .eq("id", dto.conversationId);
 
     return mapRowToMessage(data);
   },
@@ -71,13 +71,13 @@ export const messageRepository = {
   async findByConversation(
     conversationId: string,
     limit = 50,
-    offset = 0
+    offset = 0,
   ): Promise<Message[]> {
     const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: false })
+      .from("messages")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -95,11 +95,11 @@ export const messageRepository = {
    */
   async markAsRead(conversationId: string, userId: string): Promise<void> {
     const { error } = await supabase
-      .from('messages')
+      .from("messages")
       .update({ read: true } as never)
-      .eq('conversation_id', conversationId)
-      .neq('sender_id', userId)
-      .eq('read', false);
+      .eq("conversation_id", conversationId)
+      .neq("sender_id", userId)
+      .eq("read", false);
 
     if (error) {
       throw new Error(`Failed to mark messages as read: ${error.message}`);
@@ -116,9 +116,9 @@ export const messageRepository = {
     if (messageIds.length === 0) return;
 
     const { error } = await supabase
-      .from('messages')
+      .from("messages")
       .update({ read: true } as never)
-      .in('id', messageIds);
+      .in("id", messageIds);
 
     if (error) {
       throw new Error(`Failed to mark messages as read: ${error.message}`);
@@ -133,13 +133,16 @@ export const messageRepository = {
    * @returns Unread message count
    * @throws Error if query fails
    */
-  async getUnreadCount(conversationId: string, userId: string): Promise<number> {
+  async getUnreadCount(
+    conversationId: string,
+    userId: string,
+  ): Promise<number> {
     const { count, error } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .eq('conversation_id', conversationId)
-      .neq('sender_id', userId)
-      .eq('read', false);
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .eq("conversation_id", conversationId)
+      .neq("sender_id", userId)
+      .eq("read", false);
 
     if (error) {
       throw new Error(`Failed to count unread messages: ${error.message}`);
@@ -156,10 +159,13 @@ export const messageRepository = {
    */
   async getTotalUnreadCount(userId: string): Promise<number> {
     // First get user's conversations
-    const participantFilter = buildSafeEqOr(['participant1_id', 'participant2_id'], userId);
+    const participantFilter = buildSafeEqOr(
+      ["participant1_id", "participant2_id"],
+      userId,
+    );
     const { data: conversations, error: convError } = await supabase
-      .from('conversations')
-      .select('id')
+      .from("conversations")
+      .select("id")
       .or(participantFilter);
 
     if (convError) {
@@ -168,14 +174,16 @@ export const messageRepository = {
 
     if (conversations.length === 0) return 0;
 
-    const conversationIds = (conversations as Array<{ id: string }>).map((c) => c.id);
+    const conversationIds = (conversations as Array<{ id: string }>).map(
+      (c) => c.id,
+    );
 
     const { count, error } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .in('conversation_id', conversationIds)
-      .neq('sender_id', userId)
-      .eq('read', false);
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .in("conversation_id", conversationIds)
+      .neq("sender_id", userId)
+      .eq("read", false);
 
     if (error) {
       throw new Error(`Failed to count unread messages: ${error.message}`);
@@ -196,10 +204,13 @@ export const conversationRepository = {
    * @returns Created conversation entity
    * @throws Error if creation fails
    */
-  async create(participant1Id: string, participant2Id: string): Promise<Conversation> {
+  async create(
+    participant1Id: string,
+    participant2Id: string,
+  ): Promise<Conversation> {
     const insert = mapConversationToInsert(participant1Id, participant2Id);
     const { data, error } = await supabase
-      .from('conversations')
+      .from("conversations")
       .insert(insert as never)
       .select()
       .single();
@@ -219,13 +230,13 @@ export const conversationRepository = {
    */
   async findById(id: string): Promise<Conversation | null> {
     const { data, error } = await supabase
-      .from('conversations')
-      .select('*')
-      .eq('id', id)
+      .from("conversations")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch conversation: ${error.message}`);
@@ -240,11 +251,14 @@ export const conversationRepository = {
    * @param userId2 - Second user ID
    * @returns Conversation entity or null if not found
    */
-  async findByParticipants(userId1: string, userId2: string): Promise<Conversation | null> {
+  async findByParticipants(
+    userId1: string,
+    userId2: string,
+  ): Promise<Conversation | null> {
     const filter = buildParticipantFilter(userId1, userId2);
     const { data, error } = await supabase
-      .from('conversations')
-      .select('*')
+      .from("conversations")
+      .select("*")
       .or(filter)
       .maybeSingle();
 
@@ -262,7 +276,10 @@ export const conversationRepository = {
    * @returns Conversation entity
    */
   async findOrCreate(userId1: string, userId2: string): Promise<Conversation> {
-    const existing = await conversationRepository.findByParticipants(userId1, userId2);
+    const existing = await conversationRepository.findByParticipants(
+      userId1,
+      userId2,
+    );
     if (existing) {
       return existing;
     }
@@ -278,13 +295,20 @@ export const conversationRepository = {
    * @returns Array of conversation entities (most recent first)
    * @throws Error if query fails
    */
-  async findByUser(userId: string, limit = 20, offset = 0): Promise<Conversation[]> {
-    const participantFilter = buildSafeEqOr(['participant1_id', 'participant2_id'], userId);
+  async findByUser(
+    userId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Conversation[]> {
+    const participantFilter = buildSafeEqOr(
+      ["participant1_id", "participant2_id"],
+      userId,
+    );
     const { data, error } = await supabase
-      .from('conversations')
-      .select('*')
+      .from("conversations")
+      .select("*")
       .or(participantFilter)
-      .order('updated_at', { ascending: false })
+      .order("updated_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -301,7 +325,10 @@ export const conversationRepository = {
    */
   async delete(id: string): Promise<void> {
     // Messages are deleted via cascade
-    const { error } = await supabase.from('conversations').delete().eq('id', id);
+    const { error } = await supabase
+      .from("conversations")
+      .delete()
+      .eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete conversation: ${error.message}`);

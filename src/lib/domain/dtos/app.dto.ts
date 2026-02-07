@@ -5,7 +5,7 @@
  * Domain layer - no external dependencies.
  */
 
-import type { AppCategory } from '../entities/app';
+import type { AppCategory } from "../entities/app";
 
 /**
  * DTO for creating a new app.
@@ -96,8 +96,8 @@ export interface AppListQueryDTO {
   limit?: number;
 
   /** Sort field */
-  sortBy?: 'name' | 'averageRating' | 'totalReviews' | 'createdAt';
+  sortBy?: "name" | "averageRating" | "totalReviews" | "createdAt";
 
   /** Sort direction */
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }

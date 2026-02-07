@@ -68,7 +68,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ user: updatedUser }, { status: 200 });
   } catch (error) {
-    logger.error("Update profile error", error instanceof Error ? error : undefined);
+    logger.error(
+      "Update profile error",
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.json(
       { error: "An error occurred while updating profile" },
       { status: 500 },

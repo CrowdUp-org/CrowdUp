@@ -7,49 +7,54 @@
 const uuid = (): string => crypto.randomUUID();
 
 // Post factory
-export const createMockPost = (overrides: Partial<MockPost> = {}): MockPost => ({
+export const createMockPost = (
+  overrides: Partial<MockPost> = {},
+): MockPost => ({
   id: uuid(),
-  title: 'Test Post Title',
-  description: 'This is a detailed test post description for unit testing purposes.',
-  post_type: 'bug',
+  title: "Test Post Title",
+  description:
+    "This is a detailed test post description for unit testing purposes.",
+  post_type: "bug",
   company_id: null,
   app_id: null,
   created_by: uuid(),
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  status: 'open',
+  status: "open",
   votes: 0,
   comment_count: 0,
   tags: [],
-  priority: 'medium',
+  priority: "medium",
   image_url: null,
-  ...overrides
+  ...overrides,
 });
 
 interface MockPost {
   id: string;
   title: string;
   description: string;
-  post_type: 'bug' | 'feature' | 'complaint';
+  post_type: "bug" | "feature" | "complaint";
   company_id: string | null;
   app_id: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: "open" | "in_progress" | "resolved" | "closed";
   votes: number;
   comment_count: number;
   tags: string[];
-  priority: 'low' | 'medium' | 'high' | 'critical' | null;
+  priority: "low" | "medium" | "high" | "critical" | null;
   image_url: string | null;
 }
 
 // User factory
-export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => ({
+export const createMockUser = (
+  overrides: Partial<MockUser> = {},
+): MockUser => ({
   id: uuid(),
   email: `test-${Date.now()}@example.com`,
   username: `testuser_${Date.now()}`,
-  full_name: 'Test User',
+  full_name: "Test User",
   avatar_url: null,
   bio: null,
   reputation_score: 0,
@@ -57,7 +62,7 @@ export const createMockUser = (overrides: Partial<MockUser> = {}): MockUser => (
   is_admin: false,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockUser {
@@ -75,35 +80,39 @@ interface MockUser {
 }
 
 // Vote factory
-export const createMockVote = (overrides: Partial<MockVote> = {}): MockVote => ({
+export const createMockVote = (
+  overrides: Partial<MockVote> = {},
+): MockVote => ({
   id: uuid(),
   post_id: uuid(),
   user_id: uuid(),
-  vote_type: 'upvote',
+  vote_type: "upvote",
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockVote {
   id: string;
   post_id: string;
   user_id: string;
-  vote_type: 'upvote' | 'downvote';
+  vote_type: "upvote" | "downvote";
   created_at: string;
   updated_at: string;
 }
 
 // Comment factory
-export const createMockComment = (overrides: Partial<MockComment> = {}): MockComment => ({
+export const createMockComment = (
+  overrides: Partial<MockComment> = {},
+): MockComment => ({
   id: uuid(),
   post_id: uuid(),
   user_id: uuid(),
-  content: 'This is a test comment.',
+  content: "This is a test comment.",
   parent_id: null,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockComment {
@@ -117,18 +126,20 @@ interface MockComment {
 }
 
 // Company factory
-export const createMockCompany = (overrides: Partial<MockCompany> = {}): MockCompany => ({
+export const createMockCompany = (
+  overrides: Partial<MockCompany> = {},
+): MockCompany => ({
   id: uuid(),
-  name: 'Test Company',
-  slug: 'test-company',
-  description: 'A test company for unit testing.',
+  name: "Test Company",
+  slug: "test-company",
+  description: "A test company for unit testing.",
   logo_url: null,
   website_url: null,
   is_verified: false,
   created_by: uuid(),
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockCompany {
@@ -147,9 +158,9 @@ interface MockCompany {
 // Application factory
 export const createMockApp = (overrides: Partial<MockApp> = {}): MockApp => ({
   id: uuid(),
-  name: 'Test App',
-  slug: 'test-app',
-  description: 'A test application for unit testing.',
+  name: "Test App",
+  slug: "test-app",
+  description: "A test application for unit testing.",
   logo_url: null,
   website_url: null,
   company_id: null,
@@ -157,7 +168,7 @@ export const createMockApp = (overrides: Partial<MockApp> = {}): MockApp => ({
   created_by: uuid(),
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockApp {
@@ -175,14 +186,16 @@ interface MockApp {
 }
 
 // Message factory
-export const createMockMessage = (overrides: Partial<MockMessage> = {}): MockMessage => ({
+export const createMockMessage = (
+  overrides: Partial<MockMessage> = {},
+): MockMessage => ({
   id: uuid(),
   sender_id: uuid(),
   receiver_id: uuid(),
-  content: 'Hello, this is a test message.',
+  content: "Hello, this is a test message.",
   is_read: false,
   created_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockMessage {
@@ -196,24 +209,24 @@ interface MockMessage {
 
 // Notification factory
 export const createMockNotification = (
-  overrides: Partial<MockNotification> = {}
+  overrides: Partial<MockNotification> = {},
 ): MockNotification => ({
   id: uuid(),
   user_id: uuid(),
-  type: 'vote',
-  title: 'New notification',
-  message: 'You received a notification.',
+  type: "vote",
+  title: "New notification",
+  message: "You received a notification.",
   is_read: false,
   reference_id: null,
   reference_type: null,
   created_at: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 interface MockNotification {
   id: string;
   user_id: string;
-  type: 'vote' | 'comment' | 'follow' | 'mention' | 'system';
+  type: "vote" | "comment" | "follow" | "mention" | "system";
   title: string;
   message: string;
   is_read: boolean;
@@ -223,19 +236,25 @@ interface MockNotification {
 }
 
 // Helper to create multiple entities
-export const createMockPosts = (count: number, overrides: Partial<MockPost> = {}): MockPost[] =>
+export const createMockPosts = (
+  count: number,
+  overrides: Partial<MockPost> = {},
+): MockPost[] =>
   Array.from({ length: count }, (_, i) =>
     createMockPost({
       title: `Test Post ${i + 1}`,
-      ...overrides
-    })
+      ...overrides,
+    }),
   );
 
-export const createMockUsers = (count: number, overrides: Partial<MockUser> = {}): MockUser[] =>
+export const createMockUsers = (
+  count: number,
+  overrides: Partial<MockUser> = {},
+): MockUser[] =>
   Array.from({ length: count }, (_, i) =>
     createMockUser({
       username: `testuser_${i + 1}`,
       email: `test${i + 1}@example.com`,
-      ...overrides
-    })
+      ...overrides,
+    }),
   );

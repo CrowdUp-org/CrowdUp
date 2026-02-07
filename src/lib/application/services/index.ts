@@ -5,20 +5,20 @@
  */
 
 // Post service
-export { postService } from './post.service';
+export { postService } from "./post.service";
 
 // Vote service
-export { voteService } from './vote.service';
-export type { VoteToggleResult } from './vote.service';
+export { voteService } from "./vote.service";
+export type { VoteToggleResult } from "./vote.service";
 
 // Comment service
-export { commentService } from './comment.service';
+export { commentService } from "./comment.service";
 
 // User service
-export { userService } from './user.service';
+export { userService } from "./user.service";
 
 // Company service
-export { companyService } from './company.service';
+export { companyService } from "./company.service";
 
 // App service
-export { appService } from './app.service';
+export { appService } from "./app.service";

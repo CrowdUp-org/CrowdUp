@@ -3,10 +3,10 @@
  *
  * Fetches a list of posts with pagination support.
  */
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import type { Post } from '@/lib/domain/entities/post';
+import { useState, useEffect, useCallback } from "react";
+import type { Post } from "@/lib/domain/entities/post";
 
 /**
  * Filter options for posts query.
@@ -77,18 +77,18 @@ export function usePosts(options: UsePostsOptions = {}): UsePostsResult {
   const buildQueryString = useCallback(
     (currentOffset: number) => {
       const params = new URLSearchParams();
-      params.set('limit', String(limit));
-      params.set('offset', String(currentOffset));
+      params.set("limit", String(limit));
+      params.set("offset", String(currentOffset));
 
-      if (filter?.company) params.set('company', filter.company);
-      if (filter?.appId) params.set('appId', filter.appId);
-      if (filter?.userId) params.set('userId', filter.userId);
-      if (filter?.type) params.set('type', filter.type);
-      if (filter?.trending) params.set('trending', 'true');
+      if (filter?.company) params.set("company", filter.company);
+      if (filter?.appId) params.set("appId", filter.appId);
+      if (filter?.userId) params.set("userId", filter.userId);
+      if (filter?.type) params.set("type", filter.type);
+      if (filter?.trending) params.set("trending", "true");
 
       return params.toString();
     },
-    [limit, filter]
+    [limit, filter],
   );
 
   const fetchPosts = useCallback(
@@ -102,7 +102,7 @@ export function usePosts(options: UsePostsOptions = {}): UsePostsResult {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error ?? 'Failed to load posts');
+          throw new Error(errorData.error ?? "Failed to load posts");
         }
 
         const data: Post[] = await response.json();
@@ -116,7 +116,7 @@ export function usePosts(options: UsePostsOptions = {}): UsePostsResult {
         setHasMore(data.length === limit);
         setOffset(currentOffset + data.length);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
         if (!append) {
           setPosts([]);
         }
@@ -124,7 +124,7 @@ export function usePosts(options: UsePostsOptions = {}): UsePostsResult {
         setLoading(false);
       }
     },
-    [buildQueryString, limit]
+    [buildQueryString, limit],
   );
 
   const loadMore = useCallback(async () => {

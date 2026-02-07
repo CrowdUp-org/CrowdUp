@@ -8,7 +8,7 @@
 /**
  * Types of notifications.
  */
-export type NotificationType = 'badge' | 'level' | 'verification' | 'milestone';
+export type NotificationType = "badge" | "level" | "verification" | "milestone";
 
 /**
  * Core notification entity.
@@ -56,12 +56,12 @@ export interface Badge {
  * Badge requirement types.
  */
 export type BadgeRequirementType =
-  | 'posts_count'
-  | 'upvotes_received'
-  | 'reputation_score'
-  | 'days_active'
-  | 'implementations'
-  | 'comments_count';
+  | "posts_count"
+  | "upvotes_received"
+  | "reputation_score"
+  | "days_active"
+  | "implementations"
+  | "comments_count";
 
 /**
  * User badge (awarded badge to user).

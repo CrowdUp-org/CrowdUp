@@ -3,10 +3,10 @@
  *
  * Fetches user profile data by username.
  */
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import type { PublicUser } from '@/lib/domain/entities/user';
+import { useState, useEffect, useCallback } from "react";
+import type { PublicUser } from "@/lib/domain/entities/user";
 
 /**
  * Result of useUser hook.
@@ -46,17 +46,19 @@ export function useUser(username: string): UseUserResult {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/users/${encodeURIComponent(username)}`);
+      const response = await fetch(
+        `/api/users/${encodeURIComponent(username)}`,
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? 'Failed to load user');
+        throw new Error(errorData.error ?? "Failed to load user");
       }
 
       const data = await response.json();
       setUser(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
       setUser(null);
     } finally {
       setLoading(false);
@@ -88,7 +90,7 @@ export function useCurrentUser(): UseUserResult {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/users/me');
+      const response = await fetch("/api/users/me");
 
       if (response.status === 401) {
         // Not authenticated - not an error, just no user
@@ -98,13 +100,13 @@ export function useCurrentUser(): UseUserResult {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? 'Failed to load profile');
+        throw new Error(errorData.error ?? "Failed to load profile");
       }
 
       const data = await response.json();
       setUser(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
       setUser(null);
     } finally {
       setLoading(false);

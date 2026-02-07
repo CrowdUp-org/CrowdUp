@@ -3,10 +3,10 @@
  *
  * Fetches company data by name/slug.
  */
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import type { Company } from '@/lib/domain/entities/company';
+import { useState, useEffect, useCallback } from "react";
+import type { Company } from "@/lib/domain/entities/company";
 
 /**
  * Result of useCompany hook.
@@ -46,17 +46,19 @@ export function useCompany(name: string): UseCompanyResult {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/companies/${encodeURIComponent(name)}`);
+      const response = await fetch(
+        `/api/companies/${encodeURIComponent(name)}`,
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error ?? 'Failed to load company');
+        throw new Error(errorData.error ?? "Failed to load company");
       }
 
       const data = await response.json();
       setCompany(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
       setCompany(null);
     } finally {
       setLoading(false);
@@ -111,7 +113,9 @@ export interface UseCompaniesOptions {
  * @example
  * const { companies, loading, loadMore } = useCompanies({ limit: 10 });
  */
-export function useCompanies(options: UseCompaniesOptions = {}): UseCompaniesResult {
+export function useCompanies(
+  options: UseCompaniesOptions = {},
+): UseCompaniesResult {
   const { limit = 20, category, search, skip = false } = options;
 
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -131,14 +135,14 @@ export function useCompanies(options: UseCompaniesOptions = {}): UseCompaniesRes
           offset: String(currentOffset),
         });
 
-        if (category) params.set('category', category);
-        if (search) params.set('search', search);
+        if (category) params.set("category", category);
+        if (search) params.set("search", search);
 
         const response = await fetch(`/api/companies?${params}`);
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.error ?? 'Failed to load companies');
+          throw new Error(errorData.error ?? "Failed to load companies");
         }
 
         const data: Company[] = await response.json();
@@ -152,7 +156,7 @@ export function useCompanies(options: UseCompaniesOptions = {}): UseCompaniesRes
         setHasMore(data.length === limit);
         setOffset(currentOffset + data.length);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
         if (!append) {
           setCompanies([]);
         }
@@ -160,7 +164,7 @@ export function useCompanies(options: UseCompaniesOptions = {}): UseCompaniesRes
         setLoading(false);
       }
     },
-    [limit, category, search]
+    [limit, category, search],
   );
 
   const loadMore = useCallback(async () => {

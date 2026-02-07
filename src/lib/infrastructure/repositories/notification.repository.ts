@@ -5,13 +5,13 @@
  * Infrastructure layer - abstracts Supabase behind a clean interface.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { Notification } from '@/lib/domain/entities/notification';
+import { supabase } from "@/lib/supabase";
+import type { Notification } from "@/lib/domain/entities/notification";
 import {
   mapRowToNotification,
   mapNotificationToInsert,
   type CreateNotificationDTO,
-} from '../mappers/notification.mapper';
+} from "../mappers/notification.mapper";
 
 /**
  * Notification repository with CRUD and query operations.
@@ -27,7 +27,7 @@ export const notificationRepository = {
   async create(dto: CreateNotificationDTO): Promise<Notification> {
     const insert = mapNotificationToInsert(dto);
     const { data, error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .insert(insert as never)
       .select()
       .single();
@@ -47,13 +47,13 @@ export const notificationRepository = {
    */
   async findById(id: string): Promise<Notification | null> {
     const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('id', id)
+      .from("notifications")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         return null;
       }
       throw new Error(`Failed to fetch notification: ${error.message}`);
@@ -70,12 +70,16 @@ export const notificationRepository = {
    * @returns Array of notification entities (newest first)
    * @throws Error if query fails
    */
-  async findByUser(userId: string, limit = 20, offset = 0): Promise<Notification[]> {
+  async findByUser(
+    userId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Notification[]> {
     const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .from("notifications")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) {
@@ -94,11 +98,11 @@ export const notificationRepository = {
    */
   async findUnreadByUser(userId: string, limit = 20): Promise<Notification[]> {
     const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_read', false)
-      .order('created_at', { ascending: false })
+      .from("notifications")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_read", false)
+      .order("created_at", { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -116,9 +120,9 @@ export const notificationRepository = {
    */
   async markAsRead(id: string): Promise<Notification> {
     const { data, error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .update({ is_read: true } as never)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -136,13 +140,15 @@ export const notificationRepository = {
    */
   async markAllAsRead(userId: string): Promise<void> {
     const { error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .update({ is_read: true } as never)
-      .eq('user_id', userId)
-      .eq('is_read', false);
+      .eq("user_id", userId)
+      .eq("is_read", false);
 
     if (error) {
-      throw new Error(`Failed to mark all notifications as read: ${error.message}`);
+      throw new Error(
+        `Failed to mark all notifications as read: ${error.message}`,
+      );
     }
   },
 
@@ -155,10 +161,10 @@ export const notificationRepository = {
    */
   async getUnreadCount(userId: string): Promise<number> {
     const { count, error } = await supabase
-      .from('notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('is_read', false);
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("is_read", false);
 
     if (error) {
       throw new Error(`Failed to count unread notifications: ${error.message}`);
@@ -173,7 +179,10 @@ export const notificationRepository = {
    * @throws Error if deletion fails
    */
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('notifications').delete().eq('id', id);
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("id", id);
 
     if (error) {
       throw new Error(`Failed to delete notification: ${error.message}`);
@@ -192,10 +201,10 @@ export const notificationRepository = {
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
     const { error } = await supabase
-      .from('notifications')
+      .from("notifications")
       .delete()
-      .eq('user_id', userId)
-      .lt('created_at', cutoffDate.toISOString());
+      .eq("user_id", userId)
+      .lt("created_at", cutoffDate.toISOString());
 
     if (error) {
       throw new Error(`Failed to delete old notifications: ${error.message}`);

@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(googleAuthUrl.toString());
   } catch (error) {
-    logger.error("Error initiating Google OAuth", error instanceof Error ? error : undefined);
+    logger.error(
+      "Error initiating Google OAuth",
+      error instanceof Error ? error : undefined,
+    );
     return NextResponse.json(
       { error: "Failed to initiate Google sign-in" },
       { status: 500 },

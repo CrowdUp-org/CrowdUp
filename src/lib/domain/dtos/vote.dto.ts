@@ -5,7 +5,7 @@
  * Domain layer - no external dependencies.
  */
 
-import type { VoteType } from '../entities/vote';
+import type { VoteType } from "../entities/vote";
 
 /**
  * DTO for creating/updating a vote.
@@ -32,7 +32,7 @@ export interface RemoveVoteDTO {
  */
 export interface VoteResponseDTO {
   /** Operation performed */
-  action: 'created' | 'updated' | 'removed';
+  action: "created" | "updated" | "removed";
 
   /** New vote state (null if removed) */
   voteType: VoteType | null;

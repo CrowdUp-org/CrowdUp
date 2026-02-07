@@ -28,7 +28,7 @@ export {
   UnauthorizedError,
   ForbiddenError,
   BusinessRuleError,
-} from './errors';
+} from "./errors";
 
 // Services
 export {
@@ -38,7 +38,7 @@ export {
   userService,
   companyService,
   appService,
-} from './services';
+} from "./services";
 
 // Types
-export type { VoteToggleResult } from './services';
+export type { VoteToggleResult } from "./services";

@@ -9,12 +9,12 @@
  * Reputation levels based on score thresholds.
  */
 export type ReputationLevel =
-  | 'Newcomer'
-  | 'Contributor'
-  | 'Active Member'
-  | 'Trusted Voice'
-  | 'Community Leader'
-  | 'Legend';
+  | "Newcomer"
+  | "Contributor"
+  | "Active Member"
+  | "Trusted Voice"
+  | "Community Leader"
+  | "Legend";
 
 /**
  * Core user entity with all profile and reputation data.

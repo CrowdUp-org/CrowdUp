@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT fk_user
-        FOREIGN KEY (user_id) 
+        FOREIGN KEY (user_id)
         REFERENCES users(id)
         ON DELETE CASCADE
 );

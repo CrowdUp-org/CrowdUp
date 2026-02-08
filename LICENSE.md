@@ -121,7 +121,7 @@ This License is governed by the laws of Italy, without regard to its conflict of
 
 If You wish to use the Software for any purpose beyond those explicitly permitted in Section 3, You must obtain a separate written commercial license from Licensor.
 
-**Contact for licensing inquiries:**  
+**Contact for licensing inquiries:**
 📧 Email: <crowdupofficial@gmail.com>
 
 ---

@@ -10,7 +10,7 @@ import {
 describe("JWT Utilities", () => {
   const testUserId = "user-123-abc";
   const testJti = "jti-456-def";
-  
+
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -124,9 +124,8 @@ describe("JWT Utilities", () => {
 
       // Force module reload to clear cached secret
       await vi.resetModules();
-      const { signAccessToken: prodSignAccessToken } = await import(
-        "@/lib/jwt"
-      );
+      const { signAccessToken: prodSignAccessToken } =
+        await import("@/lib/jwt");
 
       await expect(prodSignAccessToken(testUserId)).rejects.toThrow(
         "JWT_SECRET environment variable is required in production",
@@ -135,7 +134,7 @@ describe("JWT Utilities", () => {
 
     it("should warn when JWT_SECRET is too short", async () => {
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-      
+
       // Set a short secret
       vi.stubEnv("JWT_SECRET", "short");
       vi.stubEnv("NODE_ENV", "development");
@@ -143,7 +142,7 @@ describe("JWT Utilities", () => {
       // Force module reload
       await vi.resetModules();
       const { signAccessToken: shortSecretSign } = await import("@/lib/jwt");
-      
+
       await shortSecretSign(testUserId);
 
       expect(consoleSpy).toHaveBeenCalledWith(
@@ -155,7 +154,7 @@ describe("JWT Utilities", () => {
 
     it("should use development fallback when JWT_SECRET is not set in dev", async () => {
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-      
+
       vi.stubEnv("NODE_ENV", "development");
       vi.stubEnv("JWT_SECRET", "");
 

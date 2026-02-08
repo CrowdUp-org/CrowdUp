@@ -47,9 +47,7 @@ describe("Supabase Configuration", () => {
 
       expect(supabase).toBeDefined();
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY not set",
-        ),
+        expect.stringContaining("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY not set"),
       );
 
       consoleSpy.mockRestore();

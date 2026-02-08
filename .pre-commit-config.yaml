@@ -18,14 +18,15 @@ repos:
       - id: check-added-large-files
         args: ["--maxkb=500"]
 
-  # Prettier (using local hook - mirror archived in April 2024)
+  # Prettier
   - repo: local
     hooks:
       - id: prettier
         name: Prettier
-        entry: npx prettier -w --ignore-unknown
-        language: system
+        entry: prettier --write --ignore-unknown
+        language: node
         types: [text]
+        additional_dependencies: ["prettier@3.7.4"]
         exclude: |
           (?x)^(
             package-lock\.json|

@@ -29,8 +29,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
   quality:
     name: ✅ Quality Checks (Prettier • ESLint • TypeScript)
     runs-on: ubuntu-latest
@@ -85,6 +83,8 @@ jobs:
           echo "All tests passed." >> $GITHUB_STEP_SUMMARY
 
   build:
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
     name: 🏗️ Build Verification (Next.js)
     runs-on: ubuntu-latest
     needs: [quality, test]

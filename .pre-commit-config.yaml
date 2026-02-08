@@ -12,19 +12,19 @@ repos:
         exclude: '\.snap$'
       - id: end-of-file-fixer
       - id: check-yaml
-        args: ['--unsafe']  # Allow custom tags (GitHub Actions)
+        args: ["--unsafe"] # Allow custom tags (GitHub Actions)
       - id: check-json
       - id: check-merge-conflict
       - id: check-added-large-files
-        args: ['--maxkb=500']
+        args: ["--maxkb=500"]
 
   # Prettier (using local hook - mirror archived in April 2024)
   - repo: local
     hooks:
       - id: prettier
         name: Prettier
-        entry: npx prettier --write --ignore-unknown
-        language: node
+        entry: npx prettier -w --ignore-unknown
+        language: system
         types: [text]
         exclude: |
           (?x)^(
@@ -44,11 +44,11 @@ repos:
         name: ESLint
         files: \.[jt]sx?$
         types: [file]
-        args: ['--fix']
+        args: ["--fix"]
         additional_dependencies:
           - eslint@9.37.0
           - eslint-config-next@15.5.4
-          - 'eslint-plugin-import@latest'
-          - '@eslint/eslintrc@3.3.1'
-          - '@typescript-eslint/eslint-plugin@8.22.0'
-          - '@typescript-eslint/parser@8.22.0'
+          - "eslint-plugin-import@latest"
+          - "@eslint/eslintrc@3.3.1"
+          - "@typescript-eslint/eslint-plugin@8.22.0"
+          - "@typescript-eslint/parser@8.22.0"

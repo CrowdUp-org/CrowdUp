@@ -29,6 +29,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
   quality:
     name: ✅ Quality Checks (Prettier • ESLint • TypeScript)
     runs-on: ubuntu-latest

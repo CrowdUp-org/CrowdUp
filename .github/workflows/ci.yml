@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   quality:
-    name: ✅ Quality Checks (Prettier • ESLint • TypeScript)
+    name: ✅ Quality Checks (TypeScript)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,18 +45,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: 🎨 Prettier
-        run: npx prettier --check .
-
-      - name: 🔍 ESLint
-        run: npm run lint
-
       - name: 🔠 TypeScript typecheck
         run: npx tsc --noEmit
 
       - name: Summary
         run: |
-          echo "Prettier, ESLint, and TypeScript checks passed." >> $GITHUB_STEP_SUMMARY
+          echo "TypeScript typecheck passed. Prettier & ESLint are handled by pre-commit.ci" >> $GITHUB_STEP_SUMMARY
 
   test:
     name: 🧪 Tests (Vitest)

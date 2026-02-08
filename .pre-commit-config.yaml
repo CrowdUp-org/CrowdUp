@@ -1,0 +1,54 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+  node: system
+
+repos:
+  # Standard file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.snap$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ['--unsafe']  # Allow custom tags (GitHub Actions)
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+  # Prettier (using local hook - mirror archived in April 2024)
+  - repo: local
+    hooks:
+      - id: prettier
+        name: Prettier
+        entry: npx prettier --write --ignore-unknown
+        language: node
+        types: [text]
+        exclude: |
+          (?x)^(
+            package-lock\.json|
+            \.next/|
+            node_modules/|
+            coverage/|
+            \.git/|
+            UI\ design\ screenshots/
+          )$
+
+  # ESLint
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.17.0
+    hooks:
+      - id: eslint
+        name: ESLint
+        files: \.[jt]sx?$
+        types: [file]
+        args: ['--fix']
+        additional_dependencies:
+          - eslint@9.37.0
+          - eslint-config-next@15.5.4
+          - 'eslint-plugin-import@latest'
+          - '@eslint/eslintrc@3.3.1'
+          - '@typescript-eslint/eslint-plugin@8.22.0'
+          - '@typescript-eslint/parser@8.22.0'

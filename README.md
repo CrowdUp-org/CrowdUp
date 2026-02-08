@@ -52,7 +52,10 @@ Top-level source: `src/` — app routes, components, hooks, and lib utilities. D
 
 1. Read the project wiki for contribution guidelines and coding conventions: https://github.com/CrowdUp-org/CrowdUp/wiki/Contributing
 2. Follow branch naming and Conventional Commits; open focused PRs.
-3. Ensure changes pass linting and type checks used in CI (`npx prettier --check .`, `npm run lint`, `npx tsc --noEmit`).
+3. Code quality checks:
+   - **Prettier & ESLint** run automatically on PRs via [pre-commit.ci](https://pre-commit.ci) and auto-fix issues
+   - **TypeScript** typecheck runs in GitHub Actions CI (`npx tsc --noEmit`)
+   - Optional: Install pre-commit locally for immediate feedback: `pip install pre-commit && pre-commit install`
 
 Notes:
 

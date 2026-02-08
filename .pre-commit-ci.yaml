@@ -1,9 +1,9 @@
 # Configuration for https://pre-commit.ci/
 ci:
   autofix_prs: true
-  autofix_commit_msg: '[pre-commit.ci] auto fixes from hooks'
+  autofix_commit_msg: "[pre-commit.ci] auto fixes from hooks"
   autoupdate_schedule: weekly
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-  autoupdate_branch: ''
-  skip: []  # Add hook IDs to skip on CI if needed: e.g., [eslint]
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_branch: ""
+  skip: [] # Add hook IDs to skip on CI if needed: e.g., [eslint]
   submodules: false

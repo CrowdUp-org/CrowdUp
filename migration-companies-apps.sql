@@ -38,9 +38,9 @@ CREATE INDEX IF NOT EXISTS idx_company_members_company ON company_members(compan
 CREATE INDEX IF NOT EXISTS idx_company_members_user ON company_members(user_id);
 
 -- Add trigger for companies updated_at
-CREATE TRIGGER update_companies_updated_at 
-  BEFORE UPDATE ON companies 
-  FOR EACH ROW 
+CREATE TRIGGER update_companies_updated_at
+  BEFORE UPDATE ON companies
+  FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert popular companies with logos

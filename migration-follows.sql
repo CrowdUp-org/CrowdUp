@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.company_follows (
   UNIQUE(user_id, company_id)
 );
 
--- App follows table  
+-- App follows table
 CREATE TABLE IF NOT EXISTS public.app_follows (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,

@@ -91,7 +91,7 @@ ALTER TABLE companies ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false
 ALTER TABLE companies ADD COLUMN IF NOT EXISTS post_count INTEGER DEFAULT 0;
 
 -- Make display_name nullable or set default if it exists
-DO $$ 
+DO $$
 BEGIN
   -- Try to alter the column to allow nulls or have a default
   ALTER TABLE companies ALTER COLUMN display_name DROP NOT NULL;
@@ -117,7 +117,7 @@ INSERT INTO companies (name, display_name, description, logo_url, website, color
   ('Microsoft', 'Microsoft', 'Empowering everyone', 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg', 'https://microsoft.com', '#00A4EF', 'Technology', true),
   ('Tesla', 'Tesla', 'Accelerating sustainable energy', 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Tesla_logo.png', 'https://tesla.com', '#CC0000', 'Automotive', true),
   ('Stripe', 'Stripe', 'Payments infrastructure', 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg', 'https://stripe.com', '#635BFF', 'Fintech', true)
-ON CONFLICT (name) DO UPDATE SET 
+ON CONFLICT (name) DO UPDATE SET
   display_name = EXCLUDED.display_name,
   description = EXCLUDED.description,
   color = EXCLUDED.color,
@@ -178,7 +178,7 @@ DECLARE
 BEGIN
   -- Get post owner
   SELECT user_id INTO post_owner_id FROM posts WHERE id = NEW.post_id;
-  
+
   -- Notify post owner if commenter is different
   IF post_owner_id IS NOT NULL AND post_owner_id != NEW.user_id THEN
     INSERT INTO notifications (user_id, type, title, message, link, actor_id, post_id)
@@ -192,7 +192,7 @@ BEGIN
       NEW.post_id
     );
   END IF;
-  
+
   -- If this is a reply, notify parent comment owner
   IF NEW.parent_id IS NOT NULL THEN
     SELECT user_id INTO parent_comment_owner_id FROM comments WHERE id = NEW.parent_id;
@@ -209,7 +209,7 @@ BEGIN
       );
     END IF;
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -226,7 +226,7 @@ DECLARE
   post_owner_id UUID;
 BEGIN
   SELECT user_id INTO post_owner_id FROM posts WHERE id = NEW.post_id;
-  
+
   -- Only notify on upvotes and if voter is different from post owner
   IF NEW.vote_type = 'up' AND post_owner_id IS NOT NULL AND post_owner_id != NEW.user_id THEN
     INSERT INTO notifications (user_id, type, title, message, link, actor_id, post_id)
@@ -240,7 +240,7 @@ BEGIN
       NEW.post_id
     );
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

@@ -370,4 +370,190 @@ describe("postService", () => {
       expect(postRepository.findByUser).toHaveBeenCalledWith("user-1", 10, 5);
     });
   });
+
+  describe("getPostsByCompany", () => {
+    const mockPost = {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      userId: "user-1",
+      type: "Bug Report" as const,
+      company: "Acme Corp",
+      companyColor: "#FF0000",
+      title: "Test Post",
+      description: "Test description",
+      votes: 0,
+      appId: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should return posts for company", async () => {
+      const mockPosts = [mockPost];
+
+      vi.mocked(postRepository.findByCompany).mockResolvedValue(mockPosts);
+
+      const result = await postService.getPostsByCompany("Acme Corp");
+
+      expect(result).toEqual(mockPosts);
+      expect(postRepository.findByCompany).toHaveBeenCalledWith(
+        "Acme Corp",
+        20,
+        0,
+      );
+    });
+
+    it("should accept pagination parameters", async () => {
+      vi.mocked(postRepository.findByCompany).mockResolvedValue([]);
+
+      await postService.getPostsByCompany("Acme Corp", 10, 5);
+
+      expect(postRepository.findByCompany).toHaveBeenCalledWith(
+        "Acme Corp",
+        10,
+        5,
+      );
+    });
+  });
+
+  describe("getPostsByApp", () => {
+    const mockPost = {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      userId: "user-1",
+      type: "Bug Report" as const,
+      company: "Acme Corp",
+      companyColor: "#FF0000",
+      title: "Test Post",
+      description: "Test description",
+      votes: 0,
+      appId: "550e8400-e29b-41d4-a716-446655440000",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should return posts for app", async () => {
+      const mockPosts = [mockPost];
+      const appId = "550e8400-e29b-41d4-a716-446655440000";
+
+      vi.mocked(postRepository.findByApp).mockResolvedValue(mockPosts);
+
+      const result = await postService.getPostsByApp(appId);
+
+      expect(result).toEqual(mockPosts);
+      expect(postRepository.findByApp).toHaveBeenCalledWith(appId, 20, 0);
+    });
+
+    it("should accept pagination parameters", async () => {
+      const appId = "550e8400-e29b-41d4-a716-446655440000";
+
+      vi.mocked(postRepository.findByApp).mockResolvedValue([]);
+
+      await postService.getPostsByApp(appId, 15, 10);
+
+      expect(postRepository.findByApp).toHaveBeenCalledWith(appId, 15, 10);
+    });
+  });
+
+  describe("getAllPosts", () => {
+    const mockPost = {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      userId: "user-1",
+      type: "Bug Report" as const,
+      company: "Acme Corp",
+      companyColor: "#FF0000",
+      title: "Test Post",
+      description: "Test description",
+      votes: 0,
+      appId: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should return all posts with default pagination", async () => {
+      const mockPosts = [mockPost];
+
+      vi.mocked(postRepository.findAll).mockResolvedValue(mockPosts);
+
+      const result = await postService.getAllPosts();
+
+      expect(result).toEqual(mockPosts);
+      expect(postRepository.findAll).toHaveBeenCalledWith(20, 0);
+    });
+
+    it("should accept custom pagination parameters", async () => {
+      vi.mocked(postRepository.findAll).mockResolvedValue([]);
+
+      await postService.getAllPosts(50, 25);
+
+      expect(postRepository.findAll).toHaveBeenCalledWith(50, 25);
+    });
+  });
+
+  describe("updateVoteCount", () => {
+    const mockPost = {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      userId: "user-1",
+      type: "Bug Report" as const,
+      company: "Acme Corp",
+      companyColor: "#FF0000",
+      title: "Test Post",
+      description: "Test description",
+      votes: 0,
+      appId: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    it("should update vote count successfully", async () => {
+      const updatedPost = { ...mockPost, votes: 5 };
+
+      vi.mocked(postRepository.findById).mockResolvedValue(mockPost);
+      vi.mocked(postRepository.updateVoteCount).mockResolvedValue(updatedPost);
+
+      const result = await postService.updateVoteCount(mockPost.id, 5);
+
+      expect(result).toEqual(updatedPost);
+      expect(postRepository.findById).toHaveBeenCalledWith(mockPost.id);
+      expect(postRepository.updateVoteCount).toHaveBeenCalledWith(
+        mockPost.id,
+        5, // increment = newVotes (5) - currentVotes (0)
+      );
+    });
+
+    it("should throw NotFoundError when post does not exist", async () => {
+      vi.mocked(postRepository.findById).mockResolvedValue(null);
+
+      await expect(
+        postService.updateVoteCount("non-existent-id", 10),
+      ).rejects.toThrow(NotFoundError);
+    });
+
+    it("should calculate correct increment when current votes exist", async () => {
+      const postWithVotes = { ...mockPost, votes: 10 };
+      const updatedPost = { ...mockPost, votes: 15 };
+
+      vi.mocked(postRepository.findById).mockResolvedValue(postWithVotes);
+      vi.mocked(postRepository.updateVoteCount).mockResolvedValue(updatedPost);
+
+      await postService.updateVoteCount(mockPost.id, 15);
+
+      expect(postRepository.updateVoteCount).toHaveBeenCalledWith(
+        mockPost.id,
+        5, // increment = newVotes (15) - currentVotes (10)
+      );
+    });
+
+    it("should handle negative vote counts", async () => {
+      const updatedPost = { ...mockPost, votes: -3 };
+
+      vi.mocked(postRepository.findById).mockResolvedValue(mockPost);
+      vi.mocked(postRepository.updateVoteCount).mockResolvedValue(updatedPost);
+
+      const result = await postService.updateVoteCount(mockPost.id, -3);
+
+      expect(result).toEqual(updatedPost);
+      expect(postRepository.updateVoteCount).toHaveBeenCalledWith(
+        mockPost.id,
+        -3,
+      );
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 
 import {
   signAccessToken,
@@ -10,6 +10,10 @@ import {
 describe("JWT Utilities", () => {
   const testUserId = "user-123-abc";
   const testJti = "jti-456-def";
+  
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
 
   describe("signAccessToken", () => {
     it("should sign a valid access token", async () => {
@@ -109,6 +113,69 @@ describe("JWT Utilities", () => {
       });
       expect(payload?.iat).toBeDefined();
       expect(payload?.exp).toBeDefined();
+    });
+  });
+
+  describe("JWT secret configuration", () => {
+    it("should throw error in production when JWT_SECRET is missing", async () => {
+      // Simula ambiente di produzione senza JWT_SECRET
+      vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv("JWT_SECRET", "");
+
+      // Force module reload to clear cached secret
+      await vi.resetModules();
+      const { signAccessToken: prodSignAccessToken } = await import(
+        "@/lib/jwt"
+      );
+
+      await expect(prodSignAccessToken(testUserId)).rejects.toThrow(
+        "JWT_SECRET environment variable is required in production",
+      );
+    });
+
+    it("should warn when JWT_SECRET is too short", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      
+      // Set a short secret
+      vi.stubEnv("JWT_SECRET", "short");
+      vi.stubEnv("NODE_ENV", "development");
+
+      // Force module reload
+      await vi.resetModules();
+      const { signAccessToken: shortSecretSign } = await import("@/lib/jwt");
+      
+      await shortSecretSign(testUserId);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("should be at least 32 characters"),
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it("should use development fallback when JWT_SECRET is not set in dev", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      
+      vi.stubEnv("NODE_ENV", "development");
+      vi.stubEnv("JWT_SECRET", "");
+
+      // Force module reload
+      await vi.resetModules();
+      const {
+        signAccessToken: devSignAccessToken,
+        verifyAccessToken: devVerifyAccessToken,
+      } = await import("@/lib/jwt");
+
+      const token = await devSignAccessToken(testUserId);
+      const payload = await devVerifyAccessToken(token);
+
+      expect(payload).not.toBeNull();
+      expect(payload?.sub).toBe(testUserId);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("SECURITY WARNING"),
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 });

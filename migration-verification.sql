@@ -3,7 +3,7 @@
 
 -- Add verification columns to company_members
 ALTER TABLE company_members ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT FALSE;
-ALTER TABLE company_members ADD COLUMN IF NOT EXISTS verification_status TEXT 
+ALTER TABLE company_members ADD COLUMN IF NOT EXISTS verification_status TEXT
   CHECK (verification_status IN ('pending', 'approved', 'rejected'));
 ALTER TABLE company_members ADD COLUMN IF NOT EXISTS verification_date TIMESTAMPTZ;
 ALTER TABLE company_members ADD COLUMN IF NOT EXISTS verification_documents JSONB;
@@ -13,11 +13,11 @@ ALTER TABLE company_members ADD COLUMN IF NOT EXISTS verification_notes TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
 
 -- Create index for pending verifications (for admin dashboard performance)
-CREATE INDEX IF NOT EXISTS idx_company_members_verification_pending 
+CREATE INDEX IF NOT EXISTS idx_company_members_verification_pending
   ON company_members(verification_status) WHERE verification_status = 'pending';
 
 -- Create index for verified members (for quick lookup)
-CREATE INDEX IF NOT EXISTS idx_company_members_verified 
+CREATE INDEX IF NOT EXISTS idx_company_members_verified
   ON company_members(verified) WHERE verified = TRUE;
 
 -- Create a trigger to update verification_date when status changes to approved

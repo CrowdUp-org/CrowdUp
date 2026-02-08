@@ -33,13 +33,13 @@ CREATE POLICY company_members_insert ON company_members
 DROP POLICY IF EXISTS company_members_update ON company_members;
 CREATE POLICY company_members_update ON company_members
   FOR UPDATE USING (
-    auth.uid()::text = user_id::text 
+    auth.uid()::text = user_id::text
     OR EXISTS (SELECT 1 FROM users WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 DROP POLICY IF EXISTS company_members_delete ON company_members;
 CREATE POLICY company_members_delete ON company_members
   FOR DELETE USING (
-    auth.uid()::text = user_id::text 
+    auth.uid()::text = user_id::text
     OR EXISTS (SELECT 1 FROM users WHERE id::text = auth.uid()::text AND is_admin = true)
   );

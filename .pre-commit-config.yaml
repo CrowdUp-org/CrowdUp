@@ -6,7 +6,7 @@ default_language_version:
 repos:
   # Standard file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         exclude: '\.snap$'
@@ -38,7 +38,7 @@ repos:
 
   # ESLint
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.17.0
+    rev: v10.10.0
     hooks:
       - id: eslint
         name: ESLint
